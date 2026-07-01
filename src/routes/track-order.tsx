@@ -79,8 +79,9 @@ function TrackOrderPage() {
           "We couldn't find that order. Double-check the order ID and the email used at checkout.",
         );
       } else {
-        setOrder(row as unknown as Order);
-        toast.success("Order found", { description: `#${(row as Order).id.slice(0, 8).toUpperCase()}` });
+        const o = row as unknown as Order;
+        setOrder(o);
+        toast.success("Order found", { description: `#${o.id.slice(0, 8).toUpperCase()}` });
       }
     } catch (err) {
       setError(
