@@ -123,7 +123,11 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             onClick={() => {
               addToCart(product.id);
-              toast("Added to cart", { description: product.name });
+              toast.success("Added to cart", {
+                description: `${product.name} · ${inr(product.price)}`,
+                icon: "🛍️",
+                action: { label: "View cart", onClick: () => (window.location.href = "/cart") },
+              });
             }}
             aria-label="Add to cart"
             className="btn-magnetic inline-flex h-9 items-center gap-1.5 rounded-full bg-foreground px-3 text-xs font-semibold text-background"
