@@ -133,11 +133,18 @@ function RootComponent() {
           <Toaster
             theme="dark"
             position="bottom-right"
+            richColors
+            closeButton
+            expand
+            visibleToasts={4}
             toastOptions={{
+              className: "pulse-toast",
               style: {
                 background: "var(--color-card)",
                 color: "var(--color-foreground)",
                 border: "1px solid var(--color-border)",
+                borderRadius: "14px",
+                boxShadow: "0 20px 40px -20px rgba(0,0,0,0.5)",
               },
             }}
           />
