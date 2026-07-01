@@ -160,6 +160,7 @@ function BrandsPage() {
               </div>
             </Link>
           );
+        })}
         </div>
       </div>
     </div>
