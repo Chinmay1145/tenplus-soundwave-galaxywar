@@ -1,7 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { PlayCircle } from "lucide-react";
-import { Download, MapPin, Package, Search, Sparkles, Truck } from "lucide-react";
+import {
+  Download,
+  MapPin,
+  Package,
+  PlayCircle,
+  Search,
+  Sparkles,
+  Truck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { OrderTracking } from "@/components/site/OrderTracking";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +45,12 @@ type Order = {
   payment_method?: string;
 };
 
+const FLOW = ["confirmed", "packed", "shipped", "out_for_delivery", "delivered"] as const;
+const nextStatus = (s: string) => {
+  const i = FLOW.indexOf(s as typeof FLOW[number]);
+  return i >= 0 && i < FLOW.length - 1 ? FLOW[i + 1] : null;
+};
+
 function TrackOrderPage() {
   const { user } = useAuth();
   const [orderId, setOrderId] = useState("");
@@ -45,6 +58,7 @@ function TrackOrderPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [simulating, setSimulating] = useState(false);
 
   const lookup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,29 +66,59 @@ function TrackOrderPage() {
     setOrder(null);
     setLoading(true);
     try {
-      const id = orderId.trim();
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .ilike("id", `${id.toLowerCase()}%`)
-        .limit(1)
-        .maybeSingle();
+      const id = orderId.trim().toLowerCase();
+      const em = email.trim();
+      const { data, error } = await supabase.rpc("lookup_order", {
+        _order_id_prefix: id,
+        _email: em,
+      });
       if (error) throw error;
-      if (!data) {
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) {
         setError(
           "We couldn't find that order. Double-check the order ID and the email used at checkout.",
         );
       } else {
-        setOrder(data as unknown as Order);
+        setOrder(row as unknown as Order);
+        toast.success("Order found", { description: `#${(row as Order).id.slice(0, 8).toUpperCase()}` });
       }
-    } catch {
+    } catch (err) {
       setError(
-        "Sign in to view your order, or contact care@pulse.audio with this order ID.",
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again in a moment.",
       );
     } finally {
       setLoading(false);
     }
   };
+
+  const simulate = async () => {
+    if (!order) return;
+    const next = nextStatus(order.status);
+    if (!next) return;
+    setSimulating(true);
+    try {
+      const { data, error } = await supabase.rpc("advance_order_status", {
+        _order_id: order.id,
+        _email: email.trim(),
+        _next_status: next,
+      });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) throw new Error("Couldn't advance status — email must match the order.");
+      setOrder(row as unknown as Order);
+      toast.success(`Status → ${next.replace(/_/g, " ")}`, {
+        description: "Timeline updated in real time.",
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't advance status");
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  const next = order ? nextStatus(order.status) : null;
 
   return (
     <div className="relative overflow-hidden">
@@ -174,28 +218,21 @@ function TrackOrderPage() {
                 <span className="mono rounded-full bg-accent/10 px-3 py-1 text-xs capitalize text-accent">
                   {order.status.replace(/_/g, " ")}
                 </span>
-                {(() => {
-                  const flow = ["confirmed", "packed", "shipped", "out_for_delivery", "delivered"];
-                  const idx = flow.indexOf(order.status);
-                  const next = idx >= 0 && idx < flow.length - 1 ? flow[idx + 1] : null;
-                  if (!next) return null;
-                  return (
-                    <button
-                      onClick={async () => {
-                        const { error } = await supabase
-                          .from("orders")
-                          .update({ status: next })
-                          .eq("id", order.id);
-                        if (error) return toast.error("Couldn't advance status");
-                        toast.success(`Order → ${next.replace(/_/g, " ")}`);
-                        setOrder({ ...order, status: next });
-                      }}
-                      className="inline-flex items-center gap-1 rounded-full border border-accent/50 bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:opacity-90"
-                    >
-                      <PlayCircle className="h-3 w-3" /> Simulate → {next.replace(/_/g, " ")}
-                    </button>
-                  );
-                })()}
+                {next ? (
+                  <button
+                    onClick={simulate}
+                    disabled={simulating}
+                    className="inline-flex items-center gap-1 rounded-full border border-accent/50 bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:opacity-90 disabled:opacity-60"
+                    title={`Advance to ${next.replace(/_/g, " ")}`}
+                  >
+                    <PlayCircle className="h-3 w-3" />
+                    {simulating ? "Advancing…" : `Simulate → ${next.replace(/_/g, " ")}`}
+                  </button>
+                ) : (
+                  <span className="mono rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-[10px] text-accent">
+                    DELIVERED
+                  </span>
+                )}
                 <button
                   onClick={() => {
                     downloadInvoice({
@@ -211,7 +248,9 @@ function TrackOrderPage() {
                       customer: { email },
                       shippingAddress: order.shipping_address as Record<string, unknown> | null,
                     });
-                    toast("Invoice downloaded");
+                    toast.success("Invoice downloaded", {
+                      description: `PULSE-${order.id.slice(0, 8).toUpperCase()}.pdf`,
+                    });
                   }}
                   className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs text-accent hover:bg-accent hover:text-accent-foreground"
                 >
