@@ -216,6 +216,11 @@
   animation: float-y 6s ease-in-out infinite;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+  50% { transform: translateY(-24px) rotate(180deg); opacity: 1; }
+}
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
