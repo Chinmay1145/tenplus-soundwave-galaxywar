@@ -189,31 +189,66 @@ function Checkout() {
       <div className="relative mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 opacity-40"
+          className="pointer-events-none absolute inset-0 -z-10 opacity-60"
           style={{
             background:
-              "radial-gradient(600px 300px at 50% 20%, oklch(0.65 0.24 25 / 0.2), transparent 60%)",
+              "radial-gradient(700px 360px at 50% 10%, oklch(0.65 0.24 25 / 0.22), transparent 60%)",
           }}
         />
+        {/* Confetti dots */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 overflow-hidden">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <span
+              key={i}
+              className="absolute block h-1.5 w-1.5 rounded-full opacity-70"
+              style={{
+                left: `${(i * 53) % 100}%`,
+                top: `${(i * 31) % 80}%`,
+                background: i % 2 ? "oklch(0.65 0.24 25)" : "oklch(0.85 0.15 80)",
+                animation: `float 6s ease-in-out ${i * 0.15}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-accent bg-accent/10 text-accent">
-            <Check className="h-8 w-8" />
+          <div className="mx-auto grid h-20 w-20 place-items-center rounded-full border-2 border-accent bg-accent/10 text-accent shadow-[0_0_60px_-10px_oklch(0.65_0.24_25/0.5)]">
+            <Check className="h-10 w-10" strokeWidth={3} />
           </div>
           <div className="mono mt-6 text-accent">— Confirmed</div>
-          <h1 className="mt-3 font-display text-5xl font-bold tracking-tight">Order placed.</h1>
+          <h1 className="mt-3 font-display text-5xl font-bold tracking-tight sm:text-6xl">
+            Order <span className="shimmer-text">placed.</span>
+          </h1>
           <p className="mt-3 text-muted-foreground">
-            We've sent the receipt to your email.
+            We've sent the receipt to <strong className="text-foreground">{user?.email}</strong>.
           </p>
-          <div className="mono mt-4 text-xs text-muted-foreground">
-            ORDER ID · {placed.id.slice(0, 8).toUpperCase()}
+        </div>
+
+        {/* Summary tiles */}
+        <div className="mt-8 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-border/60 bg-card p-4">
+            <div className="mono text-[10px] text-muted-foreground">ORDER ID</div>
+            <div className="mt-1 font-display text-lg font-bold tracking-tight">
+              #{placed.id.slice(0, 8).toUpperCase()}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-card p-4">
+            <div className="mono text-[10px] text-muted-foreground">TOTAL PAID</div>
+            <div className="mt-1 font-display text-lg font-bold tracking-tight">{inr(placed.total)}</div>
+          </div>
+          <div className="rounded-2xl border border-accent/40 bg-accent/5 p-4">
+            <div className="mono text-[10px] text-muted-foreground">DELIVERY BY</div>
+            <div className="mt-1 font-display text-lg font-bold tracking-tight text-accent">
+              {eta.serviceable ? etaText.split(" – ")[1] ?? etaText : "—"}
+            </div>
           </div>
         </div>
 
         {eta.serviceable && (
-          <div className="mt-8 flex items-center justify-center gap-3 rounded-2xl border border-accent/40 bg-accent/5 p-4 text-sm">
+          <div className="mt-4 flex items-center justify-center gap-3 rounded-2xl border border-accent/40 bg-accent/5 p-4 text-sm">
             <Truck className="h-5 w-5 text-accent" />
             <span>
-              Estimated delivery <strong>{etaText}</strong> · {eta.zone}
+              <strong>{etaText}</strong> · {eta.zone} · shipping to {form.city}
             </span>
           </div>
         )}
@@ -228,7 +263,7 @@ function Checkout() {
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
-            onClick={() =>
+            onClick={() => {
               downloadInvoice({
                 id: placed.id,
                 createdAt: placed.createdAt,
@@ -246,8 +281,11 @@ function Checkout() {
                 })),
                 customer: { name: form.name, email: user?.email },
                 shippingAddress: form,
-              })
-            }
+              });
+              toast.success("Invoice downloaded", {
+                description: `PULSE-${placed.id.slice(0, 8).toUpperCase()}.pdf`,
+              });
+            }}
             className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
           >
             Download invoice
@@ -257,6 +295,12 @@ function Checkout() {
             className="rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background"
           >
             View orders
+          </Link>
+          <Link
+            to="/track-order"
+            className="rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm text-accent"
+          >
+            Track order
           </Link>
           <Link
             to="/shop"

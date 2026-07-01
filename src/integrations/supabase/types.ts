@@ -132,7 +132,50 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      advance_order_status: {
+        Args: { _email: string; _next_status: string; _order_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          items: Json
+          payment_method: string | null
+          shipping: number
+          shipping_address: Json | null
+          status: string
+          subtotal: number
+          tax: number
+          total: number
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      lookup_order: {
+        Args: { _email: string; _order_id_prefix: string }
+        Returns: {
+          created_at: string
+          id: string
+          items: Json
+          payment_method: string | null
+          shipping: number
+          shipping_address: Json | null
+          status: string
+          subtotal: number
+          tax: number
+          total: number
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       return_status:

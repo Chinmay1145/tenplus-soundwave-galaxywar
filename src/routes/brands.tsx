@@ -40,20 +40,68 @@ export const Route = createFileRoute("/brands")({
 });
 
 function BrandsPage() {
-  return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-      <div className="flex items-center gap-3">
-        <LogoMark size={28} />
-        <div className="mono text-accent">— Brands</div>
-      </div>
-      <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-        Shop by brand.
-      </h1>
-      <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-        The labels that define modern audio. Tap any brand to see their lineup on PULSE.
-      </p>
+  const featured = ["Apple", "Sony", "Bose", "Sennheiser", "JBL", "Nothing", "Beats", "Marshall"].filter((b) =>
+    BRANDS.includes(b),
+  );
 
-      <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+  return (
+    <div className="relative overflow-hidden">
+      {/* Hero */}
+      <section className="relative">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            background:
+              "radial-gradient(900px 460px at 50% -10%, oklch(0.65 0.24 25 / 0.18), transparent 60%)",
+          }}
+        />
+        <div className="mx-auto max-w-7xl px-4 pb-8 pt-16 sm:px-6 sm:pt-24">
+          <div className="flex items-center gap-3">
+            <LogoMark size={28} />
+            <div className="mono text-accent">— Brands</div>
+          </div>
+          <h1 className="mt-3 font-display text-5xl font-bold tracking-tight sm:text-6xl">
+            The labels that <span className="shimmer-text">shaped sound.</span>
+          </h1>
+          <p className="mt-4 max-w-2xl text-base text-muted-foreground">
+            {BRANDS.length} iconic audio brands, one storefront. Tap any tile to see the lineup.
+          </p>
+
+          {/* Featured marquee */}
+          <div className="relative mt-10 overflow-hidden rounded-2xl border border-border/60 bg-card/50 py-5 backdrop-blur">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent" />
+            <div className="flex items-center gap-10 overflow-x-auto px-8 sm:justify-center">
+              {featured.map((brand) => {
+                const domain = DOMAINS[brand];
+                return (
+                  <Link
+                    key={`f-${brand}`}
+                    to="/shop"
+                    search={{ brand }}
+                    className="group flex shrink-0 items-center gap-2 opacity-70 grayscale transition-all hover:opacity-100 hover:grayscale-0"
+                    title={brand}
+                  >
+                    {domain ? (
+                      <img
+                        src={`https://logo.clearbit.com/${domain}?size=128`}
+                        alt={brand}
+                        loading="lazy"
+                        className="h-8 w-8 rounded bg-white object-contain p-1"
+                      />
+                    ) : null}
+                    <span className="font-display text-sm font-bold tracking-tight">{brand}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {BRANDS.map((brand) => {
           const domain = DOMAINS[brand];
           const count = PRODUCTS.filter((p) => p.brand === brand).length;
@@ -113,6 +161,7 @@ function BrandsPage() {
             </Link>
           );
         })}
+        </div>
       </div>
     </div>
   );

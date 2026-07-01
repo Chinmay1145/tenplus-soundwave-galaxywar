@@ -45,8 +45,17 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             onClick={(e) => {
               e.preventDefault();
+              const was = inWishlist(product.id);
               toggleWishlist(product.id);
-              toast(inWishlist(product.id) ? "Removed from wishlist" : "Saved to wishlist");
+              if (was) {
+                toast(`Removed from wishlist`, { description: product.name, icon: "💔" });
+              } else {
+                toast.success("Saved to wishlist", {
+                  description: product.name,
+                  icon: "❤️",
+                  action: { label: "View", onClick: () => (window.location.href = "/wishlist") },
+                });
+              }
             }}
             aria-label="Wishlist"
             className={`grid h-8 w-8 place-items-center rounded-full border border-border/60 bg-background/80 backdrop-blur transition-colors hover:border-accent hover:text-accent ${
@@ -58,8 +67,17 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             onClick={(e) => {
               e.preventDefault();
+              const was = inCompare(product.id);
               toggleCompare(product.id);
-              toast(inCompare(product.id) ? "Removed from compare" : "Added to compare");
+              if (was) {
+                toast(`Removed from compare`, { description: product.name, icon: "⚖️" });
+              } else {
+                toast.success("Added to compare", {
+                  description: `${product.name} · tap to open`,
+                  icon: "⚖️",
+                  action: { label: "Compare", onClick: () => (window.location.href = "/compare") },
+                });
+              }
             }}
             aria-label="Compare"
             className={`grid h-8 w-8 place-items-center rounded-full border border-border/60 bg-background/80 backdrop-blur transition-colors hover:border-accent hover:text-accent ${
@@ -105,7 +123,11 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             onClick={() => {
               addToCart(product.id);
-              toast("Added to cart", { description: product.name });
+              toast.success("Added to cart", {
+                description: `${product.name} · ${inr(product.price)}`,
+                icon: "🛍️",
+                action: { label: "View cart", onClick: () => (window.location.href = "/cart") },
+              });
             }}
             aria-label="Add to cart"
             className="btn-magnetic inline-flex h-9 items-center gap-1.5 rounded-full bg-foreground px-3 text-xs font-semibold text-background"
