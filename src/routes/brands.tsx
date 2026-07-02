@@ -57,28 +57,23 @@ function BrandsPage() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent" />
             <div className="flex items-center gap-10 overflow-x-auto px-8 sm:justify-center">
-              {featured.map((brand) => {
-                const domain = DOMAINS[brand];
-                return (
-                  <Link
-                    key={`f-${brand}`}
-                    to="/shop"
-                    search={{ brand }}
-                    className="group flex shrink-0 items-center gap-2 opacity-70 grayscale transition-all hover:opacity-100 hover:grayscale-0"
-                    title={brand}
-                  >
-                    {domain ? (
-                      <img
-                        src={`https://logo.clearbit.com/${domain}?size=128`}
-                        alt={brand}
-                        loading="lazy"
-                        className="h-8 w-8 rounded bg-white object-contain p-1"
-                      />
-                    ) : null}
-                    <span className="font-display text-sm font-bold tracking-tight">{brand}</span>
-                  </Link>
-                );
-              })}
+              {featured.map((brand) => (
+                <Link
+                  key={`f-${brand}`}
+                  to="/shop"
+                  search={{ brand }}
+                  className="group flex shrink-0 items-center gap-2 opacity-80 transition-all hover:opacity-100"
+                  title={brand}
+                >
+                  <img
+                    src={brandLogo(brand, 64)}
+                    alt={brand}
+                    loading="lazy"
+                    className="h-8 w-8 rounded bg-white object-contain p-1"
+                  />
+                  <span className="font-display text-sm font-bold tracking-tight">{brand}</span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
