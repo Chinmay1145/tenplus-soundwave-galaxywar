@@ -1,29 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BRANDS, PRODUCTS } from "@/data/products";
 import { LogoMark } from "@/components/site/Logo";
+import { brandLogo } from "@/lib/brand-logo";
 
 const BRAND_TINT: Record<string, string> = {
   Apple: "#a1a1a6", Sony: "#000000", Bose: "#000000", Sennheiser: "#0033A0",
   JBL: "#FF6600", Beats: "#E61E26", Nothing: "#ff3b30", Samsung: "#1428A0",
   OnePlus: "#EB0028", Realme: "#FFC900", Jabra: "#FF8200", Skullcandy: "#000000",
   Soundcore: "#00AEEF", Marshall: "#c0392b",
-};
-
-const DOMAINS: Record<string, string> = {
-  Apple: "apple.com",
-  Sony: "sony.com",
-  Bose: "bose.com",
-  Sennheiser: "sennheiser.com",
-  JBL: "jbl.com",
-  Beats: "beatsbydre.com",
-  Nothing: "nothing.tech",
-  Samsung: "samsung.com",
-  OnePlus: "oneplus.com",
-  Realme: "realme.com",
-  Jabra: "jabra.com",
-  Skullcandy: "skullcandy.com",
-  Soundcore: "soundcore.com",
-  Marshall: "marshallheadphones.com",
 };
 
 export const Route = createFileRoute("/brands")({
