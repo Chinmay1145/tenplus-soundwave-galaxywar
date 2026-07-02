@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Copy,
   Download,
   MapPin,
   Package,
   PlayCircle,
+  RefreshCw,
   Search,
   Sparkles,
   Truck,
@@ -17,6 +19,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { inr } from "@/lib/format";
 import { downloadInvoice } from "@/lib/invoice";
 import { LogoMark } from "@/components/site/Logo";
+import { buildTracking } from "@/lib/delivery";
 
 export const Route = createFileRoute("/track-order")({
   head: () => ({
@@ -142,6 +145,42 @@ function TrackOrderPage() {
   };
 
   const next = order ? nextStatus(order.status) : null;
+
+  // Progress % (0..1) for the courier bar
+  const progress = useMemo(() => {
+    if (!order) return 0;
+    const stages = buildTracking(order.created_at, order.status, order.shipping_address?.pincode);
+    const reached = stages.reduce((acc, s, i) => (s.reached ? i : acc), 0);
+    return reached / (stages.length - 1);
+  }, [order]);
+
+  const etaLabel = useMemo(() => {
+    if (!order) return null;
+    const stages = buildTracking(order.created_at, order.status, order.shipping_address?.pincode);
+    const last = stages[stages.length - 1];
+    return last.at
+      ? last.at.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })
+      : null;
+  }, [order]);
+
+  const copyId = () => {
+    if (!order) return;
+    navigator.clipboard?.writeText(order.id);
+    toast.success("Order ID copied", { description: order.id.slice(0, 8).toUpperCase() });
+  };
+
+  const refresh = async () => {
+    if (!order) return;
+    const { data } = await supabase.rpc("lookup_order", {
+      _order_id_prefix: order.id.slice(0, 8),
+      _email: email.trim(),
+    });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) {
+      setOrder(row as unknown as Order);
+      toast.success("Refreshed", { description: "Status is up to date." });
+    }
+  };
 
   return (
     <div className="relative overflow-hidden">
@@ -271,6 +310,13 @@ function TrackOrderPage() {
                     month: "short",
                     year: "numeric",
                   })}
+                  <button
+                    onClick={copyId}
+                    className="ml-2 inline-flex items-center gap-1 rounded-full border border-border/60 px-1.5 py-0.5 align-middle hover:border-accent hover:text-accent"
+                    title="Copy order ID"
+                  >
+                    <Copy className="h-2.5 w-2.5" /> Copy
+                  </button>
                 </div>
                 <div className="mt-1 font-display text-3xl font-bold tracking-tight">
                   {inr(Number(order.total))}
@@ -282,6 +328,11 @@ function TrackOrderPage() {
                   <div className="mono mt-3 inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     <MapPin className="h-3 w-3" /> {order.shipping_address.city},{" "}
                     {order.shipping_address.state} {order.shipping_address.pincode}
+                  </div>
+                )}
+                {etaLabel && (
+                  <div className="mono mt-1.5 text-[10px] text-accent">
+                    ETA · {etaLabel}
                   </div>
                 )}
               </div>
@@ -304,29 +355,60 @@ function TrackOrderPage() {
                     DELIVERED
                   </span>
                 )}
-                <button
-                  onClick={() => {
-                    downloadInvoice({
-                      id: order.id,
-                      createdAt: order.created_at,
-                      total: Number(order.total),
-                      subtotal: order.subtotal,
-                      tax: order.tax,
-                      shipping: order.shipping,
-                      status: order.status,
-                      paymentMethod: order.payment_method,
-                      items: order.items,
-                      customer: { email },
-                      shippingAddress: order.shipping_address as Record<string, unknown> | null,
-                    });
-                    toast.success("Invoice downloaded", {
-                      description: `PULSE-${order.id.slice(0, 8).toUpperCase()}.pdf`,
-                    });
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs text-accent hover:bg-accent hover:text-accent-foreground"
+                <div className="flex gap-2">
+                  <button
+                    onClick={refresh}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border/60 px-3 py-1.5 text-xs hover:border-accent hover:text-accent"
+                    title="Refresh status"
+                  >
+                    <RefreshCw className="h-3 w-3" /> Refresh
+                  </button>
+                  <button
+                    onClick={() => {
+                      downloadInvoice({
+                        id: order.id,
+                        createdAt: order.created_at,
+                        total: Number(order.total),
+                        subtotal: order.subtotal,
+                        tax: order.tax,
+                        shipping: order.shipping,
+                        status: order.status,
+                        paymentMethod: order.payment_method,
+                        items: order.items,
+                        customer: { email },
+                        shippingAddress: order.shipping_address as Record<string, unknown> | null,
+                      });
+                      toast.success("Invoice downloaded", {
+                        description: `PULSE-${order.id.slice(0, 8).toUpperCase()}.pdf`,
+                      });
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs text-accent hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <Download className="h-3 w-3" /> Invoice
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Animated courier bar */}
+            <div className="relative mt-8 rounded-2xl border border-border/60 bg-surface-2/60 p-5">
+              <div className="mono mb-3 flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>WAREHOUSE</span>
+                <span className="text-accent">{Math.round(progress * 100)}% · en route</span>
+                <span>YOUR DOOR</span>
+              </div>
+              <div className="relative h-2 rounded-full bg-border/60">
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-accent/70 via-accent to-accent/70 transition-all duration-1000"
+                  style={{ width: `${Math.max(6, progress * 100)}%` }}
+                />
+                <div
+                  className="absolute -top-3 grid h-8 w-8 -translate-x-1/2 place-items-center rounded-full border border-accent bg-background text-accent shadow-[0_0_20px_oklch(0.65_0.24_25/0.6)] transition-all duration-1000"
+                  style={{ left: `${Math.max(6, progress * 100)}%` }}
                 >
-                  <Download className="h-3 w-3" /> Invoice PDF
-                </button>
+                  <Truck className="h-4 w-4" />
+                </div>
+                <MapPin className="absolute -top-2 right-0 h-5 w-5 translate-x-1 text-muted-foreground" />
               </div>
             </div>
 
