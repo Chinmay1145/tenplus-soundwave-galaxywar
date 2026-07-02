@@ -85,6 +85,17 @@ function Home() {
               </div>
             </div>
 
+            {/* live listeners */}
+            <div className="rise mt-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3 py-1.5 text-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+              </span>
+              <span className="mono text-muted-foreground">LIVE</span>
+              <span className="font-semibold tabular-nums">{listeners.toLocaleString()}</span>
+              <span className="text-muted-foreground">tuned in right now</span>
+            </div>
+
             {/* meta strip */}
             <dl className="rise mt-12 grid max-w-md grid-cols-3 gap-4 border-t border-border/60 pt-6 text-xs">
               {[
