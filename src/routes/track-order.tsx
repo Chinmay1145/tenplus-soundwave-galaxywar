@@ -61,6 +61,27 @@ function TrackOrderPage() {
   const [loading, setLoading] = useState(false);
   const [simulating, setSimulating] = useState(false);
 
+  const { data: myOrders } = useQuery({
+    queryKey: ["my-orders-track", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("id,total,status,created_at,items,shipping_address,payment_method,subtotal,tax,shipping")
+        .order("created_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data as unknown as Order[];
+    },
+  });
+
+  const pickOrder = (o: Order) => {
+    setOrder(o);
+    setOrderId(o.id.slice(0, 8).toUpperCase());
+    setError(null);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const lookup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
