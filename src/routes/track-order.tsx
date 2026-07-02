@@ -146,6 +146,42 @@ function TrackOrderPage() {
 
   const next = order ? nextStatus(order.status) : null;
 
+  // Progress % (0..1) for the courier bar
+  const progress = useMemo(() => {
+    if (!order) return 0;
+    const stages = buildTracking(order.created_at, order.status, order.shipping_address?.pincode);
+    const reached = stages.reduce((acc, s, i) => (s.reached ? i : acc), 0);
+    return reached / (stages.length - 1);
+  }, [order]);
+
+  const etaLabel = useMemo(() => {
+    if (!order) return null;
+    const stages = buildTracking(order.created_at, order.status, order.shipping_address?.pincode);
+    const last = stages[stages.length - 1];
+    return last.at
+      ? last.at.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })
+      : null;
+  }, [order]);
+
+  const copyId = () => {
+    if (!order) return;
+    navigator.clipboard?.writeText(order.id);
+    toast.success("Order ID copied", { description: order.id.slice(0, 8).toUpperCase() });
+  };
+
+  const refresh = async () => {
+    if (!order) return;
+    const { data } = await supabase.rpc("lookup_order", {
+      _order_id_prefix: order.id.slice(0, 8),
+      _email: email.trim(),
+    });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) {
+      setOrder(row as unknown as Order);
+      toast.success("Refreshed", { description: "Status is up to date." });
+    }
+  };
+
   return (
     <div className="relative overflow-hidden">
       {/* Hero */}
