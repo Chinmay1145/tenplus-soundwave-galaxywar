@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronDown, Headphones, Play, Shield, Sparkles, Truck, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, ChevronDown, Headphones, Play, Quote, Shield, Sparkles, Star, Truck, Zap } from "lucide-react";
 import hero from "@/assets/hero-earbuds.jpg";
 import { PRODUCTS, CATEGORIES, BRANDS } from "@/data/products";
 import { ProductCard } from "@/components/site/ProductCard";
