@@ -161,6 +161,11 @@ export function SoundLoader({ label }: { label?: string }) {
           0%   { background-position: 200% 0; }
           100% { background-position: -200% 0; }
         }
+        .sl-progress { animation: sl-progress 1.6s ease-in-out infinite; }
+        @keyframes sl-progress {
+          0%   { transform: translateX(-120%); }
+          100% { transform: translateX(320%); }
+        }
 
         @media (prefers-reduced-motion: reduce) {
           .sl-cube, .sl-ring, .sl-bar, .sl-orbit, .sl-particle, .sl-shimmer { animation: none !important; }
