@@ -1,238 +1,246 @@
 <div align="center">
 
-# SoundWave
+# ⬡ PULSE
 
-**A full-stack e-commerce platform for premium audio gear**
+### Experience Sound Beyond Reality
 
-Built with TanStack Start, React 19, and Supabase
+A premium, full-stack e-commerce storefront for wireless earbuds, ANC headphones, gaming and sports audio — built for speed, style, and scale.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![Supabase](https://img.shields.io/badge/Backend-Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev)
+[![TanStack Start](https://img.shields.io/badge/TanStack-Start-FF4154?logo=react-query&logoColor=white)](https://tanstack.com/start)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](#license)
 
-[Live Demo](#) · [Report a Bug](#) · [Request a Feature](#)
+[Overview](#-overview) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure) • [Roadmap](#-roadmap)
 
 </div>
 
 ---
 
-## Table of Contents
+## 🎧 Overview
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Variables](#environment-variables)
-  - [Database Setup](#database-setup)
-- [Available Scripts](#available-scripts)
-- [Database Schema](#database-schema)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+**PULSE** is a modern, production-grade storefront concept for a premium audio brand. It ships with everything a real commerce site needs — a dynamic catalog, cart & checkout, order tracking, returns, wishlists, an authenticated account area, and an admin-style reporting dashboard — wrapped in a cinematic, dark-mode-first design language with animated soundwave motifs.
+
+It's built as a **full-stack TanStack Start application**, meaning the same codebase handles server-side rendering, API routes, and the client SPA experience, backed by **Supabase** for auth and data persistence.
+
+<div align="center">
+
+| 🛍️ Storefront | 🔐 Auth & Accounts | 📦 Orders & Returns | 📊 Reports |
+|:---:|:---:|:---:|:---:|
+| Browse, filter, compare | Sign up / sign in | Track, cancel, return | PDF invoices & analytics |
+
+</div>
 
 ---
 
-## Overview
+## ✨ Features
 
-SoundWave is a production-grade e-commerce storefront purpose-built for audio products — earbuds, headphones, neckbands, and studio gear. It implements the complete shopping lifecycle, from catalog browsing and product comparison through checkout, order tracking, and post-purchase support such as returns and warranty claims.
+- **🛒 Full shopping flow** — product catalog, filters & search, product detail pages with 360° view, cart, multi-step checkout
+- **🧑‍💻 Authenticated accounts** — sign-up/sign-in, protected `/account` routes, order history, saved addresses
+- **📦 Order lifecycle** — order tracking with live status, returns & refunds workflow
+- **❤️ Wishlist & compare** — save products for later and compare specs side-by-side
+- **🧾 PDF invoices** — generated client-side with `jspdf`
+- **📊 Reports dashboard** — sales and performance charts powered by `recharts`
+- **🏷️ Rich product data model** — brands, categories, variants, specs, badges (New / Best Seller), ratings & reviews
+- **🌓 Theming** — light/dark mode toggle with smooth transitions
+- **🎨 Cinematic UI** — animated hero, shimmering text, soundwave loaders, scroll progress indicator, magnetic buttons
+- **📱 Fully responsive** — mobile-first layouts across every route
+- **🔍 SEO-ready** — per-route meta tags, canonical links, and an auto-generated sitemap
+- **🧩 Accessible, composable UI** — built on Radix UI primitives + shadcn/ui patterns
+- **⚡ Type-safe routing** — file-based routes with auto-generated route tree via TanStack Router
 
-The application is architected as a reference implementation of a modern commerce stack: server-side rendering with **TanStack Start**, type-safe file-based routing, a **Supabase/Postgres** backend with row-level security, and an accessible, themeable component system built on **Radix UI** and **Tailwind CSS**.
+---
 
-## Features
+## 🧱 Tech Stack
 
-**Shopping Experience**
-- Product catalog spanning 12+ categories (TWS, ANC, gaming, sports, business, luxury, studio, kids, and more) across dozens of brands
-- Advanced filtering, sorting, and search
-- Rich product detail pages with image galleries, 360° product view, specs, and color variants
-- Side-by-side product comparison
-- Persistent cart and wishlist
+<table>
+<tr>
+<td valign="top" width="50%">
 
-**Checkout & Fulfillment**
-- Multi-step, guided checkout flow
-- Order tracking by order ID, including for guest checkouts
-- Self-service returns and warranty claim requests
+**Frontend**
+- [React 19](https://react.dev)
+- [TanStack Start](https://tanstack.com/start) (SSR framework)
+- [TanStack Router](https://tanstack.com/router) — file-based, type-safe routing
+- [TanStack Query](https://tanstack.com/query) — data fetching & caching
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [Radix UI](https://www.radix-ui.com) + shadcn/ui component patterns
+- [Lucide Icons](https://lucide.dev)
+- [React Hook Form](https://react-hook-form.com) + [Zod](https://zod.dev) validation
+- [Recharts](https://recharts.org) — data visualization
+- [jsPDF](https://github.com/parallax/jsPDF) — invoice generation
+- [Sonner](https://sonner.emilkowal.ski) — toast notifications
 
-**Account Management**
-- Email-based authentication via Supabase Auth
-- Profile management and order history
-- Downloadable account/order reports (PDF export)
+</td>
+<td valign="top" width="50%">
 
-**Platform**
-- Server-side rendering for fast first paint and SEO
-- Auto-generated sitemap
-- Light/dark theme support
-- Fully responsive, accessible UI
-- Informational pages: About, Brands, Careers, Press, Sustainability, Affiliates, FAQ, Shipping, Contact
+**Backend & Tooling**
+- [Supabase](https://supabase.com) — auth, database & storage
+- [Vite](https://vitejs.dev) — build tool & dev server
+- [Nitro](https://nitro.unjs.io) — server runtime
+- TypeScript (strict)
+- ESLint + Prettier
+- [Bun](https://bun.sh) / npm compatible
 
-## Tech Stack
+</td>
+</tr>
+</table>
 
-| Layer | Technology |
-|---|---|
-| Framework | [TanStack Start](https://tanstack.com/start) (SSR) with [TanStack Router](https://tanstack.com/router) |
-| UI Library | [React 19](https://react.dev/) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com/) |
-| Components | [Radix UI](https://www.radix-ui.com/) primitives, [shadcn/ui](https://ui.shadcn.com/)-style patterns |
-| Backend | [Supabase](https://supabase.com/) (PostgreSQL, Auth, Row-Level Security) |
-| Data Fetching | [TanStack Query](https://tanstack.com/query) |
-| Forms & Validation | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
-| Charts | [Recharts](https://recharts.org/) |
-| PDF Generation | [jsPDF](https://github.com/parallax/jsPDF) |
-| Icons | [Lucide](https://lucide.dev/) |
-| Build Tool | [Vite](https://vitejs.dev/) |
-| Language | TypeScript |
-| Package Manager | npm / Bun |
+---
 
-## Project Structure
-
-```
-soundwave/
-├── src/
-│   ├── assets/                # Product images and static media
-│   ├── components/
-│   │   ├── site/               # App-specific components (Header, Footer, ProductCard, ...)
-│   │   └── ui/                  # Reusable UI primitives (buttons, dialogs, forms, ...)
-│   ├── data/                    # Static product/catalog data
-│   ├── hooks/                   # Custom React hooks (auth, mobile detection, ...)
-│   ├── integrations/
-│   │   └── supabase/            # Supabase client, auth middleware, generated types
-│   ├── lib/                     # Utilities: formatting, invoices, delivery, reports, error handling
-│   ├── routes/                  # File-based routes (TanStack Router)
-│   │   └── _authenticated/       # Routes requiring a signed-in user
-│   ├── router.tsx                # Router configuration
-│   ├── server.ts                  # Server entry point
-│   └── start.ts                    # Application entry point
-│
-├── supabase/
-│   └── migrations/                # SQL migrations (profiles, orders, returns, ...)
-│
-├── public/                          # Static assets served as-is
-├── package.json
-└── vite.config.ts
-```
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18 or later (or [Bun](https://bun.sh/))
-- A [Supabase](https://supabase.com/) project (free tier is sufficient)
+- **Node.js** ≥ 18 (or [Bun](https://bun.sh))
+- A [Supabase](https://supabase.com) project (for auth & data)
 
-### Installation
+### 1. Clone the repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/<your-username>/soundwave.git
-cd soundwave
-
-# Install dependencies
-npm install
-# or
-bun install
+git clone https://github.com/<your-username>/tenplus-soundwave-galaxywar.git
+cd tenplus-soundwave-galaxywar
 ```
 
-### Environment Variables
+### 2. Install dependencies
 
-Create a `.env` file in the project root with the following values, available from your Supabase project settings:
+```bash
+# using bun
+bun install
+
+# or using npm
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the project root:
 
 ```env
 SUPABASE_PROJECT_ID=your-project-id
 SUPABASE_URL=your-supabase-url
 SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+
 VITE_SUPABASE_PROJECT_ID=your-project-id
 VITE_SUPABASE_URL=your-supabase-url
 VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
 
-> **Note:** Never commit `.env` to version control. A `.gitignore` entry is already provided.
+### 4. Run the database migrations
 
-### Database Setup
+SQL migrations live under `supabase/migrations`. Apply them via the [Supabase CLI](https://supabase.com/docs/guides/cli) or through the Supabase dashboard SQL editor.
 
-Apply the SQL migrations in `supabase/migrations/` to your Supabase project — either via the [Supabase CLI](https://supabase.com/docs/guides/cli) or the SQL editor in the Supabase dashboard. This provisions the `profiles`, `orders`, and `returns` tables along with their associated Row-Level Security policies.
-
-```bash
-supabase db push
-```
-
-### Run the App
+### 5. Start the dev server
 
 ```bash
+bun run dev
+# or
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000` (or the port shown in your terminal).
+The app will be available at **http://localhost:3000**.
 
-## Available Scripts
+### Available Scripts
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Starts the development server with hot reload |
-| `npm run build` | Builds the app for production |
-| `npm run build:dev` | Builds the app in development mode |
-| `npm run preview` | Serves the production build locally |
-| `npm run lint` | Runs ESLint across the codebase |
-| `npm run format` | Formats the codebase with Prettier |
+| `dev` | Start the development server |
+| `build` | Build for production |
+| `build:dev` | Build in development mode |
+| `preview` | Preview the production build locally |
+| `lint` | Run ESLint |
+| `format` | Format code with Prettier |
 
-## Database Schema
+---
 
-The application uses Supabase (PostgreSQL) with the following core tables:
+## 📁 Project Structure
 
-| Table | Description |
+```
+tenplus-soundwave-galaxywar/
+├── public/                    # Static assets
+├── src/
+│   ├── assets/                 # Product & hero imagery
+│   ├── components/
+│   │   ├── site/                # Header, Footer, ProductCard, Product360, etc.
+│   │   └── ui/                  # Reusable primitives (Radix / shadcn-style)
+│   ├── data/
+│   │   └── products.ts          # Product catalog, categories & brands
+│   ├── hooks/                  # use-auth, use-mobile, etc.
+│   ├── integrations/
+│   │   ├── lovable/              # Lovable platform integration
+│   │   └── supabase/              # Supabase client, auth & types
+│   ├── lib/                    # Formatting, invoices, reports, error handling
+│   ├── routes/                 # File-based routes (pages)
+│   │   └── _authenticated/       # Protected account/orders/reports/returns
+│   ├── router.tsx              # Router configuration
+│   ├── server.ts / start.ts    # SSR entry points
+│   └── styles.css              # Global styles & design tokens
+├── supabase/
+│   ├── config.toml
+│   └── migrations/             # SQL schema migrations
+└── vite.config.ts
+```
+
+---
+
+## 🗺️ Key Routes
+
+| Route | Description |
 |---|---|
-| `profiles` | User profile data, linked one-to-one with Supabase Auth users |
-| `orders` | Order records, including line items, status, and tracking metadata |
-| `returns` | Return and warranty claim requests, linked to originating orders |
+| `/` | Landing page — hero, trending products, new arrivals |
+| `/shop` | Full catalog with filters |
+| `/product/$id` | Product detail with gallery, specs & 360° view |
+| `/cart` · `/checkout` | Cart & multi-step checkout |
+| `/wishlist` · `/compare` | Saved items & spec comparison |
+| `/auth` | Sign in / sign up |
+| `/account` | Authenticated account dashboard |
+| `/orders` · `/track-order` | Order history & live tracking |
+| `/returns` · `/returns/new` | Returns & refunds |
+| `/reports` | Sales & performance analytics |
+| `/about` · `/brands` · `/careers` · `/press` | Company & brand pages |
+| `/faq` · `/shipping` · `/warranty` · `/sustainability` | Policy & support pages |
 
-All tables are protected by Row-Level Security (RLS) policies, ensuring users can only access and modify their own data.
+---
 
-## Deployment
+## 🎨 Design Philosophy
 
-SoundWave can be deployed to any platform that supports Node.js SSR, including [Vercel](https://vercel.com/), [Netlify](https://netlify.com/), or a self-hosted Node server via [Nitro](https://nitro.unjs.io/). Before deploying:
+PULSE leans into a **dark, cinematic aesthetic** — dot-grid backgrounds, ambient glow accents, shimmering typography, and animated soundwave motifs — paired with a fully accessible component system so the flash never comes at the cost of usability.
 
-1. Configure the environment variables listed above in your hosting provider's dashboard.
-2. Ensure all Supabase migrations have been applied to your production database.
-3. Run `npm run build` to generate the production bundle.
+---
 
-## Contributing
+## 🛣️ Roadmap
 
-Contributions are welcome and appreciated. To contribute:
+- [ ] Payment gateway integration (Stripe)
+- [ ] Real-time order status via Supabase subscriptions
+- [ ] Admin product management UI
+- [ ] Internationalization (i18n)
+- [ ] Automated test suite (unit + e2e)
 
-1. Fork the repository
-2. Create a feature branch
-   ```bash
-   git checkout -b feature/my-feature
-   ```
-3. Commit your changes
-   ```bash
-   git commit -m "Add my feature"
-   ```
-4. Push to your branch
-   ```bash
-   git push origin feature/my-feature
-   ```
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-Please run `npm run lint` and `npm run format` before submitting a PR, and ensure any new functionality includes appropriate type coverage.
+Please run `npm run lint` and `npm run format` before submitting.
 
-## License
+---
 
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
+## 📄 License
 
-## Acknowledgements
-
-- [TanStack](https://tanstack.com/) — Router, Query, and Start
-- [Radix UI](https://www.radix-ui.com/) — accessible component primitives
-- [Supabase](https://supabase.com/) — backend infrastructure and authentication
-- [Lucide](https://lucide.dev/) — iconography
+This project is licensed under the **MIT License** — feel free to use it as a learning resource or starting point for your own storefront.
 
 ---
 
 <div align="center">
 
-Made with care for people who take their audio seriously.
+Built with ⬡ by the PULSE team
 
 </div>
