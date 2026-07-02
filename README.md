@@ -13,8 +13,12 @@ A premium, full-stack e-commerce storefront for wireless earbuds, ANC headphones
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](#license)
 
-[Overview](#-overview) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure) • [Roadmap](#-roadmap)
+[Overview](#-overview) • [Features](#-features) • [Screenshots](#-screenshots) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure) • [Roadmap](#-roadmap)
 
+</div>
+
+<div align="center">
+  <img src="./docs/gallery/hero-earbuds.jpg" alt="PULSE hero product shot" width="800" />
 </div>
 
 ---
@@ -50,6 +54,69 @@ It's built as a **full-stack TanStack Start application**, meaning the same code
 - **🔍 SEO-ready** — per-route meta tags, canonical links, and an auto-generated sitemap
 - **🧩 Accessible, composable UI** — built on Radix UI primitives + shadcn/ui patterns
 - **⚡ Type-safe routing** — file-based routes with auto-generated route tree via TanStack Router
+
+---
+
+## 📸 Screenshots
+
+> Replace the placeholders below with real captures once you've run the app locally (`npm run dev`, then screenshot each route). Recommended size: **1440×900**, saved into `docs/screenshots/`.
+
+<table>
+<tr>
+<td width="50%" align="center">
+<b>Home</b><br/>
+<img src="./docs/screenshots/home.png" alt="Home page screenshot" width="100%" />
+</td>
+<td width="50%" align="center">
+<b>Shop / Catalog</b><br/>
+<img src="./docs/screenshots/shop.png" alt="Shop page screenshot" width="100%" />
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+<b>Product Detail</b><br/>
+<img src="./docs/screenshots/product-detail.png" alt="Product detail page screenshot" width="100%" />
+</td>
+<td width="50%" align="center">
+<b>Cart & Checkout</b><br/>
+<img src="./docs/screenshots/checkout.png" alt="Checkout page screenshot" width="100%" />
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+<b>Account Dashboard</b><br/>
+<img src="./docs/screenshots/account.png" alt="Account dashboard screenshot" width="100%" />
+</td>
+<td width="50%" align="center">
+<b>Reports & Analytics</b><br/>
+<img src="./docs/screenshots/reports.png" alt="Reports dashboard screenshot" width="100%" />
+</td>
+</tr>
+</table>
+
+<details>
+<summary><b>📱 Mobile views</b> (click to expand)</summary>
+<br>
+<div align="center">
+<img src="./docs/screenshots/mobile-home.png" alt="Mobile home screenshot" width="30%" />
+<img src="./docs/screenshots/mobile-shop.png" alt="Mobile shop screenshot" width="30%" />
+<img src="./docs/screenshots/mobile-product.png" alt="Mobile product screenshot" width="30%" />
+</div>
+</details>
+
+### Product Gallery
+
+<div align="center">
+<img src="./docs/gallery/product-black.jpg" alt="Black earbuds" width="150" />
+<img src="./docs/gallery/product-white.jpg" alt="White earbuds" width="150" />
+<img src="./docs/gallery/product-silver.jpg" alt="Silver earbuds" width="150" />
+<img src="./docs/gallery/product-rose.jpg" alt="Rose gold earbuds" width="150" />
+</div>
+<div align="center">
+<img src="./docs/gallery/product-headphones.jpg" alt="ANC headphones" width="150" />
+<img src="./docs/gallery/product-gaming.jpg" alt="Gaming headset" width="150" />
+<img src="./docs/gallery/product-sport.jpg" alt="Sports earbuds" width="150" />
+</div>
 
 ---
 
