@@ -411,51 +411,6 @@ function TrackOrderPage() {
                 <MapPin className="absolute -top-2 right-0 h-5 w-5 translate-x-1 text-muted-foreground" />
               </div>
             </div>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <span className="mono rounded-full bg-accent/10 px-3 py-1 text-xs capitalize text-accent">
-                  {order.status.replace(/_/g, " ")}
-                </span>
-                {next ? (
-                  <button
-                    onClick={simulate}
-                    disabled={simulating}
-                    className="inline-flex items-center gap-1 rounded-full border border-accent/50 bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:opacity-90 disabled:opacity-60"
-                    title={`Advance to ${next.replace(/_/g, " ")}`}
-                  >
-                    <PlayCircle className="h-3 w-3" />
-                    {simulating ? "Advancing…" : `Simulate → ${next.replace(/_/g, " ")}`}
-                  </button>
-                ) : (
-                  <span className="mono rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-[10px] text-accent">
-                    DELIVERED
-                  </span>
-                )}
-                <button
-                  onClick={() => {
-                    downloadInvoice({
-                      id: order.id,
-                      createdAt: order.created_at,
-                      total: Number(order.total),
-                      subtotal: order.subtotal,
-                      tax: order.tax,
-                      shipping: order.shipping,
-                      status: order.status,
-                      paymentMethod: order.payment_method,
-                      items: order.items,
-                      customer: { email },
-                      shippingAddress: order.shipping_address as Record<string, unknown> | null,
-                    });
-                    toast.success("Invoice downloaded", {
-                      description: `PULSE-${order.id.slice(0, 8).toUpperCase()}.pdf`,
-                    });
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs text-accent hover:bg-accent hover:text-accent-foreground"
-                >
-                  <Download className="h-3 w-3" /> Invoice PDF
-                </button>
-              </div>
-            </div>
 
             <div className="mt-8 border-t border-border/60 pt-8">
               <OrderTracking
