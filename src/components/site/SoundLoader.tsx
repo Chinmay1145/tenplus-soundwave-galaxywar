@@ -1,6 +1,14 @@
 import { LogoMark } from "./Logo";
 
-export function SoundLoader({ label = "Tuning the experience" }: { label?: string }) {
+const PHRASES = [
+  "Tuning the experience",
+  "Calibrating drivers",
+  "Warming the amplifier",
+  "Aligning spatial audio",
+];
+
+export function SoundLoader({ label }: { label?: string }) {
+  const phrase = label ?? PHRASES[Math.floor(Date.now() / 1400) % PHRASES.length];
   return (
     <div
       className="fixed inset-0 z-[100] grid place-items-center bg-background/85 backdrop-blur-md"
@@ -55,8 +63,11 @@ export function SoundLoader({ label = "Tuning the experience" }: { label?: strin
               <span key={i} className="sl-bar" style={{ animationDelay: `${i * 0.12}s` }} />
             ))}
           </div>
-          <div className="mono text-xs tracking-[0.4em] text-muted-foreground sl-shimmer">{label.toUpperCase()}</div>
+          <div className="mono text-xs tracking-[0.4em] text-muted-foreground sl-shimmer">{phrase.toUpperCase()}</div>
           <div className="mono text-[10px] tracking-[0.3em] text-accent/70">PULSE · AUDIO LABS</div>
+          <div className="mt-1 h-[3px] w-40 overflow-hidden rounded-full bg-border/60">
+            <span className="sl-progress block h-full w-1/3 rounded-full bg-gradient-to-r from-accent via-accent/80 to-accent" />
+          </div>
         </div>
       </div>
 
