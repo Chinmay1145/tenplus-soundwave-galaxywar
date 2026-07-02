@@ -325,6 +325,84 @@ function Home() {
         </section>
       )}
 
+      {/* TESTIMONIALS */}
+      <section className="relative overflow-hidden py-24">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            background:
+              "radial-gradient(600px 300px at 20% 30%, oklch(0.65 0.24 25 / 0.15), transparent 70%), radial-gradient(500px 250px at 85% 70%, oklch(0.65 0.24 25 / 0.10), transparent 70%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mb-12 flex items-end justify-between">
+            <div>
+              <div className="mono text-accent">— Loud opinions</div>
+              <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+                Heard by half a million.
+              </h2>
+            </div>
+            <div className="hidden items-center gap-2 sm:flex">
+              <div className="flex">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star key={i} className="h-4 w-4 fill-accent text-accent" />
+                ))}
+              </div>
+              <span className="mono text-xs text-muted-foreground">4.9 · 42,318 reviews</span>
+            </div>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              {
+                q: "The ANC is unreal. It's the first time a commute felt like a studio session.",
+                a: "Ananya S.",
+                r: "Product Designer · Bangalore",
+              },
+              {
+                q: "Bass hits like a live gig. I gave away my old cans the same week.",
+                a: "Marcus L.",
+                r: "Music Producer · Berlin",
+              },
+              {
+                q: "40h battery is not a spec sheet lie. I forgot my charger for a whole trip.",
+                a: "Priya K.",
+                r: "Travel Writer · Mumbai",
+              },
+            ].map((t, i) => (
+              <figure
+                key={i}
+                className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card p-6 transition-all hover:-translate-y-1 hover:border-accent/50"
+              >
+                <Quote className="h-6 w-6 text-accent/60" />
+                <blockquote className="mt-4 font-display text-lg leading-snug">"{t.q}"</blockquote>
+                <figcaption className="mono mt-6 border-t border-border/60 pt-4 text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">{t.a}</span> · {t.r}
+                </figcaption>
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-0 blur-3xl transition-opacity group-hover:opacity-100"
+                  style={{ background: "radial-gradient(circle, var(--color-accent), transparent 70%)" }}
+                />
+              </figure>
+            ))}
+          </div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-4">
+            {[
+              ["500k+", "Happy listeners"],
+              ["4.9★", "Average rating"],
+              ["2 yr", "Warranty"],
+              ["30 day", "Returns"],
+            ].map(([k, v]) => (
+              <div key={k} className="rounded-2xl border border-border/60 bg-card px-5 py-4 text-center">
+                <div className="font-display text-2xl font-bold sm:text-3xl">{k}</div>
+                <div className="mono mt-1 text-[10px] text-muted-foreground">{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* TRUST */}
       <section className="mx-auto max-w-7xl border-t border-border/60 px-4 py-16 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-6 text-sm text-muted-foreground">
