@@ -310,6 +310,13 @@ function TrackOrderPage() {
                     month: "short",
                     year: "numeric",
                   })}
+                  <button
+                    onClick={copyId}
+                    className="ml-2 inline-flex items-center gap-1 rounded-full border border-border/60 px-1.5 py-0.5 align-middle hover:border-accent hover:text-accent"
+                    title="Copy order ID"
+                  >
+                    <Copy className="h-2.5 w-2.5" /> Copy
+                  </button>
                 </div>
                 <div className="mt-1 font-display text-3xl font-bold tracking-tight">
                   {inr(Number(order.total))}
@@ -323,6 +330,87 @@ function TrackOrderPage() {
                     {order.shipping_address.state} {order.shipping_address.pincode}
                   </div>
                 )}
+                {etaLabel && (
+                  <div className="mono mt-1.5 text-[10px] text-accent">
+                    ETA · {etaLabel}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <span className="mono rounded-full bg-accent/10 px-3 py-1 text-xs capitalize text-accent">
+                  {order.status.replace(/_/g, " ")}
+                </span>
+                {next ? (
+                  <button
+                    onClick={simulate}
+                    disabled={simulating}
+                    className="inline-flex items-center gap-1 rounded-full border border-accent/50 bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:opacity-90 disabled:opacity-60"
+                    title={`Advance to ${next.replace(/_/g, " ")}`}
+                  >
+                    <PlayCircle className="h-3 w-3" />
+                    {simulating ? "Advancing…" : `Simulate → ${next.replace(/_/g, " ")}`}
+                  </button>
+                ) : (
+                  <span className="mono rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-[10px] text-accent">
+                    DELIVERED
+                  </span>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={refresh}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border/60 px-3 py-1.5 text-xs hover:border-accent hover:text-accent"
+                    title="Refresh status"
+                  >
+                    <RefreshCw className="h-3 w-3" /> Refresh
+                  </button>
+                  <button
+                    onClick={() => {
+                      downloadInvoice({
+                        id: order.id,
+                        createdAt: order.created_at,
+                        total: Number(order.total),
+                        subtotal: order.subtotal,
+                        tax: order.tax,
+                        shipping: order.shipping,
+                        status: order.status,
+                        paymentMethod: order.payment_method,
+                        items: order.items,
+                        customer: { email },
+                        shippingAddress: order.shipping_address as Record<string, unknown> | null,
+                      });
+                      toast.success("Invoice downloaded", {
+                        description: `PULSE-${order.id.slice(0, 8).toUpperCase()}.pdf`,
+                      });
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs text-accent hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <Download className="h-3 w-3" /> Invoice
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Animated courier bar */}
+            <div className="relative mt-8 rounded-2xl border border-border/60 bg-surface-2/60 p-5">
+              <div className="mono mb-3 flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>WAREHOUSE</span>
+                <span className="text-accent">{Math.round(progress * 100)}% · en route</span>
+                <span>YOUR DOOR</span>
+              </div>
+              <div className="relative h-2 rounded-full bg-border/60">
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-accent/70 via-accent to-accent/70 transition-all duration-1000"
+                  style={{ width: `${Math.max(6, progress * 100)}%` }}
+                />
+                <div
+                  className="absolute -top-3 grid h-8 w-8 -translate-x-1/2 place-items-center rounded-full border border-accent bg-background text-accent shadow-[0_0_20px_oklch(0.65_0.24_25/0.6)] transition-all duration-1000"
+                  style={{ left: `${Math.max(6, progress * 100)}%` }}
+                >
+                  <Truck className="h-4 w-4" />
+                </div>
+                <MapPin className="absolute -top-2 right-0 h-5 w-5 translate-x-1 text-muted-foreground" />
+              </div>
+            </div>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <span className="mono rounded-full bg-accent/10 px-3 py-1 text-xs capitalize text-accent">
