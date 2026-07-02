@@ -82,12 +82,9 @@ function BrandsPage() {
       <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {BRANDS.map((brand) => {
-          const domain = DOMAINS[brand];
           const count = PRODUCTS.filter((p) => p.brand === brand).length;
           const tint = BRAND_TINT[brand] ?? "#e11d2f";
-          const logo = domain
-            ? `https://logo.clearbit.com/${domain}?size=256`
-            : null;
+          const logo = brandLogo(brand, 256);
           return (
             <Link
               key={brand}
