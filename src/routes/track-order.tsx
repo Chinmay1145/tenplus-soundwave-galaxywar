@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Download,
   MapPin,
@@ -59,6 +60,27 @@ function TrackOrderPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [simulating, setSimulating] = useState(false);
+
+  const { data: myOrders } = useQuery({
+    queryKey: ["my-orders-track", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("id,total,status,created_at,items,shipping_address,payment_method,subtotal,tax,shipping")
+        .order("created_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data as unknown as Order[];
+    },
+  });
+
+  const pickOrder = (o: Order) => {
+    setOrder(o);
+    setOrderId(o.id.slice(0, 8).toUpperCase());
+    setError(null);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const lookup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,6 +209,54 @@ function TrackOrderPage() {
           )}
         </div>
       </section>
+
+      {/* Signed-in user's recent orders — one-tap tracking */}
+      {user && myOrders && myOrders.length > 0 && !order && (
+        <section className="mx-auto max-w-4xl px-4 pb-4 sm:px-6">
+          <div className="flex items-end justify-between">
+            <div>
+              <div className="mono text-accent">— Your recent orders</div>
+              <h2 className="mt-1 font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                Tap to track instantly
+              </h2>
+            </div>
+            <Link to="/orders" className="text-sm font-semibold text-accent hover:underline">
+              View all →
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {myOrders.map((o) => (
+              <button
+                key={o.id}
+                onClick={() => pickOrder(o)}
+                className="group flex items-center justify-between gap-4 rounded-2xl border border-border/60 bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-lg"
+              >
+                <div className="min-w-0">
+                  <div className="mono text-[10px] text-muted-foreground">
+                    #{o.id.slice(0, 8).toUpperCase()} ·{" "}
+                    {new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                  </div>
+                  <div className="mt-1 truncate text-sm font-semibold">
+                    {o.items.map((i) => i.name).join(", ")}
+                  </div>
+                  <div className="mono mt-1 text-[10px] text-muted-foreground">
+                    {o.items.reduce((a, b) => a + b.qty, 0)} item(s) · {inr(Number(o.total))}
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="mono rounded-full bg-accent/10 px-2 py-0.5 text-[10px] capitalize text-accent">
+                    {o.status.replace(/_/g, " ")}
+                  </span>
+                  <span className="text-xs text-accent opacity-0 transition-opacity group-hover:opacity-100">
+                    Track →
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
 
       {/* Result */}
       {order && (

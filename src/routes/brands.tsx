@@ -1,29 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BRANDS, PRODUCTS } from "@/data/products";
 import { LogoMark } from "@/components/site/Logo";
+import { brandLogo } from "@/lib/brand-logo";
 
 const BRAND_TINT: Record<string, string> = {
   Apple: "#a1a1a6", Sony: "#000000", Bose: "#000000", Sennheiser: "#0033A0",
   JBL: "#FF6600", Beats: "#E61E26", Nothing: "#ff3b30", Samsung: "#1428A0",
   OnePlus: "#EB0028", Realme: "#FFC900", Jabra: "#FF8200", Skullcandy: "#000000",
   Soundcore: "#00AEEF", Marshall: "#c0392b",
-};
-
-const DOMAINS: Record<string, string> = {
-  Apple: "apple.com",
-  Sony: "sony.com",
-  Bose: "bose.com",
-  Sennheiser: "sennheiser.com",
-  JBL: "jbl.com",
-  Beats: "beatsbydre.com",
-  Nothing: "nothing.tech",
-  Samsung: "samsung.com",
-  OnePlus: "oneplus.com",
-  Realme: "realme.com",
-  Jabra: "jabra.com",
-  Skullcandy: "skullcandy.com",
-  Soundcore: "soundcore.com",
-  Marshall: "marshallheadphones.com",
 };
 
 export const Route = createFileRoute("/brands")({
@@ -73,28 +57,23 @@ function BrandsPage() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent" />
             <div className="flex items-center gap-10 overflow-x-auto px-8 sm:justify-center">
-              {featured.map((brand) => {
-                const domain = DOMAINS[brand];
-                return (
-                  <Link
-                    key={`f-${brand}`}
-                    to="/shop"
-                    search={{ brand }}
-                    className="group flex shrink-0 items-center gap-2 opacity-70 grayscale transition-all hover:opacity-100 hover:grayscale-0"
-                    title={brand}
-                  >
-                    {domain ? (
-                      <img
-                        src={`https://logo.clearbit.com/${domain}?size=128`}
-                        alt={brand}
-                        loading="lazy"
-                        className="h-8 w-8 rounded bg-white object-contain p-1"
-                      />
-                    ) : null}
-                    <span className="font-display text-sm font-bold tracking-tight">{brand}</span>
-                  </Link>
-                );
-              })}
+              {featured.map((brand) => (
+                <Link
+                  key={`f-${brand}`}
+                  to="/shop"
+                  search={{ brand }}
+                  className="group flex shrink-0 items-center gap-2 opacity-80 transition-all hover:opacity-100"
+                  title={brand}
+                >
+                  <img
+                    src={brandLogo(brand, 64)}
+                    alt={brand}
+                    loading="lazy"
+                    className="h-8 w-8 rounded bg-white object-contain p-1"
+                  />
+                  <span className="font-display text-sm font-bold tracking-tight">{brand}</span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -103,12 +82,9 @@ function BrandsPage() {
       <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {BRANDS.map((brand) => {
-          const domain = DOMAINS[brand];
           const count = PRODUCTS.filter((p) => p.brand === brand).length;
           const tint = BRAND_TINT[brand] ?? "#e11d2f";
-          const logo = domain
-            ? `https://logo.clearbit.com/${domain}?size=256`
-            : null;
+          const logo = brandLogo(brand, 256);
           return (
             <Link
               key={brand}
