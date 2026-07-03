@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { LogoMark } from "./Logo";
 
 const PHRASES = [
@@ -5,10 +6,18 @@ const PHRASES = [
   "Calibrating drivers",
   "Warming the amplifier",
   "Aligning spatial audio",
+  "Priming the low-end",
+  "Syncing multipoint",
 ];
 
 export function SoundLoader({ label }: { label?: string }) {
-  const phrase = label ?? PHRASES[Math.floor(Date.now() / 1400) % PHRASES.length];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (label) return;
+    const id = setInterval(() => setIdx((i) => (i + 1) % PHRASES.length), 1400);
+    return () => clearInterval(id);
+  }, [label]);
+  const phrase = label ?? PHRASES[idx];
   return (
     <div
       className="fixed inset-0 z-[100] grid place-items-center bg-background/85 backdrop-blur-md"
