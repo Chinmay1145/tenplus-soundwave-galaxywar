@@ -196,8 +196,8 @@ function p(
     mrp,
     rating: 4.2 + ((i * 7) % 8) / 10,
     reviews: 120 + ((i * 113) % 4800),
-    image: img(i),
-    gallery: rotation(i),
+    image: primary(category, brand, i),
+    gallery: rotationFor(category, brand, i),
     colors: [
       { name: "Black", hex: "#0a0a0a" },
       { name: "White", hex: "#f5f5f5" },
