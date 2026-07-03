@@ -35,12 +35,16 @@ export function SoundLoader({ label }: { label?: string }) {
       {/* drifting particles */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         {Array.from({ length: 14 }).map((_, i) => (
-          <span key={i} className="sl-particle" style={{
-            left: `${(i * 73) % 100}%`,
-            top: `${(i * 37) % 100}%`,
-            animationDelay: `${(i % 7) * 0.4}s`,
-            animationDuration: `${4 + (i % 5)}s`,
-          }} />
+          <span
+            key={i}
+            className="sl-particle"
+            style={{
+              left: `${(i * 73) % 100}%`,
+              top: `${(i * 37) % 100}%`,
+              animationDelay: `${(i % 7) * 0.4}s`,
+              animationDuration: `${4 + (i % 5)}s`,
+            }}
+          />
         ))}
       </div>
       <div className="relative flex flex-col items-center gap-8">
@@ -72,7 +76,9 @@ export function SoundLoader({ label }: { label?: string }) {
               <span key={i} className="sl-bar" style={{ animationDelay: `${i * 0.12}s` }} />
             ))}
           </div>
-          <div className="mono text-xs tracking-[0.4em] text-muted-foreground sl-shimmer">{phrase.toUpperCase()}</div>
+          <div className="mono text-xs tracking-[0.4em] text-muted-foreground sl-shimmer">
+            {phrase.toUpperCase()}
+          </div>
           <div className="mono text-[10px] tracking-[0.3em] text-accent/70">PULSE · AUDIO LABS</div>
           <div className="mt-1 h-[3px] w-40 overflow-hidden rounded-full bg-border/60">
             <span className="sl-progress block h-full w-1/3 rounded-full bg-gradient-to-r from-accent via-accent/80 to-accent" />
