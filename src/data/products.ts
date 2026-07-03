@@ -4,10 +4,10 @@ import silver from "@/assets/product-silver.jpg";
 import neckband from "@/assets/product-neckband.jpg";
 import black from "@/assets/product-black.jpg";
 import rose from "@/assets/product-rose.jpg";
-import gaming from "@/assets/product-gaming.jpg";
+import gamingImg from "@/assets/product-gaming.jpg";
 import headphones from "@/assets/product-headphones.jpg";
 import sport from "@/assets/product-sport.jpg";
-import open from "@/assets/product-open.jpg";
+import openImg from "@/assets/product-open.jpg";
 
 export type Product = {
   id: string;
@@ -51,12 +51,129 @@ export const BRANDS = [
   "Samsung", "OnePlus", "Realme", "Jabra", "Skullcandy", "Soundcore", "Marshall",
 ];
 
-const GALLERY = [hero, white, silver, neckband, black, rose, gaming, headphones, sport, open];
-const img = (i: number) => GALLERY[i % GALLERY.length];
+// ─── Rich, category-specific image pools (Unsplash editorial product shots) ───
+// Each URL is a stable Unsplash photo id served via their CDN with sensible
+// crop/quality params. Local bundled assets are kept as safe fallbacks and
+// blended into rotations for extra variety.
+const U = (id: string) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=900&q=80`;
 
-// 4-frame 360° rotation per product (uses the broader gallery so rotation looks varied).
-function rotation(i: number): string[] {
-  return [0, 1, 2, 3].map((k) => GALLERY[(i + k * 3) % GALLERY.length]);
+const POOL: Record<string, string[]> = {
+  tws: [
+    U("1590658268037-6bf12165a8df"),
+    U("1606220588913-b3aacb4d2f46"),
+    U("1631867675167-90a456a90863"),
+    U("1572569511254-d8f925fe2cbb"),
+    U("1608156639585-b3a032ef9689"),
+    U("1655720845476-b6cba1c8e97e"),
+  ],
+  anc: [
+    U("1583394838336-acd977736f90"),
+    U("1545127398-14699f92334b"),
+    U("1618366712010-f4ae9c647dcb"),
+    U("1546435770-a3e426bf472b"),
+    U("1487215078519-e21cc028cb29"),
+  ],
+  studio: [
+    U("1524678606370-a47ad25cb82a"),
+    U("1505740420928-5e560c06d30e"),
+    U("1558537348-c0f8e733989d"),
+    U("1546435770-a3e426bf472b"),
+  ],
+  gaming: [
+    U("1591105327764-4d42fac00f7d"),
+    U("1612444530582-fc66183b16f8"),
+    U("1618478594486-c65b899c4936"),
+    U("1629429407756-446d24da3d3f"),
+  ],
+  sports: [
+    U("1608043152269-423dbba4e7e1"),
+    U("1613040809024-b4ef7ba99bc3"),
+    U("1590658268037-6bf12165a8df"),
+  ],
+  neckband: [
+    U("1610438235354-a6ae5528385c"),
+    U("1608043152269-423dbba4e7e1"),
+  ],
+  "open-ear": [
+    U("1558756520-22cfe5d382ca"),
+    U("1484704849700-f032a568e944"),
+  ],
+  wired: [
+    U("1484704849700-f032a568e944"),
+    U("1524678606370-a47ad25cb82a"),
+  ],
+  business: [
+    U("1546435770-a3e426bf472b"),
+    U("1618366712010-f4ae9c647dcb"),
+    U("1487215078519-e21cc028cb29"),
+  ],
+  luxury: [
+    U("1524678606370-a47ad25cb82a"),
+    U("1583394838336-acd977736f90"),
+    U("1546435770-a3e426bf472b"),
+    U("1618366712010-f4ae9c647dcb"),
+  ],
+  flagship: [
+    U("1590658268037-6bf12165a8df"),
+    U("1608156639585-b3a032ef9689"),
+    U("1583394838336-acd977736f90"),
+  ],
+  kids: [
+    U("1655720845476-b6cba1c8e97e"),
+    U("1618366712010-f4ae9c647dcb"),
+  ],
+};
+
+// Brand-accent shots so each product gets a distinct hero, even inside a shared category.
+const BRAND_ACCENT: Record<string, string> = {
+  Apple: U("1600294037681-c80b4cb5b434"),
+  Sony: U("1545127398-14699f92334b"),
+  Bose: U("1546435770-a3e426bf472b"),
+  Sennheiser: U("1618366712010-f4ae9c647dcb"),
+  JBL: U("1583394838336-acd977736f90"),
+  Beats: U("1558537348-c0f8e733989d"),
+  Nothing: U("1631867675167-90a456a90863"),
+  Samsung: U("1606220588913-b3aacb4d2f46"),
+  OnePlus: U("1608156639585-b3a032ef9689"),
+  Realme: U("1655720845476-b6cba1c8e97e"),
+  Jabra: U("1487215078519-e21cc028cb29"),
+  Skullcandy: U("1591105327764-4d42fac00f7d"),
+  Soundcore: U("1572569511254-d8f925fe2cbb"),
+  Marshall: U("1524678606370-a47ad25cb82a"),
+  Shure: U("1505740420928-5e560c06d30e"),
+  AKG: U("1546435770-a3e426bf472b"),
+  Audeze: U("1583394838336-acd977736f90"),
+  HyperX: U("1612444530582-fc66183b16f8"),
+  Razer: U("1591105327764-4d42fac00f7d"),
+  Logitech: U("1618478594486-c65b899c4936"),
+  Bang: U("1524678606370-a47ad25cb82a"),
+  Boat: U("1608043152269-423dbba4e7e1"),
+  Xiaomi: U("1606220588913-b3aacb4d2f46"),
+  Huawei: U("1590658268037-6bf12165a8df"),
+  Google: U("1631867675167-90a456a90863"),
+};
+
+// Local bundled assets — used as final rotation frame so images always resolve
+// even when the CDN is unreachable.
+const LOCAL = [hero, white, silver, neckband, black, rose, gamingImg, headphones, sport, openImg];
+
+function poolFor(category: string): string[] {
+  return POOL[category] ?? POOL.tws;
+}
+
+function primary(category: string, brand: string, i: number): string {
+  const pool = poolFor(category);
+  return BRAND_ACCENT[brand] ?? pool[i % pool.length];
+}
+
+function rotationFor(category: string, brand: string, i: number): string[] {
+  const pool = poolFor(category);
+  const accent = BRAND_ACCENT[brand] ?? pool[(i + 1) % pool.length];
+  const a = pool[i % pool.length];
+  const b = pool[(i + 2) % pool.length];
+  const local = LOCAL[i % LOCAL.length];
+  return [accent, a, b, local];
 }
 
 function p(
