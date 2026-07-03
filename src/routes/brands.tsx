@@ -1,14 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useRef } from "react";
 import { BRANDS, PRODUCTS } from "@/data/products";
 import { LogoMark } from "@/components/site/Logo";
-import { brandLogo } from "@/lib/brand-logo";
+import { brandLogoSources } from "@/lib/brand-logo";
 
 const BRAND_TINT: Record<string, string> = {
   Apple: "#a1a1a6", Sony: "#000000", Bose: "#000000", Sennheiser: "#0033A0",
   JBL: "#FF6600", Beats: "#E61E26", Nothing: "#ff3b30", Samsung: "#1428A0",
   OnePlus: "#EB0028", Realme: "#FFC900", Jabra: "#FF8200", Skullcandy: "#000000",
-  Soundcore: "#00AEEF", Marshall: "#c0392b",
+  Soundcore: "#00AEEF", Marshall: "#c0392b", Audeze: "#8e44ad", Shure: "#00843d",
+  AKG: "#003a70", Logitech: "#00B8FC", HyperX: "#e10600", Razer: "#44D62C",
+  Bang: "#111111", "Bang & Olufsen": "#111111", Boat: "#e11d2f", Xiaomi: "#ff6900",
+  Huawei: "#c7000b", Google: "#4285F4",
 };
+
+function BrandImage({ brand, alt, className }: { brand: string; alt: string; className?: string }) {
+  const sources = brandLogoSources(brand, 256);
+  const idxRef = useRef(0);
+  return (
+    <img
+      src={sources[0]}
+      alt={alt}
+      loading="lazy"
+      className={className}
+      onError={(e) => {
+        const el = e.currentTarget as HTMLImageElement;
+        idxRef.current += 1;
+        if (idxRef.current < sources.length) el.src = sources[idxRef.current];
+      }}
+    />
+  );
+}
 
 export const Route = createFileRoute("/brands")({
   head: () => ({
@@ -65,10 +87,9 @@ function BrandsPage() {
                   className="group flex shrink-0 items-center gap-2 opacity-80 transition-all hover:opacity-100"
                   title={brand}
                 >
-                  <img
-                    src={brandLogo(brand, 64)}
+                  <BrandImage
+                    brand={brand}
                     alt={brand}
-                    loading="lazy"
                     className="h-8 w-8 rounded bg-white object-contain p-1"
                   />
                   <span className="font-display text-sm font-bold tracking-tight">{brand}</span>
@@ -84,20 +105,19 @@ function BrandsPage() {
         {BRANDS.map((brand) => {
           const count = PRODUCTS.filter((p) => p.brand === brand).length;
           const tint = BRAND_TINT[brand] ?? "#e11d2f";
-          const logo = brandLogo(brand, 256);
           return (
             <Link
               key={brand}
               to="/shop"
               search={{ brand }}
-              className="group relative flex aspect-square flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-border/60 bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-2xl"
+              className="group relative flex aspect-square flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-border/60 bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
               style={{ ["--tint" as string]: tint } as React.CSSProperties}
             >
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                className="pointer-events-none absolute inset-0 opacity-40 transition-opacity duration-500 group-hover:opacity-100"
                 style={{
-                  background: `radial-gradient(500px 260px at 50% 0%, ${tint}22, transparent 70%)`,
+                  background: `radial-gradient(500px 260px at 50% 0%, ${tint}33, transparent 70%)`,
                 }}
               />
               <div
@@ -106,30 +126,19 @@ function BrandsPage() {
                 style={{ background: `linear-gradient(90deg, transparent, ${tint}, transparent)` }}
               />
               <div
-                className="relative grid h-20 w-20 place-items-center rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5 transition-transform duration-300 group-hover:scale-110"
+                className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5 transition-all duration-300 group-hover:scale-110"
+                style={{ boxShadow: `0 10px 30px -12px ${tint}66` }}
               >
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt={`${brand} logo`}
-                    loading="lazy"
-                    className="h-full w-full object-contain"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                      const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
-                      if (fallback) fallback.style.display = "grid";
-                    }}
-                  />
-                ) : null}
-                <span
-                  className="hidden h-full w-full place-items-center font-display text-2xl font-bold"
-                  style={{ display: logo ? "none" : "grid", color: tint }}
-                >
-                  {brand.slice(0, 2)}
-                </span>
+                <BrandImage
+                  brand={brand}
+                  alt={`${brand} logo`}
+                  className="h-full w-full object-contain"
+                />
               </div>
               <div className="text-center">
-                <div className="font-display text-base font-bold tracking-tight">{brand}</div>
+                <div className="font-display text-base font-bold tracking-tight transition-colors group-hover:text-[color:var(--tint)]" style={{ color: undefined }}>
+                  {brand}
+                </div>
                 <div className="mono mt-0.5 text-[10px] text-muted-foreground">
                   {count} {count === 1 ? "product" : "products"}
                 </div>
