@@ -1,383 +1,1077 @@
-import hero from "@/assets/hero-earbuds.jpg";
-import white from "@/assets/product-white.jpg";
-import silver from "@/assets/product-silver.jpg";
-import neckband from "@/assets/product-neckband.jpg";
+
 import black from "@/assets/product-black.jpg";
-import rose from "@/assets/product-rose.jpg";
-import gamingImg from "@/assets/product-gaming.jpg";
+import gaming from "@/assets/product-gaming.jpg";
 import headphones from "@/assets/product-headphones.jpg";
+import neckband from "@/assets/product-neckband.jpg";
+import open from "@/assets/product-open.jpg";
+import rose from "@/assets/product-rose.jpg";
+import silver from "@/assets/product-silver.jpg";
 import sport from "@/assets/product-sport.jpg";
-import openImg from "@/assets/product-open.jpg";
+import white from "@/assets/product-white.jpg";
+import hero from "@/assets/hero-earbuds.jpg";
 
 export type Product = {
-  id: string;
+  id: number;
+  slug: string;
   name: string;
   brand: string;
   category: string;
   price: number;
   mrp: number;
+  originalPrice: number;
+  discount: number;
   rating: number;
   reviews: number;
   image: string;
   gallery: string[];
-  colors: { name: string; hex: string }[];
+  colors: ProductColor[];
+  colorNames: string[];
   badges?: string[];
   inStock: boolean;
   tagline: string;
   description: string;
+  batteryLife: string;
+  bluetooth: string;
+  anc: boolean;
   specs: Record<string, string>;
   features: string[];
   isNew?: boolean;
   isBestSeller?: boolean;
 };
 
+type ProductColor = {
+  name: string;
+  hex: string;
+};
+
+type ImageRef = number | string;
+
 export const CATEGORIES = [
   { slug: "tws", name: "True Wireless", icon: "Headphones" },
   { slug: "anc", name: "Premium ANC", icon: "Waves" },
-  { slug: "gaming", name: "Gaming", icon: "Gamepad2" },
-  { slug: "sports", name: "Sports", icon: "Activity" },
-  { slug: "business", name: "Business", icon: "Briefcase" },
-  { slug: "luxury", name: "Luxury", icon: "Crown" },
-  { slug: "wired", name: "Wired", icon: "Cable" },
-  { slug: "neckband", name: "Neckband", icon: "Disc" },
-  { slug: "open-ear", name: "Open-Ear", icon: "Ear" },
-  { slug: "studio", name: "Studio", icon: "Mic2" },
-  { slug: "kids", name: "Kids", icon: "Baby" },
-  { slug: "flagship", name: "Flagship", icon: "Sparkles" },
 ];
 
 export const BRANDS = [
-  "Apple", "Sony", "Bose", "Sennheiser", "JBL", "Beats", "Nothing",
-  "Samsung", "OnePlus", "Realme", "Jabra", "Skullcandy", "Soundcore", "Marshall",
+  "Apple",
+  "Sony",
+  "Bose",
+  "Sennheiser",
+  "JBL",
+  "Beats",
+  "Nothing",
+  "Samsung",
+  "OnePlus",
+  "Realme",
+  "Jabra",
+  "Skullcandy",
+  "Soundcore",
+  "Marshall",
+  "Shure",
+  "AKG",
+  "Audeze",
+  "HyperX",
+  "Razer",
+  "Logitech",
+  "Bang",
+  "Boat",
+  "Xiaomi",
+  "Huawei",
+  "Google",
 ];
 
-// ─── Rich, category-specific image pools (Unsplash editorial product shots) ───
-// Each URL is a stable Unsplash photo id served via their CDN with sensible
-// crop/quality params. Local bundled assets are kept as safe fallbacks and
-// blended into rotations for extra variety.
-const U = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=900&q=80`;
-
-const POOL: Record<string, string[]> = {
-  tws: [
-    U("1590658268037-6bf12165a8df"),
-    U("1606220588913-b3aacb4d2f46"),
-    U("1631867675167-90a456a90863"),
-    U("1572569511254-d8f925fe2cbb"),
-    U("1608156639585-b3a032ef9689"),
-    U("1655720845476-b6cba1c8e97e"),
-  ],
-  anc: [
-    U("1583394838336-acd977736f90"),
-    U("1545127398-14699f92334b"),
-    U("1618366712010-f4ae9c647dcb"),
-    U("1546435770-a3e426bf472b"),
-    U("1487215078519-e21cc028cb29"),
-  ],
-  studio: [
-    U("1524678606370-a47ad25cb82a"),
-    U("1505740420928-5e560c06d30e"),
-    U("1558537348-c0f8e733989d"),
-    U("1546435770-a3e426bf472b"),
-  ],
-  gaming: [
-    U("1591105327764-4d42fac00f7d"),
-    U("1612444530582-fc66183b16f8"),
-    U("1618478594486-c65b899c4936"),
-    U("1629429407756-446d24da3d3f"),
-  ],
-  sports: [
-    U("1608043152269-423dbba4e7e1"),
-    U("1613040809024-b4ef7ba99bc3"),
-    U("1590658268037-6bf12165a8df"),
-  ],
-  neckband: [
-    U("1610438235354-a6ae5528385c"),
-    U("1608043152269-423dbba4e7e1"),
-  ],
-  "open-ear": [
-    U("1558756520-22cfe5d382ca"),
-    U("1484704849700-f032a568e944"),
-  ],
-  wired: [
-    U("1484704849700-f032a568e944"),
-    U("1524678606370-a47ad25cb82a"),
-  ],
-  business: [
-    U("1546435770-a3e426bf472b"),
-    U("1618366712010-f4ae9c647dcb"),
-    U("1487215078519-e21cc028cb29"),
-  ],
-  luxury: [
-    U("1524678606370-a47ad25cb82a"),
-    U("1583394838336-acd977736f90"),
-    U("1546435770-a3e426bf472b"),
-    U("1618366712010-f4ae9c647dcb"),
-  ],
-  flagship: [
-    U("1590658268037-6bf12165a8df"),
-    U("1608156639585-b3a032ef9689"),
-    U("1583394838336-acd977736f90"),
-  ],
-  kids: [
-    U("1655720845476-b6cba1c8e97e"),
-    U("1618366712010-f4ae9c647dcb"),
-  ],
+// ─── IMAGE REGISTRY ──────────────────────────────────────────────────────────
+// - number  -> cycles through IMAGE_KEYS by index (old default behavior)
+// - string  -> looked up directly in IMAGES (e.g. "gaming", "hero")
+const IMAGES = {
+  black,
+  gaming,
+  headphones,
+  neckband,
+  open,
+  rose,
+  silver,
+  sport,
+  white,
+  hero,
 };
 
-// Brand-accent shots so each product gets a distinct hero, even inside a shared category.
-const BRAND_ACCENT: Record<string, string> = {
-  Apple: U("1600294037681-c80b4cb5b434"),
-  Sony: U("1545127398-14699f92334b"),
-  Bose: U("1546435770-a3e426bf472b"),
-  Sennheiser: U("1618366712010-f4ae9c647dcb"),
-  JBL: U("1583394838336-acd977736f90"),
-  Beats: U("1558537348-c0f8e733989d"),
-  Nothing: U("1631867675167-90a456a90863"),
-  Samsung: U("1606220588913-b3aacb4d2f46"),
-  OnePlus: U("1608156639585-b3a032ef9689"),
-  Realme: U("1655720845476-b6cba1c8e97e"),
-  Jabra: U("1487215078519-e21cc028cb29"),
-  Skullcandy: U("1591105327764-4d42fac00f7d"),
-  Soundcore: U("1572569511254-d8f925fe2cbb"),
-  Marshall: U("1524678606370-a47ad25cb82a"),
-  Shure: U("1505740420928-5e560c06d30e"),
-  AKG: U("1546435770-a3e426bf472b"),
-  Audeze: U("1583394838336-acd977736f90"),
-  HyperX: U("1612444530582-fc66183b16f8"),
-  Razer: U("1591105327764-4d42fac00f7d"),
-  Logitech: U("1618478594486-c65b899c4936"),
-  Bang: U("1524678606370-a47ad25cb82a"),
-  Boat: U("1608043152269-423dbba4e7e1"),
-  Xiaomi: U("1606220588913-b3aacb4d2f46"),
-  Huawei: U("1590658268037-6bf12165a8df"),
-  Google: U("1631867675167-90a456a90863"),
+const IMAGE_KEYS = Object.keys(IMAGES) as Array<keyof typeof IMAGES>;
+
+function resolveImage(ref: ImageRef): string {
+  if (typeof ref === "number") {
+    return IMAGES[IMAGE_KEYS[ref % IMAGE_KEYS.length]];
+  }
+
+  if (typeof ref === "string" && ref in IMAGES) {
+    return IMAGES[ref as keyof typeof IMAGES];
+  }
+
+  return IMAGES.white;
+}
+
+/**
+ * Build a 4-frame 360 degree rotation gallery.
+ * - If explicit imageKeys are given for a product, use those (repeating/padding as needed).
+ * - Otherwise fall back to the old auto-cycling behavior based on numeric index.
+ */
+function buildGallery(index: number, imageKeys?: ImageRef[]): string[] {
+  if (imageKeys && imageKeys.length > 0) {
+    return [0, 1, 2, 3].map((k) => resolveImage(imageKeys[k % imageKeys.length]));
+  }
+
+  return [0, 1, 2, 3].map((offset) => resolveImage((index + offset) % IMAGE_KEYS.length));
+}
+
+export type ProductSeed = {
+  id: number;
+  name: string;
+  brand: string;
+  category: string;
+  price: number;
+  mrp?: number;
+  originalPrice?: number;
+  discount?: number;
+  rating?: number;
+  reviews?: number;
+  batteryLife?: string;
+  bluetooth?: string;
+  anc?: boolean;
+  colors?: (string | ProductColor)[];
+  description?: string;
+  features?: string[];
+  inStock?: boolean;
+  tagline: string;
+  image?: ImageRef;
+  gallery?: ImageRef[];
+  extra?: Omit<Partial<Product>, "id">;
 };
 
-// Local bundled assets — used as final rotation frame so images always resolve
-// even when the CDN is unreachable.
-const LOCAL = [hero, white, silver, neckband, black, rose, gamingImg, headphones, sport, openImg];
+const COLOR_HEX: Record<string, string> = {
+  black: "#0a0a0a",
+  white: "#f5f5f5",
+  red: "#ff3b30",
+  blue: "#2563eb",
+  green: "#22c55e",
+  silver: "#c0c0c0",
+  grey: "#64748b",
+  gray: "#64748b",
+  yellow: "#facc15",
+  rose: "#f4a7b9",
+  pink: "#ec4899",
+  purple: "#8b5cf6",
+  rgb: "#7c3aed",
+};
 
-function poolFor(category: string): string[] {
-  return POOL[category] ?? POOL.tws;
-}
+const DEFAULT_FEATURES = [
+  "Active Noise Cancellation",
+  "Spatial Audio",
+  "Multipoint Pairing",
+  "Touch Controls",
+  "Wireless Charging",
+  "In-Ear Detection",
+];
 
-function primary(category: string, brand: string, i: number): string {
-  const pool = poolFor(category);
-  return BRAND_ACCENT[brand] ?? pool[i % pool.length];
-}
+function normalizeColor(color: string | ProductColor): ProductColor {
+  if (typeof color !== "string") return color;
 
-function rotationFor(category: string, brand: string, i: number): string[] {
-  const pool = poolFor(category);
-  const accent = BRAND_ACCENT[brand] ?? pool[(i + 1) % pool.length];
-  const a = pool[i % pool.length];
-  const b = pool[(i + 2) % pool.length];
-  const local = LOCAL[i % LOCAL.length];
-  return [accent, a, b, local];
-}
-
-function p(
-  id: string,
-  name: string,
-  brand: string,
-  category: string,
-  price: number,
-  mrp: number,
-  tagline: string,
-  i: number,
-  extra: Partial<Product> = {},
-): Product {
-  const isANC = /anc|flagship|luxury|studio|business/.test(category);
-  const isGaming = category === "gaming";
-  const isSport = category === "sports";
-  const isWired = category === "wired";
-  const isOver = /studio|luxury/.test(category) && brand !== "Nothing";
-
-  const baseSpecs: Record<string, string> = {
-    Bluetooth: isWired ? "N/A (3.5mm)" : "5.3 LE Audio",
-    Driver: isOver ? "40mm Dynamic" : "11mm Dynamic",
-    "Frequency Response": isOver ? "10Hz – 40kHz" : "20Hz – 40kHz",
-    ANC: isANC ? "Hybrid Adaptive (-45dB)" : "Passive Isolation",
-    Codec: "LDAC · aptX Adaptive · AAC",
-    "Battery (Bud/Cup)": isOver ? "60h wireless" : isGaming ? "10h" : "8h",
-    "Battery (Case)": isOver ? "—" : isGaming ? "40h total" : "32h total",
-    Charging: isOver ? "USB-C fast charge" : "USB-C + Qi Wireless",
-    "Water Resistance": isSport ? "IP57 sweat & rinse" : "IPX5",
-    Microphones: "6 mics · ENC · Beamforming",
-    Latency: isGaming ? "35ms low-latency" : "55ms Game Mode",
-    Weight: isOver ? "245g" : "5.1g each",
-    Warranty: "2 Year Global",
+  const key = Object.keys(COLOR_HEX).find((name) => color.toLowerCase().includes(name));
+  return {
+    name: color,
+    hex: key ? COLOR_HEX[key] : "#0a0a0a",
   };
+}
 
-  const featureBase = [
-    "Multipoint Pairing",
-    "Touch Controls",
-    "In-Ear Detection",
-    "Find My PULSE",
-  ];
-  const extraFeatures = [
-    ...(isANC ? ["Active Noise Cancellation", "Transparency Mode"] : []),
-    ...(isSport ? ["Secure-fit wingtips", "Sweat-proof mesh"] : []),
-    ...(isGaming ? ["Dual-mode 2.4GHz + BT", "RGB indicators"] : []),
-    ...(isOver ? ["Foldable travel design", "Plush memory foam"] : ["Wireless Charging", "Spatial Audio"]),
-  ];
+function defaultBatteryLife(id: number, category: string): string {
+  if (category === "wired") return "Wired";
+  if (category === "neckband") return `${30 + (id % 6) * 4}H`;
+  if (category === "studio" || category === "gaming" || category === "luxury") {
+    return `${35 + (id % 7) * 5}H`;
+  }
+  return `${28 + (id % 8) * 3}H`;
+}
+
+function categoryHasAnc(category: string) {
+  return ["anc", "business", "flagship", "luxury", "studio"].includes(category);
+}
+
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function buildProduct(seed: ProductSeed): Product {
+  const { id, name, brand, category, price, tagline, image, gallery, extra } = seed;
+  const mrp = seed.originalPrice ?? seed.mrp ?? Math.round(price * 1.25);
+  const discount = seed.discount ?? Math.max(0, Math.round(((mrp - price) / mrp) * 100));
+  const bluetooth = seed.bluetooth ?? (category === "wired" ? "Wired" : "5.3");
+  const anc = seed.anc ?? categoryHasAnc(category);
+  const batteryLife = seed.batteryLife ?? defaultBatteryLife(id, category);
+  const features = seed.features ?? DEFAULT_FEATURES;
+  const colors = (seed.colors ?? ["Black", "White", "Red"]).map(normalizeColor);
+  const imgRef = image ?? id;
 
   return {
     id,
+    slug: slugify(name),
     name,
     brand,
     category,
     price,
     mrp,
-    rating: 4.2 + ((i * 7) % 8) / 10,
-    reviews: 120 + ((i * 113) % 4800),
-    image: primary(category, brand, i),
-    gallery: rotationFor(category, brand, i),
-    colors: colorwaysFor(brand, category, i),
-    inStock: i % 9 !== 0,
+    originalPrice: mrp,
+    discount,
+    rating: seed.rating ?? 4.2 + ((id * 7) % 8) / 10,
+    reviews: seed.reviews ?? 120 + ((id * 113) % 4800),
+    image: resolveImage(imgRef),
+    gallery: buildGallery(id, gallery),
+    colors,
+    colorNames: colors.map((color) => color.name),
+    inStock: seed.inStock ?? id % 9 !== 0,
     tagline,
-    description: descriptionFor(name, brand, category),
-    specs: baseSpecs,
-    features: [...extraFeatures, ...featureBase],
+    description:
+      seed.description ??
+      "Engineered for true audio purists. Custom-tuned drivers, hybrid adaptive noise cancellation, and a seamless multi-device experience inside a precision-machined chassis.",
+    batteryLife,
+    bluetooth,
+    anc,
+    specs: {
+      Bluetooth: bluetooth,
+      Driver: "11mm Dynamic",
+      "Frequency Response": "20Hz - 40kHz",
+      ANC: anc ? "Hybrid Adaptive (-45dB)" : "No",
+      Codec: "LDAC, AAC, SBC",
+      "Battery Life": batteryLife,
+      "Battery (Earbud)": category === "wired" ? "Wired" : "8h",
+      "Battery (Case)": category === "wired" ? "Wired" : "32h total",
+      Charging: "USB-C + Wireless",
+      "Water Resistance": "IPX5",
+      Microphones: "6 mics + ENC",
+      Weight: "5.1g each",
+      Warranty: "1 Year",
+    },
+    features,
     ...extra,
   };
 }
+// To add a product: append a new object with the next free id (or any id
+// inside a gap you want to fill). To insert "in range" (e.g. between id 5
+// and 6), give it a decimal-free integer id and renumber following seeds,
+// or just append. Order in this array does not need to match id order;
+// PRODUCTS is sorted by id automatically below.
 
-// ─── Brand-tuned colorways so every product feels curated, not templated ────
-const COLORWAY_BANK: Record<string, { name: string; hex: string }[]> = {
-  Apple:      [{ name: "Silver", hex: "#e5e5ea" }, { name: "Midnight", hex: "#1c1c1e" }, { name: "Starlight", hex: "#faf7f2" }],
-  Sony:       [{ name: "Black", hex: "#111111" }, { name: "Platinum Silver", hex: "#c9c9c9" }, { name: "Midnight Blue", hex: "#1b2a4a" }],
-  Bose:       [{ name: "Triple Black", hex: "#0a0a0a" }, { name: "Soapstone", hex: "#e8e2d5" }, { name: "Moonstone Blue", hex: "#5b7a94" }],
-  Sennheiser: [{ name: "Graphite", hex: "#2b2b2b" }, { name: "Metallic Silver", hex: "#c0c0c0" }, { name: "Copper", hex: "#b87333" }],
-  JBL:        [{ name: "Jet Black", hex: "#0a0a0a" }, { name: "Ghost", hex: "#f2f2f2" }, { name: "JBL Orange", hex: "#ff6a00" }],
-  Beats:      [{ name: "Matte Black", hex: "#111111" }, { name: "Beats Red", hex: "#e0002b" }, { name: "Cream", hex: "#f5efe4" }],
-  Nothing:    [{ name: "Transparent", hex: "#d9d9d9" }, { name: "Black", hex: "#0a0a0a" }, { name: "Yellow Pop", hex: "#f6d64a" }],
-  Samsung:    [{ name: "Titanium Silver", hex: "#b5b8ba" }, { name: "White", hex: "#f7f7f7" }, { name: "Graphite", hex: "#2a2a2a" }],
-  OnePlus:    [{ name: "Nebula Green", hex: "#3fa981" }, { name: "Space Black", hex: "#111111" }],
-  Realme:     [{ name: "Racing Yellow", hex: "#ffd400" }, { name: "Punk Black", hex: "#0a0a0a" }, { name: "Sunrise White", hex: "#fafafa" }],
-  Jabra:      [{ name: "Titanium Black", hex: "#1a1a1a" }, { name: "Cocoa", hex: "#5a3f2e" }, { name: "Cream Beige", hex: "#efe4d2" }],
-  Skullcandy: [{ name: "True Black", hex: "#0a0a0a" }, { name: "Crimson", hex: "#c8102e" }, { name: "Vice Gray", hex: "#787878" }],
-  Soundcore:  [{ name: "Astral Black", hex: "#0a0a0a" }, { name: "Cloud White", hex: "#f5f5f5" }, { name: "Sapphire", hex: "#1e3a8a" }],
-  Marshall:   [{ name: "Marshall Black", hex: "#0a0a0a" }, { name: "Brown Vintage", hex: "#5a3a1a" }, { name: "Cream", hex: "#efe1c4" }],
-  Razer:      [{ name: "Razer Black", hex: "#0a0a0a" }, { name: "Neon Green", hex: "#44d62c" }],
-  HyperX:     [{ name: "Stealth Black", hex: "#0a0a0a" }, { name: "Cloud Red", hex: "#c8102e" }],
-};
+export const PRODUCT_SEEDS: ProductSeed[] = [
+  {
+    id: 1,
+    name: "Aurora Pro",
+    brand: "Nothing",
+    category: "tws",
+    price: 14999,
+    mrp: 19999,
+    tagline: "Transparent design. Studio sound.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+    extra: { isBestSeller: true, badges: ["Editor's Pick"] },
+  },
+  {
+    id: 2,
+    name: "AirWave 3",
+    brand: "Apple",
+    category: "luxury",
+    price: 24900,
+    mrp: 26900,
+    tagline: "Spatial audio, redefined.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+    extra: { badges: ["New Launch"], isNew: true },
+  },
+  {
+    id: 3,
+    name: "WF-1000XM6",
+    brand: "Sony",
+    category: "anc",
+    price: 23990,
+    mrp: 27990,
+    tagline: "Industry-leading noise cancellation.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+    extra: { isBestSeller: true },
+  },
+  {
+    id: 4,
+    name: "QuietComfort Ultra",
+    brand: "Bose",
+    category: "anc",
+    price: 25900,
+    mrp: 29900,
+    tagline: "Immersive silence. Endless sound.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+    extra: { badges: ["Premium"] },
+  },
+  {
+    id: 5,
+    name: "Momentum True Wireless 4",
+    brand: "Sennheiser",
+    category: "studio",
+    price: 21990,
+    mrp: 24990,
+    tagline: "Audiophile grade. Wireless freedom.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 6,
+    name: "Tune Flex Pro",
+    brand: "JBL",
+    category: "tws",
+    price: 6999,
+    mrp: 8999,
+    tagline: "Big bass. Bold design.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+    extra: { isNew: true },
+  },
+  {
+    id: 7,
+    name: "Studio Buds+",
+    brand: "Beats",
+    category: "sports",
+    price: 18900,
+    mrp: 19900,
+    tagline: "Powerful, durable, your beat.",
+    image: "sport",
+    gallery: ["sport", "black", "white", "silver"],
+  },
+  {
+    id: 8,
+    name: "Galaxy Buds 3 Pro",
+    brand: "Samsung",
+    category: "flagship",
+    price: 19990,
+    mrp: 23990,
+    tagline: "Crystal-clear AI calls.",
+    image: "hero",
+    gallery: ["hero", "black", "silver", "white"],
+    extra: { badges: ["AI"] },
+  },
+  {
+    id: 9,
+    name: "OnePlus Buds Pro 3",
+    brand: "OnePlus",
+    category: "anc",
+    price: 11999,
+    mrp: 13999,
+    tagline: "Co-engineered with Dynaudio.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 10,
+    name: "Realme Buds Air 7",
+    brand: "Realme",
+    category: "tws",
+    price: 3499,
+    mrp: 4499,
+    tagline: "Beat the silence.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 11,
+    name: "Elite 10",
+    brand: "Jabra",
+    category: "business",
+    price: 22999,
+    mrp: 26999,
+    tagline: "All-day comfort. Crystal calls.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "white"],
+    extra: { badges: ["Best Seller"] },
+  },
+  {
+    id: 12,
+    name: "Crusher ANC 2",
+    brand: "Skullcandy",
+    category: "sports",
+    price: 12990,
+    mrp: 15990,
+    tagline: "Sensory bass technology.",
+    image: "sport",
+    gallery: ["sport", "black", "white", "silver"],
+  },
+  {
+    id: 13,
+    name: "Liberty 5 Pro",
+    brand: "Soundcore",
+    category: "tws",
+    price: 8999,
+    mrp: 11999,
+    tagline: "Hi-res certified. ACAA 3.0.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 14,
+    name: "Major V Wireless",
+    brand: "Marshall",
+    category: "luxury",
+    price: 16999,
+    mrp: 19999,
+    tagline: "Rock-and-roll, untethered.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+    extra: { badges: ["Limited Edition"] },
+  },
+  {
+    id: 15,
+    name: "BassFlex Neckband 200",
+    brand: "JBL",
+    category: "neckband",
+    price: 1999,
+    mrp: 2999,
+    tagline: "30hr playback. Magnetic earbuds.",
+    image: "neckband",
+    gallery: ["neckband", "black", "silver", "white"],
+  },
+  {
+    id: 16,
+    name: "GameBuds X",
+    brand: "Nothing",
+    category: "gaming",
+    price: 5999,
+    mrp: 7999,
+    tagline: "55ms latency. RGB ready.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+    extra: { isNew: true, badges: ["Low Latency"] },
+  },
 
-function colorwaysFor(brand: string, _category: string, i: number) {
-  const bank = COLORWAY_BANK[brand] ?? [
-    { name: "Midnight", hex: "#0a0a0a" },
-    { name: "Frost", hex: "#f5f5f5" },
-    { name: "Signal", hex: "#ff3b30" },
-  ];
-  // Rotate order so identical brands don't stack the same swatch first.
-  return [...bank.slice(i % bank.length), ...bank.slice(0, i % bank.length)];
-}
-
-function descriptionFor(name: string, brand: string, category: string): string {
-  const catBlurb: Record<string, string> = {
-    tws: "featherweight true-wireless comfort with all-day battery",
-    anc: "class-leading hybrid noise cancellation across every frequency",
-    gaming: "ultra-low-latency dual-mode wireless tuned for competitive play",
-    sports: "sweat-proof stability engineered for high-intensity training",
-    business: "crystal-clear beamforming mics and multipoint conferencing",
-    luxury: "hand-finished materials and reference-grade tonal balance",
-    studio: "reference-flat response for tracking, mixing and critical listening",
-    neckband: "magnetic earbuds and marathon battery for the daily commute",
-    "open-ear": "situational awareness with directional air-conduction drivers",
-    wired: "zero-latency analog signal path with braided oxygen-free copper",
-    flagship: "flagship silicon, adaptive DSP, and studio-tuned drivers",
-    kids: "volume-limited safe sound with playful colorways",
-  };
-  const c = catBlurb[category] ?? "premium sound in a precision-machined chassis";
-  return `${name} by ${brand} delivers ${c}. Custom-tuned drivers, adaptive DSP, seamless multi-device switching, and lightning-fast USB-C charging — the definitive PULSE-approved ${brand} listen.`;
-}
-
-export const PRODUCTS: Product[] = [
-  p("aurora-pro", "Aurora Pro", "Nothing", "tws", 14999, 19999, "Transparent design. Studio sound.", 0, { isBestSeller: true, badges: ["Editor's Pick"] }),
-  p("airwave-3", "AirWave 3", "Apple", "luxury", 24900, 26900, "Spatial audio, redefined.", 1, { badges: ["New Launch"], isNew: true }),
-  p("wf-1000xm6", "WF-1000XM6", "Sony", "anc", 23990, 27990, "Industry-leading noise cancellation.", 2, { isBestSeller: true }),
-  p("qc-ultra", "QuietComfort Ultra", "Bose", "anc", 25900, 29900, "Immersive silence. Endless sound.", 3, { badges: ["Premium"] }),
-  p("momentum-4", "Momentum True Wireless 4", "Sennheiser", "studio", 21990, 24990, "Audiophile grade. Wireless freedom.", 0),
-  p("flip-buds", "Tune Flex Pro", "JBL", "tws", 6999, 8999, "Big bass. Bold design.", 1, { isNew: true }),
-  p("studio-buds-plus", "Studio Buds+", "Beats", "sports", 18900, 19900, "Powerful, durable, your beat.", 2),
-  p("buds-3-pro", "Galaxy Buds 3 Pro", "Samsung", "flagship", 19990, 23990, "Crystal-clear AI calls.", 3, { badges: ["AI"] }),
-  p("buds-pro-3", "OnePlus Buds Pro 3", "OnePlus", "anc", 11999, 13999, "Co-engineered with Dynaudio.", 0),
-  p("nord-buds", "Realme Buds Air 7", "Realme", "tws", 3499, 4499, "Beat the silence.", 1),
-  p("elite-10", "Elite 10", "Jabra", "business", 22999, 26999, "All-day comfort. Crystal calls.", 2, { badges: ["Best Seller"] }),
-  p("crusher", "Crusher ANC 2", "Skullcandy", "sports", 12990, 15990, "Sensory bass technology.", 3),
-  p("liberty-5", "Liberty 5 Pro", "Soundcore", "tws", 8999, 11999, "Hi-res certified. ACAA 3.0.", 0),
-  p("major-v", "Major V Wireless", "Marshall", "luxury", 16999, 19999, "Rock-and-roll, untethered.", 1, { badges: ["Limited Edition"] }),
-  p("neck-bass", "BassFlex Neckband 200", "JBL", "neckband", 1999, 2999, "30hr playback. Magnetic earbuds.", 2),
-  p("gamebuds-x", "GameBuds X", "Nothing", "gaming", 5999, 7999, "55ms latency. RGB ready.", 3, { isNew: true, badges: ["Low Latency"] }),
+  {
+    id: 17,
+    name: "AirWave 2",
+    brand: "Apple",
+    category: "tws",
+    price: 18900,
+    mrp: 21900,
+    tagline: "The everyday AirWave.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 18,
+    name: "AirWave Max Over-Ear",
+    brand: "Apple",
+    category: "luxury",
+    price: 59900,
+    mrp: 62900,
+    tagline: "Computational audio. Over-ear.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+  },
+  {
+    id: 19,
+    name: "WF-1000XM5",
+    brand: "Sony",
+    category: "anc",
+    price: 19990,
+    mrp: 22990,
+    tagline: "Iconic noise cancellation.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 20,
+    name: "LinkBuds Open",
+    brand: "Sony",
+    category: "open-ear",
+    price: 17990,
+    mrp: 19990,
+    tagline: "Hear it all. Stream it all.",
+    image: "open",
+    gallery: ["open", "white", "silver", "hero"],
+  },
+  {
+    id: 21,
+    name: "ULT Wear",
+    brand: "Sony",
+    category: "studio",
+    price: 22999,
+    mrp: 27999,
+    tagline: "Massive ULT bass.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 22,
+    name: "QuietComfort Earbuds II",
+    brand: "Bose",
+    category: "anc",
+    price: 22900,
+    mrp: 26900,
+    tagline: "CustomTune your silence.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 23,
+    name: "SoundLink Mini Buds",
+    brand: "Bose",
+    category: "tws",
+    price: 9999,
+    mrp: 12999,
+    tagline: "Tiny case. Big Bose sound.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 24,
+    name: "Momentum 4 Over-Ear",
+    brand: "Sennheiser",
+    category: "studio",
+    price: 31990,
+    mrp: 36990,
+    tagline: "60 hours of audiophile bliss.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 25,
+    name: "Accentum Plus",
+    brand: "Sennheiser",
+    category: "anc",
+    price: 17990,
+    mrp: 21990,
+    tagline: "Hybrid ANC for the long haul.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 26,
+    name: "Live Pro 3 TWS",
+    brand: "JBL",
+    category: "tws",
+    price: 9999,
+    mrp: 12999,
+    tagline: "Hi-res. Spatial 360.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 27,
+    name: "Tour One M3",
+    brand: "JBL",
+    category: "anc",
+    price: 18999,
+    mrp: 22999,
+    tagline: "Smart Tx with the case.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 28,
+    name: "Studio Pro Over-Ear",
+    brand: "Beats",
+    category: "studio",
+    price: 32900,
+    mrp: 36900,
+    tagline: "Powerful sound. 40hr battery.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 29,
+    name: "Fit Pro 2",
+    brand: "Beats",
+    category: "sports",
+    price: 14900,
+    mrp: 17900,
+    tagline: "Secure-fit wingtips.",
+    image: "sport",
+    gallery: ["sport", "black", "white", "silver"],
+  },
+  {
+    id: 30,
+    name: "Solo 4 Wireless",
+    brand: "Beats",
+    category: "luxury",
+    price: 22900,
+    mrp: 24900,
+    tagline: "On-ear icon, reimagined.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+  },
+  {
+    id: 31,
+    name: "Ear (2)",
+    brand: "Nothing",
+    category: "tws",
+    price: 12999,
+    mrp: 14999,
+    tagline: "Transparent. Personal.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 32,
+    name: "Ear (stick)",
+    brand: "Nothing",
+    category: "tws",
+    price: 8499,
+    mrp: 9999,
+    tagline: "Designed to disappear.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 33,
+    name: "CMF Buds Pro 2",
+    brand: "Nothing",
+    category: "anc",
+    price: 4499,
+    mrp: 5499,
+    tagline: "Smart Dial. Big bass.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 34,
+    name: "Galaxy Buds 3 FE",
+    brand: "Samsung",
+    category: "tws",
+    price: 9999,
+    mrp: 12999,
+    tagline: "AI for everyone.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 35,
+    name: "Galaxy Buds 2 Pro",
+    brand: "Samsung",
+    category: "anc",
+    price: 15990,
+    mrp: 18990,
+    tagline: "24-bit Hi-Fi.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 36,
+    name: "Nord Buds 3 Pro",
+    brand: "OnePlus",
+    category: "tws",
+    price: 3999,
+    mrp: 4999,
+    tagline: "Glass-finish, AI noise reduction.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 37,
+    name: "OnePlus Buds 3",
+    brand: "OnePlus",
+    category: "tws",
+    price: 5499,
+    mrp: 6999,
+    tagline: "Dual drivers. Spatial audio.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 38,
+    name: "Narzo Buds N1",
+    brand: "Realme",
+    category: "tws",
+    price: 1499,
+    mrp: 1999,
+    tagline: "Bass boost, daily driver.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 39,
+    name: "Buds Air 6 Pro",
+    brand: "Realme",
+    category: "anc",
+    price: 4999,
+    mrp: 6999,
+    tagline: "50dB hybrid ANC.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 40,
+    name: "Elite 8 Active",
+    brand: "Jabra",
+    category: "sports",
+    price: 18999,
+    mrp: 22999,
+    tagline: "Military-grade durability.",
+    image: "sport",
+    gallery: ["sport", "black", "white", "silver"],
+  },
+  {
+    id: 41,
+    name: "Evolve2 75",
+    brand: "Jabra",
+    category: "business",
+    price: 33999,
+    mrp: 39999,
+    tagline: "Office and commute, sorted.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "white"],
+  },
+  {
+    id: 42,
+    name: "Crusher Evo",
+    brand: "Skullcandy",
+    category: "studio",
+    price: 14990,
+    mrp: 17990,
+    tagline: "Personal sound, sensory bass.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 43,
+    name: "Indy ANC",
+    brand: "Skullcandy",
+    category: "tws",
+    price: 6990,
+    mrp: 8990,
+    tagline: "Skull-iQ smart features.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 44,
+    name: "Space Q45",
+    brand: "Soundcore",
+    category: "anc",
+    price: 11999,
+    mrp: 14999,
+    tagline: "50hr ANC giant.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 45,
+    name: "Liberty 4 NC",
+    brand: "Soundcore",
+    category: "anc",
+    price: 7999,
+    mrp: 9999,
+    tagline: "Adaptive ANC 2.0.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 46,
+    name: "Sport X10",
+    brand: "Soundcore",
+    category: "sports",
+    price: 5999,
+    mrp: 7999,
+    tagline: "Rotatable ear hooks.",
+    image: "sport",
+    gallery: ["sport", "black", "white", "silver"],
+  },
+  {
+    id: 47,
+    name: "Motif ANC",
+    brand: "Marshall",
+    category: "anc",
+    price: 17999,
+    mrp: 19999,
+    tagline: "Tactile rock heritage.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 48,
+    name: "Minor IV",
+    brand: "Marshall",
+    category: "tws",
+    price: 11999,
+    mrp: 13999,
+    tagline: "30hr. Rock-star sound.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 49,
+    name: "Wave Beam 300",
+    brand: "JBL",
+    category: "neckband",
+    price: 2499,
+    mrp: 3499,
+    tagline: "32hr neckband fun.",
+    image: "neckband",
+    gallery: ["neckband", "black", "silver", "white"],
+  },
+  {
+    id: 50,
+    name: "C100SI Wired",
+    brand: "JBL",
+    category: "wired",
+    price: 499,
+    mrp: 999,
+    tagline: "The everyday wired pair.",
+    image: "silver",
+    gallery: ["silver", "black", "white", "hero"],
+  },
+  {
+    id: 51,
+    name: "SE215 Pro Wired",
+    brand: "Shure",
+    category: "studio",
+    price: 8999,
+    mrp: 11999,
+    tagline: "Reference monitoring.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 52,
+    name: "AONIC 50 Gen 2",
+    brand: "Shure",
+    category: "studio",
+    price: 36999,
+    mrp: 42999,
+    tagline: "Studio-grade, wireless.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 53,
+    name: "K371 Studio",
+    brand: "AKG",
+    category: "studio",
+    price: 8990,
+    mrp: 10990,
+    tagline: "Closed-back reference.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 54,
+    name: "Y50BT On-Ear",
+    brand: "AKG",
+    category: "luxury",
+    price: 12999,
+    mrp: 14999,
+    tagline: "Iconic foldable on-ear.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+  },
+  {
+    id: 55,
+    name: "LCD-i4 IEM",
+    brand: "Audeze",
+    category: "luxury",
+    price: 149900,
+    mrp: 169900,
+    tagline: "Planar magnetic in-ear flagship.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+  },
+  {
+    id: 56,
+    name: "Maxwell Gaming",
+    brand: "Audeze",
+    category: "gaming",
+    price: 32990,
+    mrp: 36990,
+    tagline: "Planar gaming over-ear.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 57,
+    name: "Cloud II Wireless",
+    brand: "HyperX",
+    category: "gaming",
+    price: 8999,
+    mrp: 11999,
+    tagline: "30hr stamina, DTS spatial.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 58,
+    name: "Cloud Buds II",
+    brand: "HyperX",
+    category: "gaming",
+    price: 4999,
+    mrp: 6999,
+    tagline: "Low-latency TWS for play.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 59,
+    name: "Barracuda Pro",
+    brand: "Razer",
+    category: "gaming",
+    price: 19999,
+    mrp: 22999,
+    tagline: "THX spatial. Hybrid ANC.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 60,
+    name: "Hammerhead HyperSpeed",
+    brand: "Razer",
+    category: "gaming",
+    price: 12999,
+    mrp: 14999,
+    tagline: "Tri-mode wireless.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 61,
+    name: "Zone Vibe 100",
+    brand: "Logitech",
+    category: "business",
+    price: 11999,
+    mrp: 13999,
+    tagline: "Light, soft, every-day calls.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "white"],
+  },
+  {
+    id: 62,
+    name: "G Pro X2 Lightspeed",
+    brand: "Logitech",
+    category: "gaming",
+    price: 27999,
+    mrp: 31999,
+    tagline: "Pro-grade graphene drivers.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 63,
+    name: "Beoplay H95",
+    brand: "Bang",
+    category: "luxury",
+    price: 89900,
+    mrp: 99900,
+    tagline: "Anniversary craftsmanship.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+  },
+  {
+    id: 64,
+    name: "Beoplay EX",
+    brand: "Bang",
+    category: "luxury",
+    price: 39900,
+    mrp: 44900,
+    tagline: "Cast aluminium TWS.",
+    image: "rose",
+    gallery: ["rose", "black", "silver", "hero"],
+  },
+  {
+    id: 65,
+    name: "Airdopes 458 Pro",
+    brand: "Boat",
+    category: "tws",
+    price: 1799,
+    mrp: 3499,
+    tagline: "ENx™ tech, 50hr.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 66,
+    name: "Rockerz 550",
+    brand: "Boat",
+    category: "studio",
+    price: 1999,
+    mrp: 4499,
+    tagline: "20hr playback, bold.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 67,
+    name: "Redmi Buds 5 Pro",
+    brand: "Xiaomi",
+    category: "anc",
+    price: 4999,
+    mrp: 6999,
+    tagline: "Dual driver hi-res.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 68,
+    name: "Mi True Wireless 3",
+    brand: "Xiaomi",
+    category: "tws",
+    price: 3499,
+    mrp: 4499,
+    tagline: "Lightweight every-day TWS.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 69,
+    name: "FreeBuds Pro 4",
+    brand: "Huawei",
+    category: "flagship",
+    price: 17999,
+    mrp: 21999,
+    tagline: "Triple driver, dynamic ANC.",
+    image: "hero",
+    gallery: ["hero", "black", "silver", "white"],
+  },
+  {
+    id: 70,
+    name: "Pixel Buds Pro 2",
+    brand: "Google",
+    category: "anc",
+    price: 22900,
+    mrp: 25900,
+    tagline: "Tensor A1 silicon. AI translation.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
 ];
 
-// ─── 54 additional products to reach a 70-product catalog ───────────────────
-type Seed = [string, string, string, string, number, number, string, Partial<Product>?];
+// ── ADD NEW PRODUCTS BELOW ──
+  // Example: using a specific existing image key:
+  // { id: 71, name: "New Buds X", brand: "Sony", category: "tws", price: 9999, mrp: 12999,
+  //   tagline: "Fresh drop.", image: "sport", gallery: ["sport", "black", "white", "silver"] },
+  //
+  // Example: with all-new imported images:
+  // 1) import myNewImg from "@/assets/product-newthing.jpg";
+  // 2) register it: IMAGES.myNewImg = myNewImg;   (or add to the IMAGES map above)
+  // 3) reference it by key: image: "myNewImg"
 
-const EXTRA: Seed[] = [
-  ["airwave-2", "AirWave 2", "Apple", "tws", 18900, 21900, "The everyday AirWave."],
-  ["airwave-max", "AirWave Max Over-Ear", "Apple", "luxury", 59900, 62900, "Computational audio. Over-ear."],
-  ["wf-1000xm5", "WF-1000XM5", "Sony", "anc", 19990, 22990, "Iconic noise cancellation."],
-  ["linkbuds-open", "LinkBuds Open", "Sony", "open-ear", 17990, 19990, "Hear it all. Stream it all."],
-  ["ult-wear", "ULT Wear", "Sony", "studio", 22999, 27999, "Massive ULT bass."],
-  ["qc-earbuds-2", "QuietComfort Earbuds II", "Bose", "anc", 22900, 26900, "CustomTune your silence."],
-  ["soundlink-mini", "SoundLink Mini Buds", "Bose", "tws", 9999, 12999, "Tiny case. Big Bose sound."],
-  ["momentum-3-overear", "Momentum 4 Over-Ear", "Sennheiser", "studio", 31990, 36990, "60 hours of audiophile bliss."],
-  ["accentum-plus", "Accentum Plus", "Sennheiser", "anc", 17990, 21990, "Hybrid ANC for the long haul."],
-  ["live-pro-3", "Live Pro 3 TWS", "JBL", "tws", 9999, 12999, "Hi-res. Spatial 360."],
-  ["tour-one-m3", "Tour One M3", "JBL", "anc", 18999, 22999, "Smart Tx with the case."],
-  ["studio-pro", "Studio Pro Over-Ear", "Beats", "studio", 32900, 36900, "Powerful sound. 40hr battery."],
-  ["fit-pro-2", "Fit Pro 2", "Beats", "sports", 14900, 17900, "Secure-fit wingtips."],
-  ["solo-4", "Solo 4 Wireless", "Beats", "luxury", 22900, 24900, "On-ear icon, reimagined."],
-  ["ear-2", "Ear (2)", "Nothing", "tws", 12999, 14999, "Transparent. Personal."],
-  ["ear-stick", "Ear (stick)", "Nothing", "tws", 8499, 9999, "Designed to disappear."],
-  ["cmf-buds-pro-2", "CMF Buds Pro 2", "Nothing", "anc", 4499, 5499, "Smart Dial. Big bass."],
-  ["buds-3-fe", "Galaxy Buds 3 FE", "Samsung", "tws", 9999, 12999, "AI for everyone."],
-  ["buds-2-pro", "Galaxy Buds 2 Pro", "Samsung", "anc", 15990, 18990, "24-bit Hi-Fi."],
-  ["nord-buds-3-pro", "Nord Buds 3 Pro", "OnePlus", "tws", 3999, 4999, "Glass-finish, AI noise reduction."],
-  ["buds-3", "OnePlus Buds 3", "OnePlus", "tws", 5499, 6999, "Dual drivers. Spatial audio."],
-  ["narzo-buds", "Narzo Buds N1", "Realme", "tws", 1499, 1999, "Bass boost, daily driver."],
-  ["buds-air-6", "Buds Air 6 Pro", "Realme", "anc", 4999, 6999, "50dB hybrid ANC."],
-  ["elite-8-active", "Elite 8 Active", "Jabra", "sports", 18999, 22999, "Military-grade durability."],
-  ["evolve2-75", "Evolve2 75", "Jabra", "business", 33999, 39999, "Office and commute, sorted."],
-  ["crusher-evo", "Crusher Evo", "Skullcandy", "studio", 14990, 17990, "Personal sound, sensory bass."],
-  ["indy-anc", "Indy ANC", "Skullcandy", "tws", 6990, 8990, "Skull-iQ smart features."],
-  ["space-q45", "Space Q45", "Soundcore", "anc", 11999, 14999, "50hr ANC giant."],
-  ["liberty-4-nc", "Liberty 4 NC", "Soundcore", "anc", 7999, 9999, "Adaptive ANC 2.0."],
-  ["sport-x10", "Sport X10", "Soundcore", "sports", 5999, 7999, "Rotatable ear hooks."],
-  ["motif-anc", "Motif ANC", "Marshall", "anc", 17999, 19999, "Tactile rock heritage."],
-  ["minor-iv", "Minor IV", "Marshall", "tws", 11999, 13999, "30hr. Rock-star sound."],
-  ["wave-300", "Wave Beam 300", "JBL", "neckband", 2499, 3499, "32hr neckband fun."],
-  ["c100si", "C100SI Wired", "JBL", "wired", 499, 999, "The everyday wired pair."],
-  ["se215", "SE215 Pro Wired", "Shure", "studio", 8999, 11999, "Reference monitoring."],
-  ["aonic-50", "AONIC 50 Gen 2", "Shure", "studio", 36999, 42999, "Studio-grade, wireless."],
-  ["k371", "K371 Studio", "AKG", "studio", 8990, 10990, "Closed-back reference."],
-  ["y50bt", "Y50BT On-Ear", "AKG", "luxury", 12999, 14999, "Iconic foldable on-ear."],
-  ["lcd-i4", "LCD-i4 IEM", "Audeze", "luxury", 149900, 169900, "Planar magnetic in-ear flagship."],
-  ["maxwell", "Maxwell Gaming", "Audeze", "gaming", 32990, 36990, "Planar gaming over-ear."],
-  ["cloud-ii", "Cloud II Wireless", "HyperX", "gaming", 8999, 11999, "30hr stamina, DTS spatial."],
-  ["cloud-buds-2", "Cloud Buds II", "HyperX", "gaming", 4999, 6999, "Low-latency TWS for play."],
-  ["barracuda-pro", "Barracuda Pro", "Razer", "gaming", 19999, 22999, "THX spatial. Hybrid ANC."],
-  ["hammerhead-pro", "Hammerhead HyperSpeed", "Razer", "gaming", 12999, 14999, "Tri-mode wireless."],
-  ["zone-vibe-100", "Zone Vibe 100", "Logitech", "business", 11999, 13999, "Light, soft, every-day calls."],
-  ["g-pro-x2", "G Pro X2 Lightspeed", "Logitech", "gaming", 27999, 31999, "Pro-grade graphene drivers."],
-  ["bo-h95", "Beoplay H95", "Bang", "luxury", 89900, 99900, "Anniversary craftsmanship."],
-  ["bo-ex", "Beoplay EX", "Bang", "luxury", 39900, 44900, "Cast aluminium TWS."],
-  ["airdopes-pro", "Airdopes 458 Pro", "Boat", "tws", 1799, 3499, "ENx™ tech, 50hr."],
-  ["rockerz-550", "Rockerz 550", "Boat", "studio", 1999, 4499, "20hr playback, bold."],
-  ["redmi-buds-5-pro", "Redmi Buds 5 Pro", "Xiaomi", "anc", 4999, 6999, "Dual driver hi-res."],
-  ["mi-true-wireless-3", "Mi True Wireless 3", "Xiaomi", "tws", 3499, 4499, "Lightweight every-day TWS."],
-  ["freebuds-pro-4", "FreeBuds Pro 4", "Huawei", "flagship", 17999, 21999, "Triple driver, dynamic ANC."],
-  ["pixel-buds-pro-2", "Pixel Buds Pro 2", "Google", "anc", 22900, 25900, "Tensor A1 silicon. AI translation."],
-];
+// ─── DERIVED EXPORTS ──────────────────────────────────────────────────────────
 
-EXTRA.forEach((s, idx) => {
-  const [id, name, brand, category, price, mrp, tagline, extra] = s;
-  PRODUCTS.push(p(id, name, brand, category, price, mrp, tagline, 4 + idx, extra));
-});
+export const PRODUCTS: Product[] = PRODUCT_SEEDS.slice()
+  .sort((a, b) => a.id - b.id)
+  .map(buildProduct);
 
-export const ALL_BRANDS = Array.from(new Set(PRODUCTS.map((x) => x.brand)));
+export function getProductById(id: number) {
+  return PRODUCTS.find((product) => product.id === id);
+}
 
-export function getProduct(id: string) {
-  return PRODUCTS.find((p) => p.id === id);
+export function getProductBySlug(slug: string) {
+  return PRODUCTS.find((product) => product.slug === slug);
+}
+
+/** Accepts a numeric id, a numeric string from the route, or a slug. */
+export function getProduct(idOrSlug: number | string) {
+  if (typeof idOrSlug === "number") return getProductById(idOrSlug);
+
+  const numericId = Number(idOrSlug);
+  return Number.isInteger(numericId) ? getProductById(numericId) : getProductBySlug(idOrSlug);
 }
