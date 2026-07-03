@@ -187,6 +187,41 @@ function p(
   i: number,
   extra: Partial<Product> = {},
 ): Product {
+  const isANC = /anc|flagship|luxury|studio|business/.test(category);
+  const isGaming = category === "gaming";
+  const isSport = category === "sports";
+  const isWired = category === "wired";
+  const isOver = /studio|luxury/.test(category) && brand !== "Nothing";
+
+  const baseSpecs: Record<string, string> = {
+    Bluetooth: isWired ? "N/A (3.5mm)" : "5.3 LE Audio",
+    Driver: isOver ? "40mm Dynamic" : "11mm Dynamic",
+    "Frequency Response": isOver ? "10Hz – 40kHz" : "20Hz – 40kHz",
+    ANC: isANC ? "Hybrid Adaptive (-45dB)" : "Passive Isolation",
+    Codec: "LDAC · aptX Adaptive · AAC",
+    "Battery (Bud/Cup)": isOver ? "60h wireless" : isGaming ? "10h" : "8h",
+    "Battery (Case)": isOver ? "—" : isGaming ? "40h total" : "32h total",
+    Charging: isOver ? "USB-C fast charge" : "USB-C + Qi Wireless",
+    "Water Resistance": isSport ? "IP57 sweat & rinse" : "IPX5",
+    Microphones: "6 mics · ENC · Beamforming",
+    Latency: isGaming ? "35ms low-latency" : "55ms Game Mode",
+    Weight: isOver ? "245g" : "5.1g each",
+    Warranty: "2 Year Global",
+  };
+
+  const featureBase = [
+    "Multipoint Pairing",
+    "Touch Controls",
+    "In-Ear Detection",
+    "Find My PULSE",
+  ];
+  const extraFeatures = [
+    ...(isANC ? ["Active Noise Cancellation", "Transparency Mode"] : []),
+    ...(isSport ? ["Secure-fit wingtips", "Sweat-proof mesh"] : []),
+    ...(isGaming ? ["Dual-mode 2.4GHz + BT", "RGB indicators"] : []),
+    ...(isOver ? ["Foldable travel design", "Plush memory foam"] : ["Wireless Charging", "Spatial Audio"]),
+  ];
+
   return {
     id,
     name,
@@ -198,40 +233,63 @@ function p(
     reviews: 120 + ((i * 113) % 4800),
     image: primary(category, brand, i),
     gallery: rotationFor(category, brand, i),
-    colors: [
-      { name: "Black", hex: "#0a0a0a" },
-      { name: "White", hex: "#f5f5f5" },
-      { name: "Red", hex: "#ff3b30" },
-    ],
+    colors: colorwaysFor(brand, category, i),
     inStock: i % 9 !== 0,
     tagline,
-    description:
-      "Engineered for true audio purists. Custom-tuned drivers, hybrid adaptive noise cancellation, and a seamless multi-device experience inside a precision-machined chassis.",
-    specs: {
-      Bluetooth: "5.3",
-      Driver: "11mm Dynamic",
-      "Frequency Response": "20Hz – 40kHz",
-      ANC: "Hybrid Adaptive (-45dB)",
-      Codec: "LDAC, AAC, SBC",
-      "Battery (Earbud)": "8h",
-      "Battery (Case)": "32h total",
-      Charging: "USB-C + Wireless",
-      "Water Resistance": "IPX5",
-      Microphones: "6 mics + ENC",
-      Latency: "55ms Game Mode",
-      Weight: "5.1g each",
-      Warranty: "1 Year",
-    },
-    features: [
-      "Active Noise Cancellation",
-      "Spatial Audio",
-      "Multipoint Pairing",
-      "Touch Controls",
-      "Wireless Charging",
-      "In-Ear Detection",
-    ],
+    description: descriptionFor(name, brand, category),
+    specs: baseSpecs,
+    features: [...extraFeatures, ...featureBase],
     ...extra,
   };
+}
+
+// ─── Brand-tuned colorways so every product feels curated, not templated ────
+const COLORWAY_BANK: Record<string, { name: string; hex: string }[]> = {
+  Apple:      [{ name: "Silver", hex: "#e5e5ea" }, { name: "Midnight", hex: "#1c1c1e" }, { name: "Starlight", hex: "#faf7f2" }],
+  Sony:       [{ name: "Black", hex: "#111111" }, { name: "Platinum Silver", hex: "#c9c9c9" }, { name: "Midnight Blue", hex: "#1b2a4a" }],
+  Bose:       [{ name: "Triple Black", hex: "#0a0a0a" }, { name: "Soapstone", hex: "#e8e2d5" }, { name: "Moonstone Blue", hex: "#5b7a94" }],
+  Sennheiser: [{ name: "Graphite", hex: "#2b2b2b" }, { name: "Metallic Silver", hex: "#c0c0c0" }, { name: "Copper", hex: "#b87333" }],
+  JBL:        [{ name: "Jet Black", hex: "#0a0a0a" }, { name: "Ghost", hex: "#f2f2f2" }, { name: "JBL Orange", hex: "#ff6a00" }],
+  Beats:      [{ name: "Matte Black", hex: "#111111" }, { name: "Beats Red", hex: "#e0002b" }, { name: "Cream", hex: "#f5efe4" }],
+  Nothing:    [{ name: "Transparent", hex: "#d9d9d9" }, { name: "Black", hex: "#0a0a0a" }, { name: "Yellow Pop", hex: "#f6d64a" }],
+  Samsung:    [{ name: "Titanium Silver", hex: "#b5b8ba" }, { name: "White", hex: "#f7f7f7" }, { name: "Graphite", hex: "#2a2a2a" }],
+  OnePlus:    [{ name: "Nebula Green", hex: "#3fa981" }, { name: "Space Black", hex: "#111111" }],
+  Realme:     [{ name: "Racing Yellow", hex: "#ffd400" }, { name: "Punk Black", hex: "#0a0a0a" }, { name: "Sunrise White", hex: "#fafafa" }],
+  Jabra:      [{ name: "Titanium Black", hex: "#1a1a1a" }, { name: "Cocoa", hex: "#5a3f2e" }, { name: "Cream Beige", hex: "#efe4d2" }],
+  Skullcandy: [{ name: "True Black", hex: "#0a0a0a" }, { name: "Crimson", hex: "#c8102e" }, { name: "Vice Gray", hex: "#787878" }],
+  Soundcore:  [{ name: "Astral Black", hex: "#0a0a0a" }, { name: "Cloud White", hex: "#f5f5f5" }, { name: "Sapphire", hex: "#1e3a8a" }],
+  Marshall:   [{ name: "Marshall Black", hex: "#0a0a0a" }, { name: "Brown Vintage", hex: "#5a3a1a" }, { name: "Cream", hex: "#efe1c4" }],
+  Razer:      [{ name: "Razer Black", hex: "#0a0a0a" }, { name: "Neon Green", hex: "#44d62c" }],
+  HyperX:     [{ name: "Stealth Black", hex: "#0a0a0a" }, { name: "Cloud Red", hex: "#c8102e" }],
+};
+
+function colorwaysFor(brand: string, _category: string, i: number) {
+  const bank = COLORWAY_BANK[brand] ?? [
+    { name: "Midnight", hex: "#0a0a0a" },
+    { name: "Frost", hex: "#f5f5f5" },
+    { name: "Signal", hex: "#ff3b30" },
+  ];
+  // Rotate order so identical brands don't stack the same swatch first.
+  return [...bank.slice(i % bank.length), ...bank.slice(0, i % bank.length)];
+}
+
+function descriptionFor(name: string, brand: string, category: string): string {
+  const catBlurb: Record<string, string> = {
+    tws: "featherweight true-wireless comfort with all-day battery",
+    anc: "class-leading hybrid noise cancellation across every frequency",
+    gaming: "ultra-low-latency dual-mode wireless tuned for competitive play",
+    sports: "sweat-proof stability engineered for high-intensity training",
+    business: "crystal-clear beamforming mics and multipoint conferencing",
+    luxury: "hand-finished materials and reference-grade tonal balance",
+    studio: "reference-flat response for tracking, mixing and critical listening",
+    neckband: "magnetic earbuds and marathon battery for the daily commute",
+    "open-ear": "situational awareness with directional air-conduction drivers",
+    wired: "zero-latency analog signal path with braided oxygen-free copper",
+    flagship: "flagship silicon, adaptive DSP, and studio-tuned drivers",
+    kids: "volume-limited safe sound with playful colorways",
+  };
+  const c = catBlurb[category] ?? "premium sound in a precision-machined chassis";
+  return `${name} by ${brand} delivers ${c}. Custom-tuned drivers, adaptive DSP, seamless multi-device switching, and lightning-fast USB-C charging — the definitive PULSE-approved ${brand} listen.`;
 }
 
 export const PRODUCTS: Product[] = [
