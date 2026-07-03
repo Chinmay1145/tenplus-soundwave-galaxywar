@@ -153,10 +153,7 @@ export function downloadInvoice(data: InvoiceData) {
 
   // Compute totals
   const explicitSubtotal = data.subtotal && data.subtotal > 0 ? data.subtotal : 0;
-  const itemsTotal = data.items.reduce(
-    (sum, it) => sum + (it.price ?? 0) * it.qty,
-    0,
-  );
+  const itemsTotal = data.items.reduce((sum, it) => sum + (it.price ?? 0) * it.qty, 0);
   const subtotal = explicitSubtotal || itemsTotal || data.total / 1.18;
   const tax = data.tax ?? Math.max(0, data.total - subtotal - (data.shipping ?? 0));
   const cgst = tax / 2;
@@ -167,7 +164,13 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(10);
 
   data.items.forEach((it, idx) => {
-    const unit = it.price ?? subtotal / Math.max(1, data.items.reduce((a, b) => a + b.qty, 0));
+    const unit =
+      it.price ??
+      subtotal /
+        Math.max(
+          1,
+          data.items.reduce((a, b) => a + b.qty, 0),
+        );
     const amt = unit * it.qty;
 
     if (idx % 2 === 1) {
@@ -287,7 +290,11 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(8);
   doc.setTextColor(...muted);
   doc.text("Thank you for shopping with PULSE.", M, H - 34);
-  doc.text("This is a system-generated invoice and does not require a physical signature.", M, H - 22);
+  doc.text(
+    "This is a system-generated invoice and does not require a physical signature.",
+    M,
+    H - 22,
+  );
   doc.setTextColor(...accent);
   doc.text("www.pulse.audio", W - M, H - 22, { align: "right" });
 
