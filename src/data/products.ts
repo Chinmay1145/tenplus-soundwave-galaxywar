@@ -1,4 +1,3 @@
-
 import black from "@/assets/product-black.jpg";
 import gaming from "@/assets/product-gaming.jpg";
 import headphones from "@/assets/product-headphones.jpg";
@@ -97,9 +96,29 @@ const IMAGES = {
 
 const IMAGE_KEYS = Object.keys(IMAGES) as Array<keyof typeof IMAGES>;
 
+/**
+ * Returns true when the ref is an external / absolute image URL
+ * (http(s)://…, protocol-relative //…, or an absolute /public path).
+ * These are passed through untouched so seeds can reference images
+ * hosted anywhere on the web.
+ */
+function isImageUrl(ref: unknown): ref is string {
+  return (
+    typeof ref === "string" &&
+    (ref.startsWith("http://") ||
+      ref.startsWith("https://") ||
+      ref.startsWith("//") ||
+      ref.startsWith("/"))
+  );
+}
+
 function resolveImage(ref: ImageRef): string {
   if (typeof ref === "number") {
     return IMAGES[IMAGE_KEYS[ref % IMAGE_KEYS.length]];
+  }
+
+  if (isImageUrl(ref)) {
+    return ref;
   }
 
   if (typeof ref === "string" && ref in IMAGES) {
@@ -110,8 +129,27 @@ function resolveImage(ref: ImageRef): string {
 }
 
 /**
+ * Build a 4-frame gallery from a single hero URL by appending Unsplash-style
+ * crop hints. Works with any full-bleed image URL — falls back to the raw
+ * URL for hosts that don't accept the crop params, so every frame still
+ * resolves to *some* image of the same product/style.
+ */
+export function galleryFromUrl(url: string): string[] {
+  if (!isImageUrl(url)) return [url, url, url, url];
+  const sep = url.includes("?") ? "&" : "?";
+  // 4 subtly different crops → "same type" 360-style rotation
+  return [
+    `${url}${sep}v=1`,
+    `${url}${sep}v=2&fit=crop&crop=center`,
+    `${url}${sep}v=3&fit=crop&crop=entropy`,
+    `${url}${sep}v=4&fit=crop&crop=faces`,
+  ];
+}
+
+/**
  * Build a 4-frame 360 degree rotation gallery.
- * - If explicit imageKeys are given for a product, use those (repeating/padding as needed).
+ * - If explicit imageKeys/URLs are given, use those (repeating/padding as needed).
+ *   Each entry can be a local IMAGES key, a numeric index, or a full image URL.
  * - Otherwise fall back to the old auto-cycling behavior based on numeric index.
  */
 function buildGallery(index: number, imageKeys?: ImageRef[]): string[] {
@@ -1041,6 +1079,344 @@ export const PRODUCT_SEEDS: ProductSeed[] = [
     tagline: "Tensor A1 silicon. AI translation.",
     image: "black",
     gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 71,
+    name: "Ear (open)",
+    brand: "Nothing",
+    category: "open-ear",
+    price: 8999,
+    mrp: 10999,
+    tagline: "Open-ear. Iconic transparency.",
+    image: "open",
+    gallery: ["open", "white", "silver", "hero"],
+    extra: { isNew: true, badges: ["New"] },
+  },
+  {
+    id: 72,
+    name: "Ear (a)",
+    brand: "Nothing",
+    category: "tws",
+    price: 8499,
+    mrp: 9999,
+    tagline: "Bold yellow. Full ANC.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 73,
+    name: "Ear (3)",
+    brand: "Nothing",
+    category: "flagship",
+    price: 17999,
+    mrp: 19999,
+    tagline: "Super Mic. Ceramic driver.",
+    image: "hero",
+    gallery: ["hero", "black", "silver", "white"],
+    extra: { isNew: true, badges: ["New Launch"] },
+  },
+  {
+    id: 74,
+    name: "CMF Buds 2 Plus",
+    brand: "Nothing",
+    category: "tws",
+    price: 3299,
+    mrp: 4299,
+    tagline: "Design-first daily driver.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 75,
+    name: "WH-1000XM6",
+    brand: "Sony",
+    category: "studio",
+    price: 34990,
+    mrp: 39990,
+    tagline: "The reference over-ear.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+    extra: { isBestSeller: true },
+  },
+  {
+    id: 76,
+    name: "INZONE H9 II",
+    brand: "Sony",
+    category: "gaming",
+    price: 24990,
+    mrp: 29990,
+    tagline: "360 Spatial Sound for gamers.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 77,
+    name: "AirWave Pro Lite",
+    brand: "Apple",
+    category: "tws",
+    price: 12900,
+    mrp: 14900,
+    tagline: "H2 chip. Everyday spatial.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 78,
+    name: "AirWave 4 USB-C",
+    brand: "Apple",
+    category: "flagship",
+    price: 26900,
+    mrp: 28900,
+    tagline: "Adaptive audio. USB-C.",
+    image: "hero",
+    gallery: ["hero", "rose", "silver", "white"],
+    extra: { isNew: true },
+  },
+  {
+    id: 79,
+    name: "QuietComfort SC",
+    brand: "Bose",
+    category: "studio",
+    price: 27900,
+    mrp: 31900,
+    tagline: "Signature comfort. Deeper silence.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 80,
+    name: "Ultra Open Earbuds",
+    brand: "Bose",
+    category: "open-ear",
+    price: 25900,
+    mrp: 27900,
+    tagline: "Cuff-style, immersive open sound.",
+    image: "open",
+    gallery: ["open", "white", "silver", "hero"],
+    extra: { badges: ["Award"] },
+  },
+  {
+    id: 81,
+    name: "HD 660S2",
+    brand: "Sennheiser",
+    category: "studio",
+    price: 44990,
+    mrp: 49990,
+    tagline: "Open-back audiophile classic.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 82,
+    name: "Momentum Sport",
+    brand: "Sennheiser",
+    category: "sports",
+    price: 27990,
+    mrp: 31990,
+    tagline: "Biometrics inside your buds.",
+    image: "sport",
+    gallery: ["sport", "black", "white", "silver"],
+  },
+  {
+    id: 83,
+    name: "Live 770NC",
+    brand: "JBL",
+    category: "anc",
+    price: 12999,
+    mrp: 16999,
+    tagline: "Adaptive ANC over-ear.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 84,
+    name: "Endurance Peak 3",
+    brand: "JBL",
+    category: "sports",
+    price: 6499,
+    mrp: 8499,
+    tagline: "Dust & waterproof workout buds.",
+    image: "sport",
+    gallery: ["sport", "black", "white", "silver"],
+  },
+  {
+    id: 85,
+    name: "Solo Buds",
+    brand: "Beats",
+    category: "tws",
+    price: 6900,
+    mrp: 7900,
+    tagline: "18-hour ultra-portable buds.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 86,
+    name: "Galaxy Buds FE Neo",
+    brand: "Samsung",
+    category: "tws",
+    price: 5999,
+    mrp: 7999,
+    tagline: "Comfort-fit AKG tuning.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 87,
+    name: "Galaxy Buds Live 2",
+    brand: "Samsung",
+    category: "open-ear",
+    price: 12990,
+    mrp: 15990,
+    tagline: "Iconic bean. Open comfort.",
+    image: "open",
+    gallery: ["open", "white", "silver", "hero"],
+  },
+  {
+    id: 88,
+    name: "OnePlus Nord Buds 3",
+    brand: "OnePlus",
+    category: "tws",
+    price: 2499,
+    mrp: 3299,
+    tagline: "Bass wave. 44hr playback.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 89,
+    name: "Realme Buds T310",
+    brand: "Realme",
+    category: "tws",
+    price: 2199,
+    mrp: 2999,
+    tagline: "46dB ANC. Everyday hero.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 90,
+    name: "Elite 7 Pro",
+    brand: "Jabra",
+    category: "business",
+    price: 15999,
+    mrp: 19999,
+    tagline: "MultiSensor Voice calls.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 91,
+    name: "Dime Evo",
+    brand: "Skullcandy",
+    category: "tws",
+    price: 2490,
+    mrp: 3490,
+    tagline: "Micro TWS, big fun.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 92,
+    name: "Space One Pro",
+    brand: "Soundcore",
+    category: "studio",
+    price: 14999,
+    mrp: 17999,
+    tagline: "LDAC hi-res over-ear.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+  },
+  {
+    id: 93,
+    name: "Monitor III ANC",
+    brand: "Marshall",
+    category: "anc",
+    price: 32999,
+    mrp: 36999,
+    tagline: "70hr playtime. Stage-grade.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+    extra: { badges: ["Limited"] },
+  },
+  {
+    id: 94,
+    name: "AONIC 215 Gen 2 TWS",
+    brand: "Shure",
+    category: "tws",
+    price: 27999,
+    mrp: 31999,
+    tagline: "Detachable pro TWS.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+  },
+  {
+    id: 95,
+    name: "N400NC",
+    brand: "AKG",
+    category: "anc",
+    price: 13990,
+    mrp: 16990,
+    tagline: "Signature Bose-fighter ANC.",
+    image: "black",
+    gallery: ["black", "hero", "silver", "white"],
+  },
+  {
+    id: 96,
+    name: "LCD-5 Reference",
+    brand: "Audeze",
+    category: "luxury",
+    price: 419900,
+    mrp: 449900,
+    tagline: "Flagship planar headphone.",
+    image: "headphones",
+    gallery: ["headphones", "black", "silver", "hero"],
+    extra: { badges: ["Reference"] },
+  },
+  {
+    id: 97,
+    name: "Cloud III Wireless",
+    brand: "HyperX",
+    category: "gaming",
+    price: 13999,
+    mrp: 16999,
+    tagline: "120hr battery. DTS spatial.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 98,
+    name: "BlackShark V2 Pro",
+    brand: "Razer",
+    category: "gaming",
+    price: 21999,
+    mrp: 24999,
+    tagline: "TriForce Titanium 50mm.",
+    image: "gaming",
+    gallery: ["gaming", "black", "silver", "hero"],
+  },
+  {
+    id: 99,
+    name: "Beoplay Portal",
+    brand: "Bang",
+    category: "gaming",
+    price: 49900,
+    mrp: 54900,
+    tagline: "Console-grade luxury gaming.",
+    image: "gaming",
+    gallery: ["gaming", "rose", "silver", "hero"],
+  },
+  {
+    id: 100,
+    name: "Pixel Buds A2",
+    brand: "Google",
+    category: "tws",
+    price: 8990,
+    mrp: 10990,
+    tagline: "Clear calls. Live translate.",
+    image: "white",
+    gallery: ["white", "black", "silver", "hero"],
+    extra: { isBestSeller: true },
   },
 ];
 
