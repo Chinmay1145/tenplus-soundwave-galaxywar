@@ -125,6 +125,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <StoreProvider>
+          <BootSplash />
           <ScrollProgress />
           <Header />
           <main className="pt-16">
