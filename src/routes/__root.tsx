@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
+import { BootSplash } from "@/components/site/BootSplash";
 import { StoreProvider } from "@/lib/store";
 import { AuthProvider } from "@/hooks/use-auth";
 
