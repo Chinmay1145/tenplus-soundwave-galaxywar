@@ -40,8 +40,7 @@ export type ReportSummary = {
   returnReasons: { reason: string; count: number }[];
 };
 
-const inr = (n: number) =>
-  "Rs. " + Math.round(n).toLocaleString("en-IN");
+const inr = (n: number) => "Rs. " + Math.round(n).toLocaleString("en-IN");
 
 const fmt = (d: Date) =>
   d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -64,22 +63,16 @@ export function buildSummary(
 
   const totalRevenue = inWindow.reduce((s, o) => s + Number(o.total || 0), 0);
   const totalOrders = inWindow.length;
-  const totalUnits = inWindow.reduce(
-    (s, o) => s + o.items.reduce((a, b) => a + b.qty, 0),
-    0,
-  );
+  const totalUnits = inWindow.reduce((s, o) => s + o.items.reduce((a, b) => a + b.qty, 0), 0);
   const avgOrder = totalOrders ? totalRevenue / totalOrders : 0;
   const returnCount = retWindow.length;
   const returnRate = totalOrders ? (returnCount / totalOrders) * 100 : 0;
-  const refundEstimate = totalOrders
-    ? (totalRevenue / totalOrders) * returnCount
-    : 0;
+  const refundEstimate = totalOrders ? (totalRevenue / totalOrders) * returnCount : 0;
 
   // Build time buckets
   const buckets = new Map<string, { revenue: number; orders: number; sort: number }>();
   const keyOf = (d: Date) => {
-    if (granularity === "day")
-      return d.toISOString().slice(0, 10);
+    if (granularity === "day") return d.toISOString().slice(0, 10);
     if (granularity === "week") {
       const monday = new Date(d);
       const day = (monday.getDay() + 6) % 7;
@@ -88,8 +81,7 @@ export function buildSummary(
     }
     if (granularity === "month")
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    if (granularity === "quarter")
-      return `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+    if (granularity === "quarter") return `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
     return String(d.getFullYear());
   };
   const labelOf = (key: string) => {
