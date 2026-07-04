@@ -95,7 +95,6 @@ export function brandLogoSources(brand: string, size = 256): string[] {
   if (CUSTOM[brand]) sources.push(CUSTOM[brand]);
   const slug = SLUGS[brand];
 
-  const sources: string[] = [];
   if (slug) {
     const color = HEX[brand];
     sources.push(color ? `https://cdn.simpleicons.org/${slug}/${color}` : `https://cdn.simpleicons.org/${slug}`);
