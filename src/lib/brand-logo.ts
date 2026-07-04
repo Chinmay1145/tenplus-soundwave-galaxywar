@@ -72,15 +72,14 @@ const HEX: Record<string, string> = {
 };
 
 export function brandLogo(brand: string, size = 80): string {
+  if (CUSTOM[brand]) return CUSTOM[brand];
   const slug = SLUGS[brand];
   if (slug) {
     const color = HEX[brand];
-    // simple-icons CDN: SVG with optional hex color tint
     return color
       ? `https://cdn.simpleicons.org/${slug}/${color}`
       : `https://cdn.simpleicons.org/${slug}`;
   }
-  // SVG letter avatar fallback (data URI – never 404s)
   const letter = (brand || "?").charAt(0).toUpperCase();
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='8' fill='%23111'/><text x='50%25' y='55%25' text-anchor='middle' font-family='Inter,sans-serif' font-size='20' font-weight='800' fill='%23fff'>${letter}</text></svg>`;
   return `data:image/svg+xml;utf8,${svg}`;
@@ -92,7 +91,10 @@ export function brandSlug(brand: string): string | undefined {
 
 /** Ordered list of logo URLs to try, ending with the safe data-URI fallback. */
 export function brandLogoSources(brand: string, size = 256): string[] {
+  const sources: string[] = [];
+  if (CUSTOM[brand]) sources.push(CUSTOM[brand]);
   const slug = SLUGS[brand];
+
   const sources: string[] = [];
   if (slug) {
     const color = HEX[brand];
