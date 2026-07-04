@@ -64,3 +64,16 @@ export function brandLogo(brand: string, size = 80): string {
 export function brandSlug(brand: string): string | undefined {
   return SLUGS[brand];
 }
+
+/** Ordered list of logo URLs to try, ending with the safe data-URI fallback. */
+export function brandLogoSources(brand: string, size = 256): string[] {
+  const slug = SLUGS[brand];
+  const sources: string[] = [];
+  if (slug) {
+    const color = HEX[brand];
+    sources.push(color ? `https://cdn.simpleicons.org/${slug}/${color}` : `https://cdn.simpleicons.org/${slug}`);
+    sources.push(`https://unpkg.com/simple-icons@latest/icons/${slug}.svg`);
+  }
+  sources.push(brandLogo(brand, size));
+  return sources;
+}
