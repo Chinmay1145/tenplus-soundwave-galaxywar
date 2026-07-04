@@ -1,5 +1,30 @@
 // Brand logo SVGs via simple-icons CDN (reliable, free, no key required).
 // Falls back to a colored letter avatar when the brand isn't on simple-icons.
+import nothingLogo from "@/assets/brands/nothing.png.asset.json";
+import realmeLogo from "@/assets/brands/realme.png.asset.json";
+import jabraLogo from "@/assets/brands/jabra.png.asset.json";
+import skullcandyLogo from "@/assets/brands/skullcandy.png.asset.json";
+import soundcoreLogo from "@/assets/brands/soundcore.png.asset.json";
+import marshallLogo from "@/assets/brands/marshall.png.asset.json";
+import shureLogo from "@/assets/brands/shure.png.asset.json";
+import audezeLogo from "@/assets/brands/audeze.png.asset.json";
+import hyperxLogo from "@/assets/brands/hyperx.png.asset.json";
+import logitechLogo from "@/assets/brands/logitech.png.asset.json";
+
+// Official uploaded brand assets take priority over CDN.
+const CUSTOM: Record<string, string> = {
+  Nothing: nothingLogo.url,
+  Realme: realmeLogo.url,
+  Jabra: jabraLogo.url,
+  Skullcandy: skullcandyLogo.url,
+  Soundcore: soundcoreLogo.url,
+  Marshall: marshallLogo.url,
+  Shure: shureLogo.url,
+  Audeze: audezeLogo.url,
+  HyperX: hyperxLogo.url,
+  Logitech: logitechLogo.url,
+};
+
 
 const SLUGS: Record<string, string> = {
   Apple: "apple",
