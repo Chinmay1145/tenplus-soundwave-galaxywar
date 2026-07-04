@@ -1,21 +1,22 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
-type CartItem = { id: string; qty: number; color?: string };
+type ID = string | number;
+type CartItem = { id: ID; qty: number; color?: string };
 type StoreState = {
   cart: CartItem[];
-  wishlist: string[];
-  compare: string[];
+  wishlist: ID[];
+  compare: ID[];
 };
 
 type StoreCtx = StoreState & {
-  addToCart: (id: string, qty?: number, color?: string) => void;
-  removeFromCart: (id: string) => void;
-  updateQty: (id: string, qty: number) => void;
+  addToCart: (id: ID, qty?: number, color?: string) => void;
+  removeFromCart: (id: ID) => void;
+  updateQty: (id: ID, qty: number) => void;
   clearCart: () => void;
-  toggleWishlist: (id: string) => void;
-  toggleCompare: (id: string) => void;
-  inWishlist: (id: string) => boolean;
-  inCompare: (id: string) => boolean;
+  toggleWishlist: (id: ID) => void;
+  toggleCompare: (id: ID) => void;
+  inWishlist: (id: ID) => boolean;
+  inCompare: (id: ID) => boolean;
   cartCount: number;
 };
 
