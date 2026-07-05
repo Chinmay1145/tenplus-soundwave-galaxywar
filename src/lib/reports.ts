@@ -230,34 +230,72 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   doc.setLineWidth(0.6);
   doc.line(M, 128, W - M, 128);
 
+  // ── EXECUTIVE SUMMARY BAND ───────────────────────────────
+  const topCat = s.byCategory[0]?.name?.toUpperCase() ?? "—";
+  const topProd = s.topProducts[0]?.name ?? "—";
+  const halfIdx = Math.max(1, Math.floor(s.series.length / 2));
+  const firstHalf = s.series.slice(0, halfIdx).reduce((a, b) => a + b.revenue, 0);
+  const secondHalf = s.series.slice(halfIdx).reduce((a, b) => a + b.revenue, 0);
+  const trendPct = firstHalf > 0 ? ((secondHalf - firstHalf) / firstHalf) * 100 : 0;
+  const trendLabel = trendPct >= 0 ? `+${trendPct.toFixed(1)}%` : `${trendPct.toFixed(1)}%`;
+  const trendColor: [number, number, number] = trendPct >= 0 ? [16, 122, 66] : [200, 30, 45];
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...muted);
+  doc.text("EXECUTIVE SUMMARY", M, 146);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(...sub);
+  const bullets = [
+    `Revenue of ${inr(s.totalRevenue)} across ${s.totalOrders} orders (${s.totalUnits} units) with an average order value of ${inr(s.avgOrder)}.`,
+    `Momentum is ${trendPct >= 0 ? "positive" : "negative"} — second-half revenue tracked ${trendLabel} vs the first half of the period.`,
+    `${topCat} led categories with ${inr(s.byCategory[0]?.revenue ?? 0)}; best-selling SKU: ${topProd}.`,
+    `${s.returnCount} return${s.returnCount === 1 ? "" : "s"} recorded (${s.returnRate.toFixed(1)}% rate); estimated refund exposure ${inr(s.refundEstimate)}.`,
+  ];
+  let bulletY = 160;
+  bullets.forEach((b) => {
+    doc.setFillColor(...accent);
+    doc.circle(M + 3, bulletY - 3, 1.6, "F");
+    const wrap = doc.splitTextToSize(b, W - 2 * M - 14);
+    doc.text(wrap, M + 12, bulletY);
+    bulletY += 12 + (wrap.length - 1) * 12;
+  });
+
   // ── KPI CARDS ────────────────────────────────────────────
-  let y = 150;
+  let y = bulletY + 12;
   const cardW = (W - 2 * M - 24) / 4;
   const cards: [string, string, string][] = [
     ["REVENUE", inr(s.totalRevenue), `${s.totalOrders} orders`],
     ["AVG ORDER", inr(s.avgOrder), `${s.totalUnits} units sold`],
-    ["RETURNS", String(s.returnCount), `${s.returnRate.toFixed(1)}% rate`],
-    ["REFUND EST.", inr(s.refundEstimate), `Across ${s.returnCount} returns`],
+    ["MOMENTUM", trendLabel, "vs previous half"],
+    ["RETURN RATE", `${s.returnRate.toFixed(1)}%`, `${s.returnCount} returns · ${inr(s.refundEstimate)}`],
   ];
   cards.forEach(([k, v, sub2], i) => {
     const x = M + i * (cardW + 8);
     doc.setFillColor(...tint);
-    doc.rect(x, y, cardW, 78, "F");
+    doc.rect(x, y, cardW, 84, "F");
     doc.setDrawColor(...hair);
-    doc.rect(x, y, cardW, 78, "S");
+    doc.rect(x, y, cardW, 84, "S");
+    // top accent bar
+    doc.setFillColor(...accent);
+    doc.rect(x, y, cardW, 3, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(k, x + 14, y + 20);
+    doc.text(k, x + 14, y + 22);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.setTextColor(...ink);
-    doc.text(v, x + 14, y + 46);
+    if (k === "MOMENTUM") doc.setTextColor(...trendColor);
+    else doc.setTextColor(...ink);
+    doc.text(v, x + 14, y + 50);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...sub);
-    doc.text(sub2, x + 14, y + 64);
+    doc.text(sub2, x + 14, y + 70);
   });
+  y += 6;
+
 
   // ── TREND CHART ──────────────────────────────────────────
   y += 100;

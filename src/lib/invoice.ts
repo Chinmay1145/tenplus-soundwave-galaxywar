@@ -18,12 +18,44 @@ export type InvoiceData = {
 const inr = (n: number) =>
   "Rs. " + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+// Convert a number to Indian-English words (rupees + paise). Handles up to 99 crore.
+function numberToWords(n: number): string {
+  const a = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen",
+  ];
+  const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+  const two = (x: number): string => (x < 20 ? a[x] : `${b[Math.floor(x / 10)]}${x % 10 ? " " + a[x % 10] : ""}`);
+  const three = (x: number): string => {
+    const h = Math.floor(x / 100), r = x % 100;
+    return `${h ? a[h] + " Hundred" + (r ? " " : "") : ""}${r ? two(r) : ""}`.trim();
+  };
+  const rupees = Math.floor(n);
+  const paise = Math.round((n - rupees) * 100);
+  if (rupees === 0 && paise === 0) return "Zero Rupees Only";
+  const crore = Math.floor(rupees / 10000000);
+  const lakh = Math.floor((rupees % 10000000) / 100000);
+  const thousand = Math.floor((rupees % 100000) / 1000);
+  const rest = rupees % 1000;
+  let words = "";
+  if (crore) words += two(crore) + " Crore ";
+  if (lakh) words += two(lakh) + " Lakh ";
+  if (thousand) words += two(thousand) + " Thousand ";
+  if (rest) words += three(rest);
+  words = words.trim() + " Rupees";
+  if (paise) words += ` and ${two(paise)} Paise`;
+  return words + " Only";
+}
+
 const ink: [number, number, number] = [17, 17, 19];
 const sub: [number, number, number] = [60, 60, 68];
 const muted: [number, number, number] = [120, 120, 128];
 const hair: [number, number, number] = [225, 225, 230];
 const accent: [number, number, number] = [225, 29, 47];
 const tint: [number, number, number] = [250, 250, 252];
+const paidGreen: [number, number, number] = [16, 122, 66];
+
 
 export function downloadInvoice(data: InvoiceData) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -221,6 +253,39 @@ export function downloadInvoice(data: InvoiceData) {
   row("Shipping", shipFee === 0 ? "FREE" : inr(shipFee));
   row("Total (INR)", inr(data.total), { bold: true, rule: true });
 
+  // Amount in words (professional touch, mandatory on Indian invoices)
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...muted);
+  doc.text("AMOUNT IN WORDS", M, y);
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(10);
+  doc.setTextColor(...ink);
+  const words = numberToWords(data.total);
+  const wrapped = doc.splitTextToSize(words, W - 2 * M - 8);
+  doc.text(wrapped, M, y + 14);
+  y += 14 + wrapped.length * 12 + 8;
+
+  // PAID stamp (rotated) if the order is paid
+  const isPaid = (data.status || "").toLowerCase() !== "unpaid" && (data.paymentMethod || "prepaid").toLowerCase() !== "cod";
+  if (isPaid) {
+    doc.saveGraphicsState();
+    doc.setTextColor(...paidGreen);
+    doc.setDrawColor(...paidGreen);
+    doc.setLineWidth(2);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(28);
+    const stampX = W - M - 210;
+    const stampY = y - 50;
+    doc.roundedRect(stampX, stampY, 150, 46, 6, 6, "S");
+    doc.text("PAID", stampX + 75, stampY + 24, { align: "center", angle: -8 });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(`${new Date(created).toLocaleDateString("en-IN")}  ·  PULSE`, stampX + 75, stampY + 38, { align: "center", angle: -8 });
+    doc.restoreGraphicsState();
+  }
+
+
   // ── PAYMENT SUMMARY ──────────────────────────────────────
   y += 12;
   doc.setFillColor(...tint);
@@ -261,14 +326,27 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(8.5);
   doc.setTextColor(...sub);
   const terms = [
-    "1. Returns accepted within 30 days of delivery in original condition.",
+    "1. Returns accepted within 30 days of delivery in original, unused condition with all accessories.",
     "2. Warranty: 2 years on all PULSE audio products against manufacturing defects.",
-    "3. Goods once sold will not be taken back except as per return policy.",
-    "4. Subject to Bengaluru jurisdiction. E. & O. E.",
+    "3. Goods once sold will not be taken back except as per the published return policy.",
+    "4. Late payments beyond 7 days attract 1.5% monthly interest under the MSME Act, 2006.",
+    "5. All disputes are subject to the exclusive jurisdiction of Bengaluru courts. E. & O. E.",
   ];
   terms.forEach((t, i) => doc.text(t, M, y + 14 + i * 12));
 
-  // Signature box
+  // Bank details panel
+  const bankY = y + 84;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...muted);
+  doc.text("BANK DETAILS FOR NEFT / RTGS", M, bankY);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...ink);
+  doc.text("Beneficiary: PULSE Audio Pvt. Ltd.   ·   HDFC Bank, MG Road, Bengaluru", M, bankY + 14);
+  doc.text("A/c: 5010 0234 5678 90   ·   IFSC: HDFC0000123   ·   UPI: pulse@hdfcbank", M, bankY + 27);
+
+  // Signature box (right)
   const sigX = W - M - 160;
   const sigY = y + 8;
   doc.setDrawColor(...hair);
@@ -278,10 +356,12 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(8);
   doc.setTextColor(...muted);
   doc.text("Authorised Signatory", sigX + 80, sigY + 58, { align: "center" });
+  doc.text(`For PULSE Audio Pvt. Ltd.`, sigX + 80, sigY + 70, { align: "center" });
   doc.setFont("helvetica", "italic");
-  doc.setFontSize(14);
+  doc.setFontSize(16);
   doc.setTextColor(...accent);
   doc.text("PULSE", sigX + 80, sigY + 38, { align: "center" });
+
 
   // ── FOOTER ───────────────────────────────────────────────
   doc.setDrawColor(...hair);

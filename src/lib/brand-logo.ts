@@ -1,18 +1,33 @@
 // Brand logos with multi-source fallback:
 //  0. Local override    — user-supplied official artwork (highest priority).
-//  1. Clearbit Logo API — high quality, no key, works for real company domains.
-//  2. simple-icons CDN  — clean SVG marks for popular tech brands.
+//  1. simple-icons CDN  — clean SVG marks for popular tech brands.
+//  2. Clearbit Logo API — high quality, no key, works for real company domains.
 //  3. Google favicon    — last-resort raster.
 //  4. SVG letter avatar — inline data-URI, never 404s.
-//
-// The consumer (<img onError>) walks the list, so every brand renders
-// something recognisable.
 
-import nothingLogo from "@/assets/nothing-logo.png.asset.json";
+import audezeLogo from "@/assets/brands/audeze.png.asset.json";
+import hyperxLogo from "@/assets/brands/hyperx.png.asset.json";
+import jabraLogo from "@/assets/brands/jabra.png.asset.json";
+import logitechLogo from "@/assets/brands/logitech.png.asset.json";
+import marshallLogo from "@/assets/brands/marshall.png.asset.json";
+import nothingLogo from "@/assets/brands/nothing.png.asset.json";
+import realmeLogo from "@/assets/brands/realme.png.asset.json";
+import shureLogo from "@/assets/brands/shure.png.asset.json";
+import skullcandyLogo from "@/assets/brands/skullcandy.png.asset.json";
+import soundcoreLogo from "@/assets/brands/soundcore.png.asset.json";
 
 // Official brand artwork provided by the user. Always tried first.
 const BRAND_LOGO_OVERRIDES: Record<string, string> = {
   Nothing: nothingLogo.url,
+  Realme: realmeLogo.url,
+  Jabra: jabraLogo.url,
+  Skullcandy: skullcandyLogo.url,
+  Soundcore: soundcoreLogo.url,
+  Marshall: marshallLogo.url,
+  Shure: shureLogo.url,
+  Audeze: audezeLogo.url,
+  HyperX: hyperxLogo.url,
+  Logitech: logitechLogo.url,
 };
 
 const DOMAINS: Record<string, string> = {
@@ -61,34 +76,34 @@ const SI_SLUGS: Record<string, string> = {
   Huawei: "huawei",
   Google: "google",
   Marshall: "marshall",
+  AKG: "akg",
+  Bang: "bandolufsen",
+  "Bang & Olufsen": "bandolufsen",
 };
 
-function letterAvatar(brand: string, tint = "#111"): string {
-  const letter = (brand || "?").charAt(0).toUpperCase();
+function wordmarkAvatar(brand: string, tint = "#111"): string {
+  // Elegant wordmark fallback used when no image is available.
   const safeTint = tint.replace("#", "%23");
+  const label = brand.replace(/&/g, "%26").toUpperCase();
   const svg =
-    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'>` +
-    `<rect width='40' height='40' rx='10' fill='${safeTint}'/>` +
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'>` +
+    `<rect width='200' height='80' rx='10' fill='%23fff'/>` +
     `<text x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' ` +
-    `font-family='Inter,sans-serif' font-size='20' font-weight='800' fill='%23fff'>` +
-    `${letter}</text></svg>`;
+    `font-family='Inter,Helvetica,Arial,sans-serif' font-size='26' font-weight='900' ` +
+    `letter-spacing='2' fill='${safeTint}'>${label}</text></svg>`;
   return `data:image/svg+xml;utf8,${svg}`;
 }
 
-/** Primary logo URL (override first, then Clearbit, simple-icons, else avatar). */
+/** Primary logo URL (override first, then simple-icons, Clearbit, else avatar). */
 export function brandLogo(brand: string, size = 128): string {
   const override = BRAND_LOGO_OVERRIDES[brand];
   if (override) return override;
-  const domain = DOMAINS[brand];
-  if (domain) return `https://logo.clearbit.com/${domain}?size=${size}`;
   const slug = SI_SLUGS[brand];
   if (slug) return `https://cdn.simpleicons.org/${slug}`;
-  return letterAvatar(brand);
+  const domain = DOMAINS[brand];
+  if (domain) return `https://logo.clearbit.com/${domain}?size=${size}`;
+  return wordmarkAvatar(brand);
 }
-
-// Brands whose "official" logo comes out cleaner from simple-icons than Clearbit.
-// For these we prefer the SVG mark first (Nothing's dotted wordmark, etc.).
-const PREFER_SIMPLEICONS = new Set<string>(["Nothing"]);
 
 /** Ordered fallback chain for use with <img onError>. */
 export function brandLogoSources(brand: string, size = 128): string[] {
@@ -98,8 +113,7 @@ export function brandLogoSources(brand: string, size = 128): string[] {
   const slug = SI_SLUGS[brand];
 
   if (override) list.push(override);
-
-  if (slug && PREFER_SIMPLEICONS.has(brand)) {
+  if (slug) {
     list.push(`https://cdn.simpleicons.org/${slug}`);
     list.push(`https://cdn.simpleicons.org/${slug}/000000`);
   }
@@ -107,10 +121,7 @@ export function brandLogoSources(brand: string, size = 128): string[] {
     list.push(`https://logo.clearbit.com/${domain}?size=${size}`);
     list.push(`https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`);
   }
-  if (slug && !PREFER_SIMPLEICONS.has(brand)) {
-    list.push(`https://cdn.simpleicons.org/${slug}`);
-  }
-  list.push(letterAvatar(brand));
+  list.push(wordmarkAvatar(brand));
   return list;
 }
 
