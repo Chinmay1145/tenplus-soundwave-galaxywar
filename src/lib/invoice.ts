@@ -253,6 +253,39 @@ export function downloadInvoice(data: InvoiceData) {
   row("Shipping", shipFee === 0 ? "FREE" : inr(shipFee));
   row("Total (INR)", inr(data.total), { bold: true, rule: true });
 
+  // Amount in words (professional touch, mandatory on Indian invoices)
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...muted);
+  doc.text("AMOUNT IN WORDS", M, y);
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(10);
+  doc.setTextColor(...ink);
+  const words = numberToWords(data.total);
+  const wrapped = doc.splitTextToSize(words, W - 2 * M - 8);
+  doc.text(wrapped, M, y + 14);
+  y += 14 + wrapped.length * 12 + 8;
+
+  // PAID stamp (rotated) if the order is paid
+  const isPaid = (data.status || "").toLowerCase() !== "unpaid" && (data.paymentMethod || "prepaid").toLowerCase() !== "cod";
+  if (isPaid) {
+    doc.saveGraphicsState();
+    doc.setTextColor(...paidGreen);
+    doc.setDrawColor(...paidGreen);
+    doc.setLineWidth(2);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(28);
+    const stampX = W - M - 210;
+    const stampY = y - 50;
+    doc.roundedRect(stampX, stampY, 150, 46, 6, 6, "S");
+    doc.text("PAID", stampX + 75, stampY + 24, { align: "center", angle: -8 });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(`${new Date(created).toLocaleDateString("en-IN")}  ·  PULSE`, stampX + 75, stampY + 38, { align: "center", angle: -8 });
+    doc.restoreGraphicsState();
+  }
+
+
   // ── PAYMENT SUMMARY ──────────────────────────────────────
   y += 12;
   doc.setFillColor(...tint);
