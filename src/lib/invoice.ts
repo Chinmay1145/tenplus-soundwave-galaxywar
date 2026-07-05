@@ -18,12 +18,44 @@ export type InvoiceData = {
 const inr = (n: number) =>
   "Rs. " + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+// Convert a number to Indian-English words (rupees + paise). Handles up to 99 crore.
+function numberToWords(n: number): string {
+  const a = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen",
+  ];
+  const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+  const two = (x: number): string => (x < 20 ? a[x] : `${b[Math.floor(x / 10)]}${x % 10 ? " " + a[x % 10] : ""}`);
+  const three = (x: number): string => {
+    const h = Math.floor(x / 100), r = x % 100;
+    return `${h ? a[h] + " Hundred" + (r ? " " : "") : ""}${r ? two(r) : ""}`.trim();
+  };
+  const rupees = Math.floor(n);
+  const paise = Math.round((n - rupees) * 100);
+  if (rupees === 0 && paise === 0) return "Zero Rupees Only";
+  const crore = Math.floor(rupees / 10000000);
+  const lakh = Math.floor((rupees % 10000000) / 100000);
+  const thousand = Math.floor((rupees % 100000) / 1000);
+  const rest = rupees % 1000;
+  let words = "";
+  if (crore) words += two(crore) + " Crore ";
+  if (lakh) words += two(lakh) + " Lakh ";
+  if (thousand) words += two(thousand) + " Thousand ";
+  if (rest) words += three(rest);
+  words = words.trim() + " Rupees";
+  if (paise) words += ` and ${two(paise)} Paise`;
+  return words + " Only";
+}
+
 const ink: [number, number, number] = [17, 17, 19];
 const sub: [number, number, number] = [60, 60, 68];
 const muted: [number, number, number] = [120, 120, 128];
 const hair: [number, number, number] = [225, 225, 230];
 const accent: [number, number, number] = [225, 29, 47];
 const tint: [number, number, number] = [250, 250, 252];
+const paidGreen: [number, number, number] = [16, 122, 66];
+
 
 export function downloadInvoice(data: InvoiceData) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
