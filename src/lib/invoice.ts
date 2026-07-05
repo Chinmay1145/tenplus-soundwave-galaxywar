@@ -326,14 +326,27 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(8.5);
   doc.setTextColor(...sub);
   const terms = [
-    "1. Returns accepted within 30 days of delivery in original condition.",
+    "1. Returns accepted within 30 days of delivery in original, unused condition with all accessories.",
     "2. Warranty: 2 years on all PULSE audio products against manufacturing defects.",
-    "3. Goods once sold will not be taken back except as per return policy.",
-    "4. Subject to Bengaluru jurisdiction. E. & O. E.",
+    "3. Goods once sold will not be taken back except as per the published return policy.",
+    "4. Late payments beyond 7 days attract 1.5% monthly interest under the MSME Act, 2006.",
+    "5. All disputes are subject to the exclusive jurisdiction of Bengaluru courts. E. & O. E.",
   ];
   terms.forEach((t, i) => doc.text(t, M, y + 14 + i * 12));
 
-  // Signature box
+  // Bank details panel
+  const bankY = y + 84;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...muted);
+  doc.text("BANK DETAILS FOR NEFT / RTGS", M, bankY);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...ink);
+  doc.text("Beneficiary: PULSE Audio Pvt. Ltd.   ·   HDFC Bank, MG Road, Bengaluru", M, bankY + 14);
+  doc.text("A/c: 5010 0234 5678 90   ·   IFSC: HDFC0000123   ·   UPI: pulse@hdfcbank", M, bankY + 27);
+
+  // Signature box (right)
   const sigX = W - M - 160;
   const sigY = y + 8;
   doc.setDrawColor(...hair);
@@ -343,10 +356,12 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(8);
   doc.setTextColor(...muted);
   doc.text("Authorised Signatory", sigX + 80, sigY + 58, { align: "center" });
+  doc.text(`For PULSE Audio Pvt. Ltd.`, sigX + 80, sigY + 70, { align: "center" });
   doc.setFont("helvetica", "italic");
-  doc.setFontSize(14);
+  doc.setFontSize(16);
   doc.setTextColor(...accent);
   doc.text("PULSE", sigX + 80, sigY + 38, { align: "center" });
+
 
   // ── FOOTER ───────────────────────────────────────────────
   doc.setDrawColor(...hair);
