@@ -8,7 +8,11 @@ const PHRASES = [
   "Aligning spatial audio",
   "Priming the low-end",
   "Syncing multipoint",
+  "Loading reference tracks",
+  "Polishing the soundstage",
 ];
+
+const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial Audio"];
 
 export function SoundLoader({ label }: { label?: string }) {
   const [idx, setIdx] = useState(0);
@@ -32,6 +36,21 @@ export function SoundLoader({ label }: { label?: string }) {
             "radial-gradient(800px 420px at 50% 50%, oklch(0.65 0.24 25 / 0.22), transparent 70%), conic-gradient(from 0deg at 50% 50%, transparent 0deg, oklch(0.65 0.24 25 / 0.08) 90deg, transparent 180deg, oklch(0.65 0.24 25 / 0.08) 270deg, transparent 360deg)",
         }}
       />
+      {/* fine grid */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(oklch(0.65 0.24 25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.65 0.24 25) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage: "radial-gradient(closest-side at 50% 50%, black, transparent 80%)",
+        }}
+      />
+      {/* scanline */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-full overflow-hidden">
+        <span className="sl-scan" />
+      </div>
       {/* drifting particles */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         {Array.from({ length: 14 }).map((_, i) => (
@@ -82,6 +101,16 @@ export function SoundLoader({ label }: { label?: string }) {
           <div className="mono text-[10px] tracking-[0.3em] text-accent/70">PULSE · AUDIO LABS</div>
           <div className="mt-1 h-[3px] w-40 overflow-hidden rounded-full bg-border/60">
             <span className="sl-progress block h-full w-1/3 rounded-full bg-gradient-to-r from-accent via-accent/80 to-accent" />
+          </div>
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+            {TAGS.map((t) => (
+              <span
+                key={t}
+                className="mono rounded-full border border-accent/25 bg-accent/5 px-2.5 py-1 text-[9px] tracking-[0.25em] text-accent/80"
+              >
+                {t.toUpperCase()}
+              </span>
+            ))}
           </div>
         </div>
       </div>
@@ -180,6 +209,15 @@ export function SoundLoader({ label }: { label?: string }) {
         @keyframes sl-progress {
           0%   { transform: translateX(-120%); }
           100% { transform: translateX(320%); }
+        }
+        .sl-scan {
+          position: absolute; left: 0; right: 0; top: -20%; height: 40%;
+          background: linear-gradient(180deg, transparent, oklch(0.65 0.24 25 / 0.10), transparent);
+          animation: sl-scan 3.4s ease-in-out infinite;
+        }
+        @keyframes sl-scan {
+          0%   { transform: translateY(0); }
+          100% { transform: translateY(320%); }
         }
 
         @media (prefers-reduced-motion: reduce) {
