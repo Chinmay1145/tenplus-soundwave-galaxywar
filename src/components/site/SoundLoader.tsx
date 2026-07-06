@@ -8,7 +8,11 @@ const PHRASES = [
   "Aligning spatial audio",
   "Priming the low-end",
   "Syncing multipoint",
+  "Loading reference tracks",
+  "Polishing the soundstage",
 ];
+
+const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial Audio"];
 
 export function SoundLoader({ label }: { label?: string }) {
   const [idx, setIdx] = useState(0);
