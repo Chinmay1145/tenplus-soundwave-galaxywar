@@ -102,6 +102,16 @@ export function SoundLoader({ label }: { label?: string }) {
           <div className="mt-1 h-[3px] w-40 overflow-hidden rounded-full bg-border/60">
             <span className="sl-progress block h-full w-1/3 rounded-full bg-gradient-to-r from-accent via-accent/80 to-accent" />
           </div>
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+            {TAGS.map((t) => (
+              <span
+                key={t}
+                className="mono rounded-full border border-accent/25 bg-accent/5 px-2.5 py-1 text-[9px] tracking-[0.25em] text-accent/80"
+              >
+                {t.toUpperCase()}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
