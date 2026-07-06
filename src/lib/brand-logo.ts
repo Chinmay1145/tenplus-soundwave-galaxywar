@@ -61,7 +61,8 @@ const DOMAINS: Record<string, string> = {
 
 const SI_SLUGS: Record<string, string> = {
   Apple: "apple",
-  Sony: "sony",
+  // Sony is intentionally omitted from simple-icons (retired for trademark).
+  // Falls back to the Clearbit wordmark via DOMAINS below.
   Bose: "bose",
   Sennheiser: "sennheiser",
   JBL: "jbl",
