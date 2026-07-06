@@ -48,6 +48,15 @@ type ImageRef = number | string;
 export const CATEGORIES = [
   { slug: "tws", name: "True Wireless", icon: "Headphones" },
   { slug: "anc", name: "Premium ANC", icon: "Waves" },
+  { slug: "flagship", name: "Flagship", icon: "Crown", tagline: "The best of the best." },
+  { slug: "luxury", name: "Luxury", icon: "Gem", tagline: "Craft, materials, prestige." },
+  { slug: "studio", name: "Studio", icon: "Mic2", tagline: "Reference sound for creators." },
+  { slug: "gaming", name: "Gaming", icon: "Gamepad2", tagline: "Low-latency, high-immersion." },
+  { slug: "sports", name: "Sports", icon: "Activity", tagline: "Sweat-proof, secure, ready." },
+  { slug: "open-ear", name: "Open-Ear", icon: "Ear", tagline: "Aware of your surroundings." },
+  { slug: "neckband", name: "Neckband", icon: "Cable", tagline: "All-day comfort, all-day battery." },
+  { slug: "wired", name: "Wired", icon: "Plug", tagline: "Pure signal, zero latency." },
+  { slug: "business", name: "Business", icon: "Briefcase", tagline: "Calls that sound like meetings." },
 ];
 
 export const BRANDS = [
