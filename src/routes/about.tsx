@@ -92,18 +92,51 @@ function About() {
             </Link>
           </div>
 
+          {/* Live EQ strip */}
+          <div className="mt-10 flex items-end gap-1.5" aria-hidden>
+            {Array.from({ length: 48 }).map((_, i) => (
+              <span
+                key={i}
+                className="about-eq"
+                style={{
+                  height: `${8 + ((i * 13) % 34)}px`,
+                  animationDelay: `${(i % 12) * 0.08}s`,
+                }}
+              />
+            ))}
+          </div>
+
           {/* Stat strip */}
-          <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {STATS.map(([v, l]) => (
               <div
                 key={l}
-                className="rounded-2xl border border-border/60 bg-card/70 p-5 backdrop-blur"
+                className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-5 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-accent/60"
               >
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
+                  style={{ background: "oklch(0.65 0.24 25 / 0.5)" }}
+                />
                 <div className="font-display text-3xl font-bold tracking-tight text-accent sm:text-4xl">{v}</div>
                 <div className="mono mt-1 text-[11px] text-muted-foreground">{l}</div>
               </div>
             ))}
           </div>
+          <style>{`
+            .about-eq {
+              display:inline-block; width:4px; border-radius:2px;
+              background: linear-gradient(180deg, oklch(0.78 0.2 25), oklch(0.55 0.24 25 / 0.35));
+              transform-origin: bottom;
+              animation: about-eq 1.4s ease-in-out infinite;
+              box-shadow: 0 0 10px oklch(0.65 0.24 25 / 0.35);
+            }
+            @keyframes about-eq {
+              0%,100% { transform: scaleY(0.4); }
+              50%     { transform: scaleY(1.6); }
+            }
+            @media (prefers-reduced-motion: reduce) { .about-eq { animation: none; } }
+          `}</style>
         </div>
       </section>
 
