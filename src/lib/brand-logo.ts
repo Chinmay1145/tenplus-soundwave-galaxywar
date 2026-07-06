@@ -95,6 +95,16 @@ function wordmarkAvatar(brand: string, tint = "#111"): string {
   return `data:image/svg+xml;utf8,${svg}`;
 }
 
+// Brand-tinted guaranteed wordmarks for brands whose CDN icons are unreliable
+// (Sony retired from simple-icons; AKG missing entirely). These are the LAST
+// resort before the generic avatar, so the tile is never blank.
+const GUARANTEED_WORDMARKS: Record<string, string> = {
+  Sony: wordmarkAvatar("Sony", "#000000"),
+  AKG: wordmarkAvatar("AKG", "#003a70"),
+  "Bang & Olufsen": wordmarkAvatar("B&O", "#111111"),
+  Bang: wordmarkAvatar("B&O", "#111111"),
+};
+
 /** Primary logo URL (override first, then simple-icons, Clearbit, else avatar). */
 export function brandLogo(brand: string, size = 128): string {
   const override = BRAND_LOGO_OVERRIDES[brand];
@@ -103,7 +113,7 @@ export function brandLogo(brand: string, size = 128): string {
   if (slug) return `https://cdn.simpleicons.org/${slug}`;
   const domain = DOMAINS[brand];
   if (domain) return `https://logo.clearbit.com/${domain}?size=${size}`;
-  return wordmarkAvatar(brand);
+  return GUARANTEED_WORDMARKS[brand] ?? wordmarkAvatar(brand);
 }
 
 /** Ordered fallback chain for use with <img onError>. */
@@ -112,6 +122,7 @@ export function brandLogoSources(brand: string, size = 128): string[] {
   const override = BRAND_LOGO_OVERRIDES[brand];
   const domain = DOMAINS[brand];
   const slug = SI_SLUGS[brand];
+  const guaranteed = GUARANTEED_WORDMARKS[brand];
 
   if (override) list.push(override);
   if (slug) {
@@ -122,6 +133,7 @@ export function brandLogoSources(brand: string, size = 128): string[] {
     list.push(`https://logo.clearbit.com/${domain}?size=${size}`);
     list.push(`https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`);
   }
+  if (guaranteed) list.push(guaranteed);
   list.push(wordmarkAvatar(brand));
   return list;
 }
