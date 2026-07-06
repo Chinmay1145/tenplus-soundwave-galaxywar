@@ -36,6 +36,21 @@ export function SoundLoader({ label }: { label?: string }) {
             "radial-gradient(800px 420px at 50% 50%, oklch(0.65 0.24 25 / 0.22), transparent 70%), conic-gradient(from 0deg at 50% 50%, transparent 0deg, oklch(0.65 0.24 25 / 0.08) 90deg, transparent 180deg, oklch(0.65 0.24 25 / 0.08) 270deg, transparent 360deg)",
         }}
       />
+      {/* fine grid */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(oklch(0.65 0.24 25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.65 0.24 25) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage: "radial-gradient(closest-side at 50% 50%, black, transparent 80%)",
+        }}
+      />
+      {/* scanline */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-full overflow-hidden">
+        <span className="sl-scan" />
+      </div>
       {/* drifting particles */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         {Array.from({ length: 14 }).map((_, i) => (
