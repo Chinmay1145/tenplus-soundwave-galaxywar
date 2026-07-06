@@ -99,7 +99,14 @@ function Contact() {
           }}
         />
         <div className="mx-auto max-w-6xl px-4 pb-8 pt-20 sm:px-6 sm:pt-28">
-          <div className="mono text-accent">— Contact</div>
+          <div className="flex items-center gap-2">
+            <span className="relative inline-flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            <span className="mono text-[10px] uppercase tracking-[0.3em] text-emerald-500">Live · Support online now</span>
+          </div>
+          <div className="mono mt-3 text-accent">— Contact</div>
           <h1 className="mt-3 font-display text-5xl font-bold leading-[1.02] tracking-tight sm:text-7xl">
             Say hello. <span className="shimmer-text">We're listening.</span>
           </h1>
@@ -113,8 +120,18 @@ function Contact() {
             {PROMISES.map(([Ico, t, d]) => {
               const Icon = Ico as typeof Clock;
               return (
-                <div key={t} className="rounded-2xl border border-border/60 bg-card/70 p-4 backdrop-blur">
-                  <Icon className="h-4 w-4 text-accent" />
+                <div
+                  key={t}
+                  className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-4 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-lg"
+                >
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
+                    style={{ background: "oklch(0.65 0.24 25 / 0.55)" }}
+                  />
+                  <div className="grid h-8 w-8 place-items-center rounded-lg border border-accent/30 bg-accent/10 text-accent">
+                    <Icon className="h-4 w-4" />
+                  </div>
                   <div className="mt-3 font-display text-sm font-bold">{t}</div>
                   <div className="mt-1 text-xs leading-5 text-muted-foreground">{d}</div>
                 </div>
