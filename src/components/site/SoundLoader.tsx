@@ -210,6 +210,15 @@ export function SoundLoader({ label }: { label?: string }) {
           0%   { transform: translateX(-120%); }
           100% { transform: translateX(320%); }
         }
+        .sl-scan {
+          position: absolute; left: 0; right: 0; top: -20%; height: 40%;
+          background: linear-gradient(180deg, transparent, oklch(0.65 0.24 25 / 0.10), transparent);
+          animation: sl-scan 3.4s ease-in-out infinite;
+        }
+        @keyframes sl-scan {
+          0%   { transform: translateY(0); }
+          100% { transform: translateY(320%); }
+        }
 
         @media (prefers-reduced-motion: reduce) {
           .sl-cube, .sl-ring, .sl-bar, .sl-orbit, .sl-particle, .sl-shimmer { animation: none !important; }
