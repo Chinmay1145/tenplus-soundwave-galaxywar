@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail, MapPin, MessageCircle, Phone, Headphones, ShieldCheck, Truck, RefreshCw, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowUpRight, Clock, Mail, MapPin, MessageCircle, Phone, ShieldCheck, Truck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { LogoMark } from "@/components/site/Logo";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact & Support — PULSE" },
-      { name: "description", content: "Reach PULSE for orders, warranty, product support and partnerships. Indian customer care 9 AM – 9 PM IST, replies within 4 hours." },
+      { name: "description", content: "Get in touch with PULSE for orders, warranty and product support." },
       { property: "og:title", content: "Contact — PULSE" },
-      { property: "og:description", content: "We reply within 4 hours. Phone, email, WhatsApp or in-app chat — take your pick." },
       { property: "og:url", content: "/contact" },
     ],
     links: [{ rel: "canonical", href: "/contact" }],
@@ -17,254 +17,232 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
 });
 
-const TOPICS = [
-  "Order / Shipping",
-  "Warranty claim",
-  "Product support",
-  "Returns & refunds",
-  "Partnerships / Press",
-  "Something else",
-] as const;
-
-const CHANNELS = [
-  {
-    icon: Phone,
-    label: "Phone",
-    value: "1800-PULSE-IN",
-    sub: "Toll-free · 9 AM – 9 PM IST",
-    href: "tel:18007857346",
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: "+91 99999 88888",
-    sub: "Fastest replies · usually < 10 min",
-    href: "https://wa.me/919999988888",
-  },
-  {
-    icon: Mail,
-    label: "Email",
-    value: "care@pulse.audio",
-    sub: "Responses within 4 hours",
-    href: "mailto:care@pulse.audio",
-  },
-  {
-    icon: MapPin,
-    label: "HQ",
-    value: "Indiranagar, Bengaluru 560038",
-    sub: "Mon – Fri · walk-ins by appointment",
-    href: "https://maps.google.com/?q=Indiranagar+Bengaluru",
-  },
-] as const;
-
-const PROMISES = [
-  [Clock, "4-hour replies", "Every ticket answered within 4 business hours, guaranteed."],
-  [ShieldCheck, "2-year warranty", "Global coverage on all PULSE products, no fine print."],
-  [Truck, "Free shipping", "On orders above ₹999. 3-day delivery to Indian metros."],
-  [RefreshCw, "30-day returns", "Not in love with it? Return it, unquestioned, unboxed or otherwise."],
-] as const;
-
-const FAQ: [string, string][] = [
-  ["How long does delivery take?", "1–3 days to metros, 3–5 days elsewhere in India. Every order ships with tracking."],
-  ["Do you ship internationally?", "Yes — 40+ countries via DHL Express. Duties are prepaid at checkout."],
-  ["What if my product develops a fault?", "Two-year warranty. Raise a ticket, get a pickup, we replace or refund — your call."],
-  ["Can I cancel or modify my order?", "Yes, up to 2 hours after placing it. Ping us on WhatsApp for the fastest turnaround."],
-];
-
 function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", topic: TOPICS[0] as string, order: "", message: "" });
-  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", topic: "Product support", message: "" });
+  const [sending, setSending] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) {
-      toast.error("Please fill in your name, email and a short message.");
-      return;
-    }
-    toast.success("Message sent. We'll be in touch within 4 hours.");
-    setSent(true);
-    setForm({ name: "", email: "", topic: TOPICS[0], order: "", message: "" });
+    setSending(true);
+    await new Promise((r) => setTimeout(r, 500));
+    toast.success("Message sent. We'll get back within 24 hours.");
+    setForm({ name: "", email: "", topic: "Product support", message: "" });
+    setSending(false);
   };
 
   return (
     <div className="relative overflow-hidden">
       {/* HERO */}
-      <section className="relative">
+      <section className="relative border-b border-border/60">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(900px 500px at 50% -10%, oklch(0.65 0.24 25 / 0.2), transparent 60%)",
+              "radial-gradient(900px 480px at 90% -10%, oklch(0.65 0.24 25 / 0.22), transparent 60%)",
           }}
         />
-        <div className="mx-auto max-w-6xl px-4 pb-8 pt-20 sm:px-6 sm:pt-28">
-          <div className="flex items-center gap-2">
-            <span className="relative inline-flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            <span className="mono text-[10px] uppercase tracking-[0.3em] text-emerald-500">Live · Support online now</span>
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-20 sm:px-6 sm:pb-20 sm:pt-28 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <div className="flex items-center gap-3">
+              <LogoMark size={28} />
+              <div className="mono text-accent">— Contact · 24h response</div>
+            </div>
+            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-[104px]">
+              Say <span className="shimmer-text italic">hello.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-lg text-muted-foreground">
+              Questions about a product, an order, or a partnership? We're a
+              small team based in Bengaluru and Stockholm, and we answer every
+              message ourselves.
+            </p>
           </div>
-          <div className="mono mt-3 text-accent">— Contact</div>
-          <h1 className="mt-3 font-display text-5xl font-bold leading-[1.02] tracking-tight sm:text-7xl">
-            Say hello. <span className="shimmer-text">We're listening.</span>
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            Product questions, order updates, or a partnership pitch — a real human
-            replies within four hours, every day, 9 AM – 9 PM IST.
-          </p>
-
-          {/* Promise strip */}
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {PROMISES.map(([Ico, t, d]) => {
-              const Icon = Ico as typeof Clock;
-              return (
-                <div
-                  key={t}
-                  className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-4 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-lg"
-                >
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
-                    style={{ background: "oklch(0.65 0.24 25 / 0.55)" }}
-                  />
-                  <div className="grid h-8 w-8 place-items-center rounded-lg border border-accent/30 bg-accent/10 text-accent">
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <div className="mt-3 font-display text-sm font-bold">{t}</div>
-                  <div className="mt-1 text-xs leading-5 text-muted-foreground">{d}</div>
+          <div className="flex items-end lg:col-span-4">
+            <div className="grid w-full grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60">
+              {[
+                ["< 24h", "Reply time"],
+                ["9–9", "Live chat IST"],
+                ["24 mo.", "Warranty"],
+                ["Free", "Returns 30d"],
+              ].map(([n, l]) => (
+                <div key={l} className="bg-background px-4 py-5">
+                  <div className="font-display text-2xl font-bold tracking-tight">{n}</div>
+                  <div className="mono mt-1 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{l}</div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* MAIN GRID */}
-      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-          {/* FORM */}
+      {/* FORM + CHANNELS */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+          {/* Form */}
           <form
             onSubmit={submit}
-            className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-6 sm:p-8"
+            className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-8 sm:p-10"
           >
-            <div className="mono text-accent">— Send a message</div>
-            <h2 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
-              Tell us what you need.
-            </h2>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ background: "radial-gradient(500px 260px at 0% 0%, oklch(0.65 0.24 25 / 0.14), transparent 60%)" }}
+            />
+            <div className="relative">
+              <div className="mono text-accent">— Send us a note</div>
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight">Start a conversation.</h2>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <Field label="Full name" value={form.name} on={(v) => setForm({ ...form, name: v })} required />
-              <Field label="Email" type="email" value={form.email} on={(v) => setForm({ ...form, email: v })} required />
-            </div>
+              <div className="mt-8 space-y-5">
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Name" value={form.name} on={(v) => setForm({ ...form, name: v })} placeholder="Ada Lovelace" />
+                  <Field label="Email" type="email" value={form.email} on={(v) => setForm({ ...form, email: v })} placeholder="ada@studio.com" />
+                </div>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label className="block">
-                <span className="mono mb-1.5 block text-muted-foreground">Topic</span>
-                <select
-                  value={form.topic}
-                  onChange={(e) => setForm({ ...form, topic: e.target.value })}
-                  className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-                >
-                  {TOPICS.map((t) => (
-                    <option key={t}>{t}</option>
-                  ))}
-                </select>
-              </label>
-              <Field label="Order # (optional)" value={form.order} on={(v) => setForm({ ...form, order: v })} placeholder="PUL-…" />
-            </div>
+                <div>
+                  <span className="mono mb-2 block text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Topic</span>
+                  <div className="flex flex-wrap gap-2">
+                    {["Product support", "Order & shipping", "Warranty", "Press", "Partnership"].map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setForm({ ...form, topic: t })}
+                        className={`rounded-full border px-3.5 py-1.5 text-xs transition ${
+                          form.topic === t
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border bg-surface-2 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            <label className="mt-4 block">
-              <span className="mono mb-1.5 block text-muted-foreground">Message</span>
-              <textarea
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-                rows={6}
-                placeholder="Tell us what's going on…"
-                required
-                className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-              />
-            </label>
+                <label className="block">
+                  <span className="mono mb-2 block text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Message</span>
+                  <textarea
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    rows={6}
+                    required
+                    placeholder="Tell us what's on your mind…"
+                    className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  />
+                </label>
 
-            <div className="mt-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-              <p className="text-xs text-muted-foreground">
-                By sending, you agree to our <Link to="/" className="underline">privacy policy</Link>. We never share your data.
-              </p>
-              <button className="btn-magnetic inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/30">
-                Send message →
-              </button>
-            </div>
-
-            {sent && (
-              <div className="mt-5 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="h-4 w-4" />
-                Thanks! A support engineer will reply from care@pulse.audio shortly.
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+                  <div className="mono text-[11px] text-muted-foreground">
+                    We reply in under 24 hours · Mon–Sat
+                  </div>
+                  <button
+                    disabled={sending}
+                    className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition hover:brightness-110 disabled:opacity-60"
+                  >
+                    {sending ? "Sending…" : "Send message"}
+                    <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </button>
+                </div>
               </div>
-            )}
+            </div>
           </form>
 
-          {/* CHANNELS */}
-          <aside className="space-y-3">
-            <div className="mono text-accent">— Reach us directly</div>
-            {CHANNELS.map(({ icon: Icon, label, value, sub, href }) => (
-              <a
-                key={label}
-                href={href}
-                target={href.startsWith("http") ? "_blank" : undefined}
-                rel="noreferrer"
-                className="group flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-lg"
-              >
-                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-accent/40 bg-accent/10 text-accent">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="mono text-[10px] uppercase text-muted-foreground">{label}</div>
-                  <div className="mt-0.5 truncate font-display text-base font-bold group-hover:text-accent">
-                    {value}
+          {/* Channels */}
+          <aside className="flex flex-col gap-3">
+            {[
+              [Mail, "Email", "support@pulseaudio.com", "mailto:support@pulseaudio.com"],
+              [Phone, "Phone", "+91 80 4567 8900", "tel:+918045678900"],
+              [MessageCircle, "Live chat", "9am – 9pm IST", null],
+              [MapPin, "Studio", "Indiranagar, Bengaluru 560038", null],
+            ].map(([Ico, label, val, href]) => {
+              const Icon = Ico as typeof Mail;
+              const inner = (
+                <>
+                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-accent/40 bg-accent/10 text-accent">
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <div className="mt-0.5 text-xs text-muted-foreground">{sub}</div>
+                  <div className="min-w-0">
+                    <div className="mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label as string}</div>
+                    <div className="mt-0.5 truncate font-display text-base font-bold tracking-tight">{val as string}</div>
+                  </div>
+                  <ArrowUpRight className="ml-auto h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+                </>
+              );
+              return href ? (
+                <a
+                  key={label as string}
+                  href={href as string}
+                  className="group flex items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 transition hover:border-accent/50 hover:bg-card/80"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div
+                  key={label as string}
+                  className="group flex items-center gap-4 rounded-2xl border border-border/60 bg-card p-4"
+                >
+                  {inner}
                 </div>
-              </a>
-            ))}
+              );
+            })}
 
-            <div className="rounded-2xl border border-border/60 bg-card p-5">
-              <div className="flex items-center gap-2">
-                <Headphones className="h-4 w-4 text-accent" />
-                <div className="mono text-[10px] uppercase text-muted-foreground">Product help</div>
+            <div className="mt-2 rounded-2xl border border-border/60 bg-card p-5">
+              <div className="mono mb-3 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Hours</div>
+              <div className="space-y-1.5 text-sm">
+                <Row k="Mon – Fri" v="9:00 – 21:00 IST" />
+                <Row k="Saturday" v="10:00 – 18:00 IST" />
+                <Row k="Sunday" v="Closed" />
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Setup, pairing, firmware — most questions have a fix in our
-                <Link to="/faq" className="mx-1 underline">FAQ</Link>
-                or
-                <Link to="/warranty" className="mx-1 underline">warranty guide</Link>.
-              </p>
             </div>
           </aside>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <div className="mono text-accent">— Frequently asked</div>
-        <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">Quick answers.</h2>
-        <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          {FAQ.map(([q, a]) => (
-            <details
-              key={q}
-              className="group rounded-2xl border border-border/60 bg-card p-5 open:shadow-lg"
-            >
-              <summary className="flex cursor-pointer items-center justify-between font-display text-base font-bold marker:hidden">
-                {q}
-                <span className="ml-4 grid h-7 w-7 place-items-center rounded-full border border-border/60 text-accent transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">{a}</p>
-            </details>
-          ))}
+      {/* HELP SHORTCUTS */}
+      <section className="border-t border-border/60">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <div className="mono text-accent">— Faster than an email</div>
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Answer it yourself.</h2>
+            </div>
+            <Link to="/faq" className="mono text-xs text-muted-foreground hover:text-foreground">
+              ALL FAQS →
+            </Link>
+          </div>
+
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              [Truck, "Track order", "See where your package is right now.", "/track-order"],
+              [ShieldCheck, "Warranty", "24-month cover on every product.", "/warranty"],
+              [Clock, "Returns", "30-day, no-questions-asked returns.", "/returns"],
+              [MessageCircle, "FAQ", "Answers to the top 40 questions.", "/faq"],
+            ].map(([Ico, t, d, to]) => {
+              const Icon = Ico as typeof Truck;
+              return (
+                <Link
+                  key={t as string}
+                  to={to as string}
+                  className="group relative flex flex-col gap-3 bg-background p-6 transition-colors hover:bg-card"
+                >
+                  <Icon className="h-5 w-5 text-accent transition-transform group-hover:scale-110" />
+                  <div className="font-display text-lg font-bold tracking-tight">{t as string}</div>
+                  <div className="text-sm text-muted-foreground">{d as string}</div>
+                  <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function Row({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between text-muted-foreground">
+      <span>{k}</span>
+      <span className="text-foreground">{v}</span>
     </div>
   );
 }
@@ -274,24 +252,23 @@ function Field({
   value,
   on,
   type = "text",
-  required,
   placeholder,
 }: {
   label: string;
   value: string;
   on: (v: string) => void;
   type?: string;
-  required?: boolean;
   placeholder?: string;
 }) {
   return (
     <label className="block">
-      <span className="mono mb-1.5 block text-muted-foreground">{label}{required && <span className="ml-1 text-accent">*</span>}</span>
+      <span className="mono mb-2 block text-[11px] uppercase tracking-[0.25em] text-muted-foreground">{label}</span>
       <input
         type={type}
         value={value}
-        placeholder={placeholder}
         onChange={(e) => on(e.target.value)}
+        placeholder={placeholder}
+        required
         className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
       />
     </label>
