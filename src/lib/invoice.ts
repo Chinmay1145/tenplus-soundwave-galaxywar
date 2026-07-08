@@ -18,365 +18,422 @@ export type InvoiceData = {
 const inr = (n: number) =>
   "Rs. " + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// Convert a number to Indian-English words (rupees + paise). Handles up to 99 crore.
-function numberToWords(n: number): string {
-  const a = [
-    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
-    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
-    "Seventeen", "Eighteen", "Nineteen",
-  ];
-  const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
-  const two = (x: number): string => (x < 20 ? a[x] : `${b[Math.floor(x / 10)]}${x % 10 ? " " + a[x % 10] : ""}`);
-  const three = (x: number): string => {
-    const h = Math.floor(x / 100), r = x % 100;
-    return `${h ? a[h] + " Hundred" + (r ? " " : "") : ""}${r ? two(r) : ""}`.trim();
-  };
-  const rupees = Math.floor(n);
-  const paise = Math.round((n - rupees) * 100);
-  if (rupees === 0 && paise === 0) return "Zero Rupees Only";
-  const crore = Math.floor(rupees / 10000000);
-  const lakh = Math.floor((rupees % 10000000) / 100000);
-  const thousand = Math.floor((rupees % 100000) / 1000);
-  const rest = rupees % 1000;
-  let words = "";
-  if (crore) words += two(crore) + " Crore ";
-  if (lakh) words += two(lakh) + " Lakh ";
-  if (thousand) words += two(thousand) + " Thousand ";
-  if (rest) words += three(rest);
-  words = words.trim() + " Rupees";
-  if (paise) words += ` and ${two(paise)} Paise`;
-  return words + " Only";
-}
-
-const ink: [number, number, number] = [17, 17, 19];
-const sub: [number, number, number] = [60, 60, 68];
-const muted: [number, number, number] = [120, 120, 128];
-const hair: [number, number, number] = [225, 225, 230];
+// Refined monochrome palette with a single strong accent
+const ink: [number, number, number] = [12, 12, 14];
+const graphite: [number, number, number] = [42, 42, 48];
+const sub: [number, number, number] = [88, 88, 96];
+const muted: [number, number, number] = [140, 140, 148];
+const hair: [number, number, number] = [230, 230, 234];
 const accent: [number, number, number] = [225, 29, 47];
-const tint: [number, number, number] = [250, 250, 252];
-const paidGreen: [number, number, number] = [16, 122, 66];
+const paper: [number, number, number] = [252, 252, 253];
+const soft: [number, number, number] = [246, 246, 248];
+const success: [number, number, number] = [22, 133, 87];
 
+// ── Number to words (Indian system) ──────────────────────────
+const ones = [
+  "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+  "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+  "Seventeen", "Eighteen", "Nineteen",
+];
+const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+const twoDigits = (n: number): string =>
+  n < 20 ? ones[n] : tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "");
+const threeDigits = (n: number): string => {
+  const h = Math.floor(n / 100);
+  const r = n % 100;
+  return (h ? ones[h] + " Hundred" + (r ? " and " : "") : "") + (r ? twoDigits(r) : "");
+};
+function numToWordsInr(num: number): string {
+  const n = Math.floor(num);
+  if (n === 0) return "Zero Rupees Only";
+  const crore = Math.floor(n / 10000000);
+  const lakh = Math.floor((n % 10000000) / 100000);
+  const thousand = Math.floor((n % 100000) / 1000);
+  const rest = n % 1000;
+  const paise = Math.round((num - n) * 100);
+  let out = "";
+  if (crore) out += twoDigits(crore) + " Crore ";
+  if (lakh) out += twoDigits(lakh) + " Lakh ";
+  if (thousand) out += twoDigits(thousand) + " Thousand ";
+  if (rest) out += threeDigits(rest);
+  out = out.trim() + " Rupees";
+  if (paise) out += " and " + twoDigits(paise) + " Paise";
+  return out + " Only";
+}
 
 export function downloadInvoice(data: InvoiceData) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
-  const M = 48; // page margin
+  const M = 48;
 
   const shortId = data.id.slice(0, 8).toUpperCase();
   const created = new Date(data.createdAt);
   const due = new Date(created.getTime() + 7 * 86400000);
   const dateFmt = (d: Date) =>
     d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  const isPaid = /paid|confirmed|packed|shipped|delivered|out_for_delivery/i.test(
+    data.status || "confirmed",
+  );
 
-  // ── HEADER BAND ──────────────────────────────────────────
-  doc.setFillColor(...ink);
-  doc.rect(0, 0, W, 36, "F");
+  // Page background
+  doc.setFillColor(...paper);
+  doc.rect(0, 0, W, H, "F");
+
+  // ── MASTHEAD ─────────────────────────────────────────────
+  // Slim accent bar
   doc.setFillColor(...accent);
-  doc.rect(0, 36, W, 3, "F");
+  doc.rect(0, 0, W, 4, "F");
+
+  // Wordmark
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(255, 255, 255);
-  doc.text("PULSE · AUDIO LABS", M, 23);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(220, 220, 224);
-  doc.text("Experience Sound Beyond Reality", W - M, 23, { align: "right" });
-
-  // Logo mark (circle + dot)
-  doc.setDrawColor(...accent);
-  doc.setLineWidth(1.4);
-  doc.circle(M + 12, 72, 12, "S");
-  doc.setFillColor(...accent);
-  doc.circle(M + 12, 72, 4, "F");
-
+  doc.setFontSize(11);
   doc.setTextColor(...ink);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.text("PULSE", M + 32, 77);
+  doc.text("PULSE", M, 34);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
+  doc.setFontSize(7);
   doc.setTextColor(...muted);
-  doc.text("TAX INVOICE / BILL OF SUPPLY", M + 32, 90);
+  doc.text("AUDIO  LABS", M + 32, 34);
 
-  // Right side: invoice meta
+  // Right — document type
   doc.setFont("helvetica", "bold");
   doc.setFontSize(28);
   doc.setTextColor(...ink);
-  doc.text("INVOICE", W - M, 74, { align: "right" });
+  doc.text("Invoice", W - M, 40, { align: "right" });
+
+  // Divider
+  doc.setDrawColor(...hair);
+  doc.setLineWidth(0.5);
+  doc.line(M, 54, W - M, 54);
+
+  // ── META STRIP (4 columns) ───────────────────────────────
+  const metaY = 72;
+  const metaCols: [string, string][] = [
+    ["INVOICE NO.", `INV-${shortId}`],
+    ["ISSUE DATE", dateFmt(created)],
+    ["DUE DATE", dateFmt(due)],
+    ["STATUS", isPaid ? "PAID" : "DUE"],
+  ];
+  const metaW = (W - 2 * M) / 4;
+  metaCols.forEach(([k, v], i) => {
+    const x = M + i * metaW;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...muted);
+    doc.text(k, x, metaY);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    if (k === "STATUS") {
+      doc.setTextColor(...(isPaid ? success : accent));
+    } else {
+      doc.setTextColor(...ink);
+    }
+    doc.text(v, x, metaY + 16);
+  });
+
+  // ── PARTIES ──────────────────────────────────────────────
+  let y = 120;
+  const colW = (W - 2 * M - 40) / 2;
+
+  const label = (t: string, x: number, yy: number) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...muted);
+    doc.text(t, x, yy);
+  };
+
+  label("FROM", M, y);
+  label("BILLED TO", M + colW + 40, y);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(...ink);
+  doc.text("PULSE Audio Pvt. Ltd.", M, y + 16);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(...sub);
-  doc.text(`No.     INV-${shortId}`, W - M, 90, { align: "right" });
-  doc.text(`Issued  ${dateFmt(created)}`, W - M, 104, { align: "right" });
-  doc.text(`Due     ${dateFmt(due)}`, W - M, 118, { align: "right" });
-
-  // Hairline rule
-  doc.setDrawColor(...hair);
-  doc.setLineWidth(0.6);
-  doc.line(M, 134, W - M, 134);
-
-  // ── PARTIES ──────────────────────────────────────────────
-  let y = 158;
-  const colW = (W - 2 * M) / 3;
-
-  const labelStyle = () => {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
-    doc.setTextColor(...muted);
-  };
-  const bodyStyle = () => {
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(...ink);
-  };
-
-  labelStyle();
-  doc.text("FROM", M, y);
-  doc.text("BILLED TO", M + colW, y);
-  doc.text("SHIPPED TO", M + colW * 2, y);
-
-  bodyStyle();
-  const fromLines = [
-    "PULSE Audio Pvt. Ltd.",
-    "12, Innovation Park",
-    "Bengaluru, KA 560001",
-    "GSTIN: 29ABCDE1234F1Z5",
-    "support@pulse.audio",
-  ];
-  fromLines.forEach((l, i) => doc.text(l, M, y + 16 + i * 13));
+  ["12, Innovation Park, Koramangala", "Bengaluru, Karnataka 560001", "GSTIN 29ABCDE1234F1Z5", "support@pulse.audio"].forEach(
+    (l, i) => doc.text(l, M, y + 32 + i * 12),
+  );
 
   const addr = (data.shippingAddress || {}) as Record<string, string>;
   const customerName = data.customer?.name || (addr.name as string) || "Valued Customer";
   const customerEmail = data.customer?.email || "";
-  const billLines = [customerName, customerEmail].filter(Boolean) as string[];
-  billLines.forEach((l, i) => doc.text(l, M + colW, y + 16 + i * 13));
-
-  const shipLines = [
-    addr.name as string,
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(...ink);
+  doc.text(customerName, M + colW + 40, y + 16);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...sub);
+  const billLines = [
     addr.line1 as string,
     [addr.city, addr.state, addr.pincode].filter(Boolean).join(", "),
+    customerEmail,
     addr.phone ? `Tel: ${addr.phone}` : "",
   ].filter(Boolean) as string[];
-  if (shipLines.length === 0) shipLines.push("Same as billing");
-  shipLines.forEach((l, i) => doc.text(l, M + colW * 2, y + 16 + i * 13));
+  billLines.forEach((l, i) => doc.text(l, M + colW + 40, y + 32 + i * 12));
 
   // ── ITEMS TABLE ──────────────────────────────────────────
-  y = 260;
+  y = 220;
   const tableX = M;
   const tableW = W - 2 * M;
-  const colHsn = M + 280;
-  const colQty = M + 340;
-  const colUnit = M + 410;
-  const colAmt = W - M;
+  const colDesc = tableX + 14;
+  const colHsn = tableX + tableW * 0.55;
+  const colQty = tableX + tableW * 0.68;
+  const colUnit = tableX + tableW * 0.83;
+  const colAmt = tableX + tableW - 14;
 
-  // Header band
-  doc.setFillColor(...ink);
-  doc.rect(tableX, y, tableW, 26, "F");
-  doc.setTextColor(255, 255, 255);
+  // Header row — no fill, just rules — editorial feel
+  doc.setDrawColor(...ink);
+  doc.setLineWidth(1);
+  doc.line(tableX, y, tableX + tableW, y);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(8.5);
-  doc.text("DESCRIPTION", tableX + 12, y + 17);
-  doc.text("HSN", colHsn, y + 17);
-  doc.text("QTY", colQty, y + 17, { align: "right" });
-  doc.text("UNIT PRICE", colUnit, y + 17, { align: "right" });
-  doc.text("AMOUNT", colAmt - 12, y + 17, { align: "right" });
+  doc.setFontSize(7);
+  doc.setTextColor(...ink);
+  doc.text("DESCRIPTION", colDesc, y + 14);
+  doc.text("HSN", colHsn, y + 14);
+  doc.text("QTY", colQty, y + 14, { align: "right" });
+  doc.text("UNIT PRICE", colUnit, y + 14, { align: "right" });
+  doc.text("AMOUNT", colAmt, y + 14, { align: "right" });
+  doc.setDrawColor(...hair);
+  doc.setLineWidth(0.5);
+  doc.line(tableX, y + 22, tableX + tableW, y + 22);
 
-  y += 36;
+  y += 38;
 
-  // Compute totals
   const explicitSubtotal = data.subtotal && data.subtotal > 0 ? data.subtotal : 0;
-  const itemsTotal = data.items.reduce((sum, it) => sum + (it.price ?? 0) * it.qty, 0);
+  const itemsTotal = data.items.reduce((s, it) => s + (it.price ?? 0) * it.qty, 0);
   const subtotal = explicitSubtotal || itemsTotal || data.total / 1.18;
   const tax = data.tax ?? Math.max(0, data.total - subtotal - (data.shipping ?? 0));
   const cgst = tax / 2;
   const sgst = tax / 2;
   const shipFee = data.shipping ?? 0;
+  const totalQty = data.items.reduce((a, b) => a + b.qty, 0);
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+  const pageBottomLimit = H - 240; // reserve space for totals + footer
+
+  const drawPageChrome = (pageNum: number, pageTotal: number) => {
+    // Footer
+    doc.setDrawColor(...hair);
+    doc.setLineWidth(0.5);
+    doc.line(M, H - 44, W - M, H - 44);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text("PULSE Audio Pvt. Ltd.  ·  support@pulse.audio  ·  www.pulse.audio", M, H - 28);
+    doc.text(`Page ${pageNum} of ${pageTotal}`, W - M, H - 28, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...muted);
+    doc.text(`INV-${shortId}`, W - M, H - 16, { align: "right" });
+  };
 
   data.items.forEach((it, idx) => {
-    const unit =
-      it.price ??
-      subtotal /
-        Math.max(
-          1,
-          data.items.reduce((a, b) => a + b.qty, 0),
-        );
+    const unit = it.price ?? subtotal / Math.max(1, totalQty);
     const amt = unit * it.qty;
+    const nameLines = doc.splitTextToSize(it.name, (colHsn - colDesc) - 20) as string[];
+    const rowH = Math.max(28, 14 + nameLines.length * 12);
 
-    if (idx % 2 === 1) {
-      doc.setFillColor(...tint);
-      doc.rect(tableX, y - 14, tableW, 24, "F");
+    if (y + rowH > pageBottomLimit) {
+      drawPageChrome(doc.getNumberOfPages(), 0); // will fix totals later
+      doc.addPage();
+      doc.setFillColor(...paper);
+      doc.rect(0, 0, W, H, "F");
+      doc.setFillColor(...accent);
+      doc.rect(0, 0, W, 4, "F");
+      y = 60;
+      // Re-draw table header
+      doc.setDrawColor(...ink);
+      doc.setLineWidth(1);
+      doc.line(tableX, y, tableX + tableW, y);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.setTextColor(...ink);
+      doc.text("DESCRIPTION", colDesc, y + 14);
+      doc.text("HSN", colHsn, y + 14);
+      doc.text("QTY", colQty, y + 14, { align: "right" });
+      doc.text("UNIT PRICE", colUnit, y + 14, { align: "right" });
+      doc.text("AMOUNT", colAmt, y + 14, { align: "right" });
+      doc.setDrawColor(...hair);
+      doc.setLineWidth(0.5);
+      doc.line(tableX, y + 22, tableX + tableW, y + 22);
+      y += 38;
     }
+
     doc.setTextColor(...ink);
-    doc.text(doc.splitTextToSize(it.name, 260)[0], tableX + 12, y);
-    doc.setTextColor(...sub);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.text(nameLines[0], colDesc, y);
+    if (nameLines.length > 1) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(...sub);
+      nameLines.slice(1).forEach((ln, i) => doc.text(ln, colDesc, y + 12 + i * 11));
+    }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(...muted);
+    doc.text("SKU · " + (String(idx + 1).padStart(3, "0")), colDesc, y + 12 + Math.max(0, nameLines.length - 1) * 11);
+
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
+    doc.setTextColor(...graphite);
     doc.text("8518", colHsn, y);
     doc.text(String(it.qty), colQty, y, { align: "right" });
     doc.text(inr(unit), colUnit, y, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
     doc.setTextColor(...ink);
-    doc.setFontSize(10);
-    doc.text(inr(amt), colAmt - 12, y, { align: "right" });
-    y += 24;
-  });
+    doc.text(inr(amt), colAmt, y, { align: "right" });
 
-  // hairline under last row
-  doc.setDrawColor(...hair);
-  doc.setLineWidth(0.5);
-  doc.line(tableX, y - 8, tableX + tableW, y - 8);
+    // Row separator
+    doc.setDrawColor(...hair);
+    doc.setLineWidth(0.4);
+    doc.line(tableX, y + rowH - 8, tableX + tableW, y + rowH - 8);
+
+    y += rowH;
+  });
 
   // ── TOTALS ───────────────────────────────────────────────
-  y += 14;
-  const labelX = W - M - 200;
-  const valueX = W - M;
-
-  const row = (label: string, value: string, opts: { bold?: boolean; rule?: boolean } = {}) => {
-    if (opts.rule) {
-      doc.setDrawColor(...ink);
-      doc.setLineWidth(0.8);
-      doc.line(labelX, y - 10, valueX, y - 10);
-    }
-    doc.setFont("helvetica", opts.bold ? "bold" : "normal");
-    doc.setFontSize(opts.bold ? 12 : 10);
-    doc.setTextColor(...(opts.bold ? ink : sub));
-    doc.text(label, labelX, y);
-    doc.setTextColor(...ink);
-    doc.text(value, valueX, y, { align: "right" });
-    y += opts.bold ? 22 : 16;
-  };
-
-  row("Subtotal", inr(subtotal));
-  row("CGST (9%)", inr(cgst));
-  row("SGST (9%)", inr(sgst));
-  row("Shipping", shipFee === 0 ? "FREE" : inr(shipFee));
-  row("Total (INR)", inr(data.total), { bold: true, rule: true });
-
-  // Amount in words (professional touch, mandatory on Indian invoices)
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(7.5);
-  doc.setTextColor(...muted);
-  doc.text("AMOUNT IN WORDS", M, y);
-  doc.setFont("helvetica", "italic");
-  doc.setFontSize(10);
-  doc.setTextColor(...ink);
-  const words = numberToWords(data.total);
-  const wrapped = doc.splitTextToSize(words, W - 2 * M - 8);
-  doc.text(wrapped, M, y + 14);
-  y += 14 + wrapped.length * 12 + 8;
-
-  // PAID stamp (rotated) if the order is paid
-  const isPaid = (data.status || "").toLowerCase() !== "unpaid" && (data.paymentMethod || "prepaid").toLowerCase() !== "cod";
-  if (isPaid) {
-    doc.saveGraphicsState();
-    doc.setTextColor(...paidGreen);
-    doc.setDrawColor(...paidGreen);
-    doc.setLineWidth(2);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(28);
-    const stampX = W - M - 210;
-    const stampY = y - 50;
-    doc.roundedRect(stampX, stampY, 150, 46, 6, 6, "S");
-    doc.text("PAID", stampX + 75, stampY + 24, { align: "center", angle: -8 });
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    doc.text(`${new Date(created).toLocaleDateString("en-IN")}  ·  PULSE`, stampX + 75, stampY + 38, { align: "center", angle: -8 });
-    doc.restoreGraphicsState();
-  }
-
-
-  // ── PAYMENT SUMMARY ──────────────────────────────────────
   y += 12;
-  doc.setFillColor(...tint);
-  doc.rect(M, y, W - 2 * M, 64, "F");
-  doc.setDrawColor(...hair);
-  doc.rect(M, y, W - 2 * M, 64, "S");
+  const totalsW = 260;
+  const totalsX = W - M - totalsW;
 
-  const blockW = (W - 2 * M) / 4;
-  const blocks: [string, string][] = [
-    ["ORDER ID", `#${shortId}`],
-    ["STATUS", (data.status || "confirmed").replace(/_/g, " ").toUpperCase()],
-    ["PAYMENT", (data.paymentMethod || "Prepaid").toUpperCase()],
-    ["AMOUNT PAID", inr(data.total)],
-  ];
-  blocks.forEach(([k, v], i) => {
-    const bx = M + i * blockW + 14;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
-    doc.setTextColor(...muted);
-    doc.text(k, bx, y + 22);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(...ink);
-    doc.text(v, bx, y + 44);
-  });
-
-  // Accent strip
-  doc.setFillColor(...accent);
-  doc.rect(M, y + 60, W - 2 * M, 4, "F");
-
-  // ── TERMS & SIGNATURE ────────────────────────────────────
-  y += 92;
+  // Left — amount in words + notes
+  const leftW = W - 2 * M - totalsW - 24;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
+  doc.setFontSize(6.5);
+  doc.setTextColor(...muted);
+  doc.text("AMOUNT IN WORDS", M, y + 10);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9.5);
   doc.setTextColor(...ink);
-  doc.text("TERMS & CONDITIONS", M, y);
+  const words = doc.splitTextToSize(numToWordsInr(data.total), leftW) as string[];
+  words.slice(0, 3).forEach((w, i) => doc.text(w, M, y + 26 + i * 13));
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5);
+  doc.setTextColor(...muted);
+  doc.text("NOTES", M, y + 82);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(...sub);
-  const terms = [
-    "1. Returns accepted within 30 days of delivery in original, unused condition with all accessories.",
-    "2. Warranty: 2 years on all PULSE audio products against manufacturing defects.",
-    "3. Goods once sold will not be taken back except as per the published return policy.",
-    "4. Late payments beyond 7 days attract 1.5% monthly interest under the MSME Act, 2006.",
-    "5. All disputes are subject to the exclusive jurisdiction of Bengaluru courts. E. & O. E.",
-  ];
-  terms.forEach((t, i) => doc.text(t, M, y + 14 + i * 12));
+  doc.text(
+    `${totalQty} item${totalQty !== 1 ? "s" : ""}  ·  Payment via ${(data.paymentMethod || "Prepaid").toUpperCase()}  ·  Thank you for choosing PULSE.`,
+    M,
+    y + 96,
+  );
 
-  // Bank details panel
-  const bankY = y + 84;
+  // Right — totals column
+  let ty = y + 10;
+  const line = (l: string, v: string, opts: { bold?: boolean; big?: boolean; rule?: boolean } = {}) => {
+    if (opts.rule) {
+      doc.setDrawColor(...ink);
+      doc.setLineWidth(0.8);
+      doc.line(totalsX, ty - 6, W - M, ty - 6);
+      ty += 6;
+    }
+    doc.setFont("helvetica", opts.bold ? "bold" : "normal");
+    doc.setFontSize(opts.big ? 14 : 9.5);
+    doc.setTextColor(...(opts.bold ? ink : sub));
+    doc.text(l, totalsX, ty);
+    doc.setFont("helvetica", opts.bold ? "bold" : "normal");
+    doc.setTextColor(...ink);
+    doc.text(v, W - M, ty, { align: "right" });
+    ty += opts.big ? 22 : 16;
+  };
+  line("Subtotal", inr(subtotal));
+  line("CGST (9%)", inr(cgst));
+  line("SGST (9%)", inr(sgst));
+  line("Shipping", shipFee === 0 ? "Free" : inr(shipFee));
+  line("Total", inr(data.total), { bold: true, big: true, rule: true });
+
+  // Amount due block (large)
+  ty += 6;
+  doc.setFillColor(...ink);
+  doc.roundedRect(totalsX, ty, totalsW, 56, 4, 4, "F");
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(7.5);
-  doc.setTextColor(...muted);
-  doc.text("BANK DETAILS FOR NEFT / RTGS", M, bankY);
+  doc.setFontSize(7);
+  doc.setTextColor(180, 180, 190);
+  doc.text(isPaid ? "AMOUNT PAID" : "AMOUNT DUE", totalsX + 16, ty + 20);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.setTextColor(255, 255, 255);
+  doc.text(isPaid ? inr(0) : inr(data.total), W - M - 16, ty + 34, { align: "right" });
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(...ink);
-  doc.text("Beneficiary: PULSE Audio Pvt. Ltd.   ·   HDFC Bank, MG Road, Bengaluru", M, bankY + 14);
-  doc.text("A/c: 5010 0234 5678 90   ·   IFSC: HDFC0000123   ·   UPI: pulse@hdfcbank", M, bankY + 27);
+  doc.setFontSize(8);
+  doc.setTextColor(180, 180, 190);
+  doc.text(isPaid ? `Received ${dateFmt(created)}` : `Due by ${dateFmt(due)}`, W - M - 16, ty + 48, {
+    align: "right",
+  });
 
-  // Signature box (right)
-  const sigX = W - M - 160;
-  const sigY = y + 8;
+  y = Math.max(y + 120, ty + 76);
+
+  // ── TERMS + SIGNATURE ────────────────────────────────────
+  y += 8;
   doc.setDrawColor(...hair);
   doc.setLineWidth(0.5);
-  doc.line(sigX, sigY + 44, W - M, sigY + 44);
+  doc.line(M, y, W - M, y);
+  y += 18;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+  doc.setTextColor(...muted);
+  doc.text("TERMS", M, y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.setTextColor(...muted);
-  doc.text("Authorised Signatory", sigX + 80, sigY + 58, { align: "center" });
-  doc.text(`For PULSE Audio Pvt. Ltd.`, sigX + 80, sigY + 70, { align: "center" });
+  doc.setTextColor(...sub);
+  const terms = [
+    "Returns accepted within 30 days of delivery in original, unopened condition.",
+    "Warranty: 2 years on all PULSE audio products against manufacturing defects.",
+    "Subject to Bengaluru jurisdiction. E. & O. E.",
+  ];
+  terms.forEach((t, i) => doc.text("·  " + t, M, y + 14 + i * 11));
+
+  // Signature (right)
+  const sigX = W - M - 180;
   doc.setFont("helvetica", "italic");
-  doc.setFontSize(16);
-  doc.setTextColor(...accent);
-  doc.text("PULSE", sigX + 80, sigY + 38, { align: "center" });
-
-
-  // ── FOOTER ───────────────────────────────────────────────
-  doc.setDrawColor(...hair);
-  doc.line(M, H - 50, W - M, H - 50);
+  doc.setFontSize(18);
+  doc.setTextColor(...ink);
+  doc.text("Pulse", sigX + 90, y + 20, { align: "center" });
+  doc.setDrawColor(...ink);
+  doc.setLineWidth(0.6);
+  doc.line(sigX, y + 32, W - M, y + 32);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(...muted);
-  doc.text("Thank you for shopping with PULSE.", M, H - 34);
-  doc.text(
-    "This is a system-generated invoice and does not require a physical signature.",
-    M,
-    H - 22,
-  );
-  doc.setTextColor(...accent);
-  doc.text("www.pulse.audio", W - M, H - 22, { align: "right" });
+  doc.text("Authorised Signatory  ·  PULSE Audio Pvt. Ltd.", sigX + 90, y + 44, { align: "center" });
+
+  // ── Draw footer + PAID watermark on every page ───────────
+  const totalPages = doc.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    // Watermark
+    if (isPaid) {
+      const g = doc as unknown as { GState: new (o: object) => object; setGState: (s: object) => void };
+      doc.setTextColor(...success);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(120);
+      g.setGState(new g.GState({ opacity: 0.06 }));
+      // Rotated text
+      doc.text("PAID", W / 2, H / 2 + 40, { align: "center", angle: 20 });
+      g.setGState(new g.GState({ opacity: 1 }));
+    }
+    // Footer
+    doc.setDrawColor(...hair);
+    doc.setLineWidth(0.5);
+    doc.line(M, H - 44, W - M, H - 44);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text("PULSE Audio Pvt. Ltd.  ·  support@pulse.audio  ·  www.pulse.audio", M, H - 28);
+    doc.text(`Page ${p} of ${totalPages}`, W - M, H - 28, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...muted);
+    doc.text(`INV-${shortId}`, W - M, H - 16, { align: "right" });
+  }
 
   doc.save(`PULSE-Invoice-${shortId}.pdf`);
 }
