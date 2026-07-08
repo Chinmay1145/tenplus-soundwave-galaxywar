@@ -41,6 +41,12 @@ export type ReportSummary = {
 };
 
 const inr = (n: number) => "Rs. " + Math.round(n).toLocaleString("en-IN");
+const inrK = (n: number) => {
+  if (n >= 10000000) return "Rs. " + (n / 10000000).toFixed(1) + "Cr";
+  if (n >= 100000) return "Rs. " + (n / 100000).toFixed(1) + "L";
+  if (n >= 1000) return "Rs. " + (n / 1000).toFixed(1) + "k";
+  return "Rs. " + Math.round(n);
+};
 
 const fmt = (d: Date) =>
   d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -63,13 +69,17 @@ export function buildSummary(
 
   const totalRevenue = inWindow.reduce((s, o) => s + Number(o.total || 0), 0);
   const totalOrders = inWindow.length;
-  const totalUnits = inWindow.reduce((s, o) => s + o.items.reduce((a, b) => a + b.qty, 0), 0);
+  const totalUnits = inWindow.reduce(
+    (s, o) => s + o.items.reduce((a, b) => a + b.qty, 0),
+    0,
+  );
   const avgOrder = totalOrders ? totalRevenue / totalOrders : 0;
   const returnCount = retWindow.length;
   const returnRate = totalOrders ? (returnCount / totalOrders) * 100 : 0;
-  const refundEstimate = totalOrders ? (totalRevenue / totalOrders) * returnCount : 0;
+  const refundEstimate = totalOrders
+    ? (totalRevenue / totalOrders) * returnCount
+    : 0;
 
-  // Build time buckets
   const buckets = new Map<string, { revenue: number; orders: number; sort: number }>();
   const keyOf = (d: Date) => {
     if (granularity === "day") return d.toISOString().slice(0, 10);
@@ -81,7 +91,8 @@ export function buildSummary(
     }
     if (granularity === "month")
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    if (granularity === "quarter") return `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+    if (granularity === "quarter")
+      return `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
     return String(d.getFullYear());
   };
   const labelOf = (key: string) => {
@@ -116,7 +127,6 @@ export function buildSummary(
     .sort(([, a], [, b]) => a.sort - b.sort)
     .map(([k, v]) => ({ label: labelOf(k), revenue: v.revenue, orders: v.orders }));
 
-  // Category & product breakdowns
   const catMap = new Map<string, { revenue: number; units: number }>();
   const prodMap = new Map<string, { units: number; revenue: number }>();
   inWindow.forEach((o) => {
@@ -128,7 +138,6 @@ export function buildSummary(
       c.revenue += rev;
       c.units += it.qty;
       catMap.set(cat, c);
-
       const pr = prodMap.get(it.name) ?? { units: 0, revenue: 0 };
       pr.units += it.qty;
       pr.revenue += rev;
@@ -172,163 +181,242 @@ export function buildSummary(
   };
 }
 
-// ────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // PDF
-// ────────────────────────────────────────────────────────────
-const ink: [number, number, number] = [17, 17, 19];
-const sub: [number, number, number] = [70, 70, 78];
-const muted: [number, number, number] = [130, 130, 138];
-const hair: [number, number, number] = [225, 225, 230];
+// ─────────────────────────────────────────────────────────────
+const ink: [number, number, number] = [12, 12, 14];
+const sub: [number, number, number] = [88, 88, 96];
+const muted: [number, number, number] = [140, 140, 148];
+const hair: [number, number, number] = [230, 230, 234];
 const accent: [number, number, number] = [225, 29, 47];
 const tint: [number, number, number] = [250, 250, 252];
+const soft: [number, number, number] = [246, 246, 248];
+const good: [number, number, number] = [22, 133, 87];
+
+const catPalette: [number, number, number][] = [
+  [225, 29, 47],
+  [17, 17, 19],
+  [22, 133, 87],
+  [201, 128, 26],
+  [45, 96, 179],
+  [126, 34, 206],
+];
 
 export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
-  const M = 48;
+  const M = 44;
 
-  // ── HEADER BAND ──────────────────────────────────────────
-  doc.setFillColor(...ink);
-  doc.rect(0, 0, W, 36, "F");
+  // ── MASTHEAD (editorial, light) ──────────────────────────
   doc.setFillColor(...accent);
-  doc.rect(0, 36, W, 3, "F");
+  doc.rect(0, 0, W, 4, "F");
+
+  // Wordmark
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(255, 255, 255);
-  doc.text("PULSE · ANALYTICS", M, 23);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(220, 220, 224);
-  doc.text("Performance Report", W - M, 23, { align: "right" });
-
-  doc.setDrawColor(...accent);
-  doc.setLineWidth(1.4);
-  doc.circle(M + 12, 72, 12, "S");
-  doc.setFillColor(...accent);
-  doc.circle(M + 12, 72, 4, "F");
-
+  doc.setFontSize(11);
   doc.setTextColor(...ink);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.text("PULSE", M + 32, 77);
+  doc.text("PULSE", M, 34);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
+  doc.setFontSize(7);
   doc.setTextColor(...muted);
-  doc.text("PERFORMANCE REPORT", M + 32, 90);
+  doc.text("ANALYTICS", M + 32, 34);
 
+  // Right — doc type
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
+  doc.setFontSize(28);
   doc.setTextColor(...ink);
-  doc.text(s.label.toUpperCase(), W - M, 74, { align: "right" });
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(...sub);
-  doc.text(s.rangeLabel, W - M, 92, { align: "right" });
-  if (customerName) doc.text(`Account: ${customerName}`, W - M, 106, { align: "right" });
+  doc.text("Report", W - M, 40, { align: "right" });
 
   doc.setDrawColor(...hair);
-  doc.setLineWidth(0.6);
-  doc.line(M, 128, W - M, 128);
+  doc.setLineWidth(0.5);
+  doc.line(M, 54, W - M, 54);
 
-  // ── EXECUTIVE SUMMARY BAND ───────────────────────────────
-  const topCat = s.byCategory[0]?.name?.toUpperCase() ?? "—";
-  const topProd = s.topProducts[0]?.name ?? "—";
+  // Report title block
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+  doc.setTextColor(...accent);
+  doc.text(s.label.toUpperCase() + "  ·  PERFORMANCE OVERVIEW", M, 78);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(26);
+  doc.setTextColor(...ink);
+  doc.text(s.rangeLabel, M, 106);
+
+  // Right meta strip
+  const metaTop = 74;
+  const metaGap = 16;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5);
+  doc.setTextColor(...muted);
+  doc.text("GENERATED", W - M, metaTop, { align: "right" });
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(...ink);
+  doc.text(fmt(new Date()), W - M, metaTop + metaGap, { align: "right" });
+  if (customerName) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...muted);
+    doc.text("ACCOUNT", W - M, metaTop + 34, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(...ink);
+    doc.text(customerName, W - M, metaTop + 50, { align: "right" });
+  }
+
+
+  // ── EXECUTIVE SUMMARY ────────────────────────────────────
+  let y = 154;
   const halfIdx = Math.max(1, Math.floor(s.series.length / 2));
   const firstHalf = s.series.slice(0, halfIdx).reduce((a, b) => a + b.revenue, 0);
   const secondHalf = s.series.slice(halfIdx).reduce((a, b) => a + b.revenue, 0);
-  const trendPct = firstHalf > 0 ? ((secondHalf - firstHalf) / firstHalf) * 100 : 0;
-  const trendLabel = trendPct >= 0 ? `+${trendPct.toFixed(1)}%` : `${trendPct.toFixed(1)}%`;
-  const trendColor: [number, number, number] = trendPct >= 0 ? [16, 122, 66] : [200, 30, 45];
+  const delta = firstHalf ? ((secondHalf - firstHalf) / firstHalf) * 100 : 0;
+  const trending = delta >= 0;
 
+  doc.setFillColor(...soft);
+  doc.roundedRect(M, y, W - 2 * M, 54, 4, 4, "F");
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(7.5);
+  doc.setFontSize(8);
   doc.setTextColor(...muted);
-  doc.text("EXECUTIVE SUMMARY", M, 146);
+  doc.text("EXECUTIVE SUMMARY", M + 16, y + 18);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.setTextColor(...sub);
-  const bullets = [
-    `Revenue of ${inr(s.totalRevenue)} across ${s.totalOrders} orders (${s.totalUnits} units) with an average order value of ${inr(s.avgOrder)}.`,
-    `Momentum is ${trendPct >= 0 ? "positive" : "negative"} — second-half revenue tracked ${trendLabel} vs the first half of the period.`,
-    `${topCat} led categories with ${inr(s.byCategory[0]?.revenue ?? 0)}; best-selling SKU: ${topProd}.`,
-    `${s.returnCount} return${s.returnCount === 1 ? "" : "s"} recorded (${s.returnRate.toFixed(1)}% rate); estimated refund exposure ${inr(s.refundEstimate)}.`,
-  ];
-  let bulletY = 160;
-  bullets.forEach((b) => {
-    doc.setFillColor(...accent);
-    doc.circle(M + 3, bulletY - 3, 1.6, "F");
-    const wrap = doc.splitTextToSize(b, W - 2 * M - 14);
-    doc.text(wrap, M + 12, bulletY);
-    bulletY += 12 + (wrap.length - 1) * 12;
-  });
+  doc.setTextColor(...ink);
+  const bestCat = s.byCategory[0]?.name ?? "—";
+  const bestProd = s.topProducts[0]?.name ?? "—";
+  const summaryLine =
+    s.totalOrders === 0
+      ? "No sales recorded in this period. Try widening the range or promoting fresh drops."
+      : `Recorded ${s.totalOrders} orders totalling ${inr(s.totalRevenue)} across ${s.totalUnits} units. ` +
+        `Leading category: ${bestCat.toUpperCase()}. Bestseller: ${bestProd}. ` +
+        `Momentum ${trending ? "up" : "down"} ${Math.abs(delta).toFixed(1)}% vs. earlier half.`;
+  doc.splitTextToSize(summaryLine, W - 2 * M - 32).forEach((l: string, i: number) =>
+    doc.text(l, M + 16, y + 34 + i * 12),
+  );
 
   // ── KPI CARDS ────────────────────────────────────────────
-  let y = bulletY + 12;
+  y += 68;
   const cardW = (W - 2 * M - 24) / 4;
-  const cards: [string, string, string][] = [
-    ["REVENUE", inr(s.totalRevenue), `${s.totalOrders} orders`],
-    ["AVG ORDER", inr(s.avgOrder), `${s.totalUnits} units sold`],
-    ["MOMENTUM", trendLabel, "vs previous half"],
-    ["RETURN RATE", `${s.returnRate.toFixed(1)}%`, `${s.returnCount} returns · ${inr(s.refundEstimate)}`],
+  const cards: { k: string; v: string; sub: string; tone?: [number, number, number] }[] = [
+    { k: "REVENUE", v: inr(s.totalRevenue), sub: `${s.totalOrders} orders`, tone: accent },
+    { k: "AVG ORDER", v: inr(s.avgOrder), sub: `${s.totalUnits} units sold` },
+    { k: "RETURNS", v: String(s.returnCount), sub: `${s.returnRate.toFixed(1)}% rate` },
+    { k: "REFUND EST.", v: inr(s.refundEstimate), sub: `${s.returnCount} returns` },
   ];
-  cards.forEach(([k, v, sub2], i) => {
+  cards.forEach((c, i) => {
     const x = M + i * (cardW + 8);
-    doc.setFillColor(...tint);
-    doc.rect(x, y, cardW, 84, "F");
+    doc.setFillColor(255, 255, 255);
     doc.setDrawColor(...hair);
-    doc.rect(x, y, cardW, 84, "S");
-    // top accent bar
-    doc.setFillColor(...accent);
-    doc.rect(x, y, cardW, 3, "F");
+    doc.roundedRect(x, y, cardW, 84, 4, 4, "FD");
+    if (c.tone) {
+      doc.setFillColor(...c.tone);
+      doc.rect(x, y, 3, 84, "F");
+    }
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
+    doc.setFontSize(7);
     doc.setTextColor(...muted);
-    doc.text(k, x + 14, y + 22);
+    doc.text(c.k, x + 14, y + 20);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    if (k === "MOMENTUM") doc.setTextColor(...trendColor);
-    else doc.setTextColor(...ink);
-    doc.text(v, x + 14, y + 50);
+    doc.setTextColor(...ink);
+    doc.text(c.v, x + 14, y + 48);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...sub);
-    doc.text(sub2, x + 14, y + 70);
+    doc.text(c.sub, x + 14, y + 68);
   });
-  y += 6;
 
-
-  // ── TREND CHART ──────────────────────────────────────────
-  y += 100;
+  // ── TREND CHART (line + area) ────────────────────────────
+  y += 104;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(12);
   doc.setTextColor(...ink);
   doc.text("Revenue Trend", M, y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...muted);
-  doc.text(`Bucketed by ${s.series.length} periods`, M, y + 12);
+  doc.text(`${s.series.length} periods  ·  ${trending ? "▲" : "▼"} ${Math.abs(delta).toFixed(1)}%`, W - M, y, {
+    align: "right",
+  });
 
-  y += 24;
-  const chartH = 140;
+  y += 12;
+  const chartH = 150;
   const chartW = W - 2 * M;
-  doc.setDrawColor(...hair);
-  doc.rect(M, y, chartW, chartH, "S");
+  const padL = 44;
+  const padR = 12;
+  const padT = 16;
+  const padB = 24;
+  const plotX = M + padL;
+  const plotY = y + padT;
+  const plotW = chartW - padL - padR;
+  const plotH = chartH - padT - padB;
+
+  doc.setFillColor(...tint);
+  doc.roundedRect(M, y, chartW, chartH, 4, 4, "F");
 
   if (s.series.length > 0) {
     const maxRev = Math.max(...s.series.map((d) => d.revenue), 1);
-    const bw = (chartW - 24) / s.series.length;
-    s.series.forEach((d, i) => {
-      const bh = (d.revenue / maxRev) * (chartH - 32);
-      const bx = M + 12 + i * bw;
-      const by = y + chartH - 18 - bh;
-      doc.setFillColor(...ink);
-      doc.rect(bx + 4, by, Math.max(2, bw - 8), bh, "F");
+    // Grid + Y labels (4 lines)
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...muted);
+    for (let i = 0; i <= 4; i++) {
+      const gy = plotY + plotH - (plotH * i) / 4;
+      doc.setDrawColor(230, 230, 234);
+      doc.setLineWidth(0.4);
+      doc.line(plotX, gy, plotX + plotW, gy);
+      doc.text(inrK((maxRev * i) / 4), plotX - 6, gy + 3, { align: "right" });
+    }
+
+    const n = s.series.length;
+    const step = n > 1 ? plotW / (n - 1) : 0;
+    const pts = s.series.map((d, i) => ({
+      x: n === 1 ? plotX + plotW / 2 : plotX + i * step,
+      yv: plotY + plotH - (d.revenue / maxRev) * plotH,
+      d,
+    }));
+
+    // Area fill
+    if (n > 1) {
       doc.setFillColor(...accent);
-      doc.rect(bx + 4, by, Math.max(2, bw - 8), Math.min(4, bh), "F");
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(7);
-      doc.setTextColor(...muted);
-      doc.text(d.label, bx + bw / 2, y + chartH - 6, { align: "center" });
+      doc.setGState(new (doc as unknown as { GState: new (o: object) => object }).GState({ opacity: 0.12 }));
+      const path: [number, number][] = [
+        [pts[0].x, plotY + plotH],
+        ...pts.map((p): [number, number] => [p.x, p.yv]),
+        [pts[n - 1].x, plotY + plotH],
+      ];
+      doc.lines(
+        path.slice(1).map(([px, py], i) => [px - path[i][0], py - path[i][1]]),
+        path[0][0],
+        path[0][1],
+        [1, 1],
+        "F",
+        true,
+      );
+      doc.setGState(new (doc as unknown as { GState: new (o: object) => object }).GState({ opacity: 1 }));
+    }
+
+    // Line
+    doc.setDrawColor(...accent);
+    doc.setLineWidth(1.6);
+    for (let i = 0; i < pts.length - 1; i++) {
+      doc.line(pts[i].x, pts[i].yv, pts[i + 1].x, pts[i + 1].yv);
+    }
+
+    // Dots + X labels
+    const labelStride = Math.max(1, Math.ceil(n / 10));
+    pts.forEach((p, i) => {
+      doc.setFillColor(...accent);
+      doc.circle(p.x, p.yv, 2.4, "F");
+      doc.setFillColor(255, 255, 255);
+      doc.circle(p.x, p.yv, 1.2, "F");
+      if (i % labelStride === 0 || i === n - 1) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        doc.setTextColor(...muted);
+        doc.text(p.d.label, p.x, plotY + plotH + 12, { align: "center" });
+      }
     });
   } else {
     doc.setFont("helvetica", "italic");
@@ -337,137 +425,231 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
     doc.text("No orders in this period.", W / 2, y + chartH / 2, { align: "center" });
   }
 
-  // ── CATEGORY TABLE ───────────────────────────────────────
-  y += chartH + 28;
+  // ── CATEGORY SPLIT (donut-style + table) ─────────────────
+  y += chartH + 24;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(12);
   doc.setTextColor(...ink);
-  doc.text("By Category", M, y);
+  doc.text("Category Mix", M, y);
+  y += 10;
 
-  y += 14;
-  doc.setFillColor(...ink);
-  doc.rect(M, y, chartW, 22, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.text("CATEGORY", M + 12, y + 14);
-  doc.text("UNITS", M + chartW - 160, y + 14, { align: "right" });
-  doc.text("REVENUE", M + chartW - 12, y + 14, { align: "right" });
-  y += 30;
+  const catBoxH = 150;
+  const donutCx = M + 78;
+  const donutCy = y + catBoxH / 2;
+  const donutR = 54;
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  if (s.byCategory.length === 0) {
-    doc.setTextColor(...muted);
-    doc.text("—", M + 12, y);
-    y += 18;
-  } else {
-    s.byCategory.slice(0, 6).forEach((c, i) => {
-      if (i % 2 === 1) {
-        doc.setFillColor(...tint);
-        doc.rect(M, y - 12, chartW, 20, "F");
+  doc.setFillColor(...tint);
+  doc.roundedRect(M, y, chartW, catBoxH, 4, 4, "F");
+
+  const cats = s.byCategory.slice(0, 6);
+  const catTotal = cats.reduce((a, b) => a + b.revenue, 0) || 1;
+
+  if (cats.length > 0) {
+    // Draw donut as segmented wedges via triangle fan
+    let a0 = -Math.PI / 2;
+    cats.forEach((c, i) => {
+      const frac = c.revenue / catTotal;
+      const a1 = a0 + frac * Math.PI * 2;
+      const color = catPalette[i % catPalette.length];
+      doc.setFillColor(...color);
+      // Fan of triangles
+      const steps = Math.max(6, Math.ceil(frac * 60));
+      for (let k = 0; k < steps; k++) {
+        const t0 = a0 + ((a1 - a0) * k) / steps;
+        const t1 = a0 + ((a1 - a0) * (k + 1)) / steps;
+        doc.triangle(
+          donutCx,
+          donutCy,
+          donutCx + Math.cos(t0) * donutR,
+          donutCy + Math.sin(t0) * donutR,
+          donutCx + Math.cos(t1) * donutR,
+          donutCy + Math.sin(t1) * donutR,
+          "F",
+        );
       }
-      doc.setTextColor(...ink);
-      doc.text(c.name.toUpperCase(), M + 12, y);
-      doc.text(String(c.units), M + chartW - 160, y, { align: "right" });
-      doc.text(inr(c.revenue), M + chartW - 12, y, { align: "right" });
-      y += 20;
+      a0 = a1;
     });
+    // Inner hole
+    doc.setFillColor(...tint);
+    doc.circle(donutCx, donutCy, donutR * 0.55, "F");
+    // Center label
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(...ink);
+    doc.text(String(cats.length), donutCx, donutCy - 2, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...muted);
+    doc.text("categories", donutCx, donutCy + 10, { align: "center" });
+
+    // Legend / list
+    const listX = donutCx + donutR + 40;
+    const listW = W - M - listX - 12;
+    cats.forEach((c, i) => {
+      const ly = y + 20 + i * 20;
+      const color = catPalette[i % catPalette.length];
+      doc.setFillColor(...color);
+      doc.rect(listX, ly - 8, 8, 8, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(...ink);
+      doc.text(c.name.toUpperCase(), listX + 14, ly);
+      const pct = ((c.revenue / catTotal) * 100).toFixed(1) + "%";
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...muted);
+      doc.text(`${c.units} units`, listX + 14, ly + 10);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(...ink);
+      doc.text(inr(c.revenue), listX + listW, ly, { align: "right" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...accent);
+      doc.text(pct, listX + listW, ly + 10, { align: "right" });
+    });
+  } else {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(10);
+    doc.setTextColor(...muted);
+    doc.text("No category data.", W / 2, y + catBoxH / 2, { align: "center" });
   }
 
-  // Page break if needed
-  if (y > H - 240) {
-    doc.addPage();
-    y = M + 20;
-  }
+  y += catBoxH + 24;
+
+  // Page 2 if needed
+  const ensure = (needed: number) => {
+    if (y + needed > H - 60) {
+      doc.addPage();
+      y = M + 20;
+    }
+  };
 
   // ── TOP PRODUCTS ─────────────────────────────────────────
-  y += 16;
+  ensure(220);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(12);
   doc.setTextColor(...ink);
   doc.text("Top Products", M, y);
-  y += 14;
+  y += 12;
   doc.setFillColor(...ink);
-  doc.rect(M, y, chartW, 22, "F");
+  doc.roundedRect(M, y, chartW, 22, 3, 3, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
-  doc.text("PRODUCT", M + 12, y + 14);
-  doc.text("UNITS", M + chartW - 160, y + 14, { align: "right" });
+  doc.text("#  PRODUCT", M + 12, y + 14);
+  doc.text("UNITS", M + chartW - 200, y + 14, { align: "right" });
+  doc.text("SHARE", M + chartW - 90, y + 14, { align: "right" });
   doc.text("REVENUE", M + chartW - 12, y + 14, { align: "right" });
   y += 30;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+
   if (s.topProducts.length === 0) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(10);
     doc.setTextColor(...muted);
-    doc.text("—", M + 12, y);
-    y += 18;
+    doc.text("No products sold.", M + 12, y);
+    y += 20;
   } else {
+    const maxProdUnits = Math.max(...s.topProducts.map((p) => p.units), 1);
     s.topProducts.forEach((p, i) => {
+      ensure(24);
       if (i % 2 === 1) {
         doc.setFillColor(...tint);
-        doc.rect(M, y - 12, chartW, 20, "F");
+        doc.rect(M, y - 12, chartW, 22, "F");
       }
+      const barMaxW = 90;
+      const barW = (p.units / maxProdUnits) * barMaxW;
+      doc.setFillColor(...accent);
+      doc.rect(M + chartW - 300, y - 6, Math.max(1, barW), 5, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(...accent);
+      doc.text("#" + String(i + 1).padStart(2, "0"), M + 12, y);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
       doc.setTextColor(...ink);
-      doc.text(doc.splitTextToSize(p.name, 320)[0], M + 12, y);
-      doc.text(String(p.units), M + chartW - 160, y, { align: "right" });
+      doc.text(doc.splitTextToSize(p.name, 220)[0], M + 42, y);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.text(String(p.units), M + chartW - 200, y, { align: "right" });
+      doc.setTextColor(...muted);
+      doc.text(((p.revenue / (s.totalRevenue || 1)) * 100).toFixed(1) + "%", M + chartW - 90, y, {
+        align: "right",
+      });
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...ink);
       doc.text(inr(p.revenue), M + chartW - 12, y, { align: "right" });
-      y += 20;
+      y += 22;
     });
   }
 
   // ── RETURNS ──────────────────────────────────────────────
-  if (y > H - 180) {
-    doc.addPage();
-    y = M + 20;
-  }
   y += 16;
+  ensure(140);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(12);
   doc.setTextColor(...ink);
   doc.text("Returns Analysis", M, y);
-  y += 14;
+  y += 12;
   doc.setFillColor(...ink);
-  doc.rect(M, y, chartW, 22, "F");
+  doc.roundedRect(M, y, chartW, 22, 3, 3, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.text("REASON", M + 12, y + 14);
-  doc.text("COUNT", M + chartW - 12, y + 14, { align: "right" });
+  doc.text("COUNT", M + chartW - 90, y + 14, { align: "right" });
+  doc.text("SHARE", M + chartW - 12, y + 14, { align: "right" });
   y += 30;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+
   if (s.returnReasons.length === 0) {
-    doc.setTextColor(...muted);
-    doc.text("No returns in this period.", M + 12, y);
-    y += 18;
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(10);
+    doc.setTextColor(...good);
+    doc.text("No returns in this period — great job!", M + 12, y);
+    y += 20;
   } else {
+    const maxCount = Math.max(...s.returnReasons.map((r) => r.count), 1);
+    const total = s.returnReasons.reduce((a, b) => a + b.count, 0) || 1;
     s.returnReasons.forEach((r, i) => {
+      ensure(24);
       if (i % 2 === 1) {
         doc.setFillColor(...tint);
-        doc.rect(M, y - 12, chartW, 20, "F");
+        doc.rect(M, y - 12, chartW, 22, "F");
       }
+      const barMaxW = chartW - 280;
+      const barW = (r.count / maxCount) * barMaxW;
+      doc.setFillColor(...accent);
+      doc.rect(M + 160, y - 6, Math.max(1, barW), 5, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
       doc.setTextColor(...ink);
       doc.text(r.reason, M + 12, y);
-      doc.text(String(r.count), M + chartW - 12, y, { align: "right" });
-      y += 20;
+      doc.setFont("helvetica", "bold");
+      doc.text(String(r.count), M + chartW - 90, y, { align: "right" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...muted);
+      doc.text(((r.count / total) * 100).toFixed(1) + "%", M + chartW - 12, y, { align: "right" });
+      y += 22;
     });
   }
 
-  // Footer on each page
+  // ── FOOTERS (editorial) ──────────────────────────────────
   const total = doc.getNumberOfPages();
   for (let p = 1; p <= total; p++) {
     doc.setPage(p);
     doc.setDrawColor(...hair);
-    doc.line(M, H - 50, W - M, H - 50);
+    doc.setLineWidth(0.5);
+    doc.line(M, H - 44, W - M, H - 44);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(`Generated ${fmt(new Date())} · PULSE Analytics`, M, H - 34);
-    doc.text(`Page ${p} of ${total}`, W - M, H - 34, { align: "right" });
-    doc.setTextColor(...accent);
-    doc.text("www.pulse.audio", W / 2, H - 22, { align: "center" });
+    doc.text(`PULSE Analytics  ·  Generated ${fmt(new Date())}  ·  www.pulse.audio`, M, H - 28);
+    doc.text(`Page ${p} of ${total}`, W - M, H - 28, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...muted);
+    doc.text(`${s.label.toUpperCase()}  ·  ${s.rangeLabel}`, W - M, H - 16, { align: "right" });
   }
 
   doc.save(`PULSE-Report-${s.label.replace(/\s+/g, "-")}-${s.from.toISOString().slice(0, 10)}.pdf`);
