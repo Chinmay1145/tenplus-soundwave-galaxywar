@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Award, Cpu, Globe, Leaf, Headphones, Heart, Radio, Sparkles, Users, Building2, Rocket, ShieldCheck } from "lucide-react";
+import { Award, Cpu, Globe, Leaf, ArrowUpRight, Quote } from "lucide-react";
+import { LogoMark } from "@/components/site/Logo";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — PULSE" },
-      { name: "description", content: "PULSE Audio Labs designs premium wireless earbuds and headphones engineered for sound purists across 40+ countries." },
+      { name: "description", content: "PULSE Audio Labs designs premium wireless earbuds engineered for sound purists." },
       { property: "og:title", content: "About — PULSE" },
-      { property: "og:description", content: "Meet the team crafting sound you can almost touch." },
       { property: "og:url", content: "/about" },
     ],
     links: [{ rel: "canonical", href: "/about" }],
@@ -15,288 +15,170 @@ export const Route = createFileRoute("/about")({
   component: About,
 });
 
-const STATS: [string, string][] = [
-  ["4M+", "Listeners worldwide"],
-  ["40+", "Countries shipped"],
-  ["8", "Acoustic patents"],
-  ["4.8★", "Average rating"],
-];
-
-const PILLARS = [
-  [Cpu, "Engineering", "8 acoustic patents. In-house DSP. Custom 11mm bio-cellulose drivers tuned by ex-Sennheiser engineers."],
-  [Award, "Awards", "iF Design 2024, Red Dot Best-of-Best, EISA Product of the Year — three years running."],
-  [Globe, "Global", "Warehouses in Bengaluru, Rotterdam and Austin. 40+ markets. 3-day delivery to metros."],
-  [Leaf, "Sustainability", "100% recycled aluminium chassis. FSC-certified packaging. Carbon-neutral shipping by 2026."],
-] as const;
-
-const TIMELINE: [string, string, string][] = [
-  ["2021", "Founded", "Two ex-Sennheiser engineers and a designer meet in a Stockholm garage. Series 01 ships six months later."],
-  ["2022", "India-first", "Bengaluru HQ opens. Local tuning for Indian ears — warmer mids, punchier low-end."],
-  ["2023", "Series 02", "72-hour sellout across 20 markets. Featured in WIRED, GQ, T3."],
-  ["2024", "Studio Line", "Reference-grade headphones for producers. Endorsed by 400+ studios worldwide."],
-  ["2025", "Sport & Gaming", "PulseFit and PulseArena launch — 8-hour ANC, 30ms latency."],
-  ["2026", "Series 03", "Transparent design meets hybrid adaptive ANC. Available in six markets today."],
-];
-
-const VALUES = [
-  [Heart, "People first", "Every headphone is tested on real ears — not just anechoic chambers."],
-  [Radio, "Sound honesty", "Neutral by default. Signature mode by choice. Never marketing-driven EQ."],
-  [Sparkles, "Craft obsession", "3,200 hours of tuning before a driver ships. No exceptions."],
-  [ShieldCheck, "Trust", "Two-year global warranty, no-question 30-day returns, lifetime firmware."],
-] as const;
-
-const TEAM = [
-  ["Astrid Lindqvist", "Co-founder · CEO", "Ex-Sennheiser R&D. 12 years in transducer design."],
-  ["Rohan Iyer", "Co-founder · CTO", "Ex-Sonos DSP lead. Built the PulseCore acoustic engine."],
-  ["Mira Chen", "Head of Design", "iF Gold, Red Dot. Believes hardware should feel like a keepsake."],
-];
-
 function About() {
   return (
     <div className="relative overflow-hidden">
       {/* HERO */}
-      <section className="relative">
+      <section className="relative border-b border-border/60">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(1000px 500px at 50% -10%, oklch(0.65 0.24 25 / 0.22), transparent 60%)",
+              "radial-gradient(1000px 520px at 10% -10%, oklch(0.65 0.24 25 / 0.25), transparent 60%)",
           }}
         />
-        <div className="mx-auto max-w-6xl px-4 pb-10 pt-20 sm:px-6 sm:pt-28">
-          <div className="mono text-accent">— Our story</div>
-          <h1 className="mt-3 font-display text-5xl font-bold leading-[1.02] tracking-tight sm:text-7xl">
-            We build sound<br />
-            <span className="shimmer-text">you can almost touch.</span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-            PULSE was founded in 2021 by a small group of engineers, audiophiles and
-            industrial designers obsessed with one idea: the most personal piece of
-            technology you own should feel like it. Today we ship to 40+ countries and
-            we're still tuning every driver by ear.
-          </p>
-
-          <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <div className="flex items-center gap-3">
+              <LogoMark size={28} />
+              <div className="mono text-accent">— Our story · Est. 2021</div>
+            </div>
+            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-[112px]">
+              Sound you
+              <br />
+              can almost <span className="shimmer-text italic">touch.</span>
+            </h1>
+          </div>
+          <div className="flex flex-col justify-end gap-6 lg:col-span-4">
+            <p className="text-lg leading-relaxed text-muted-foreground">
+              PULSE was founded by a small group of engineers, audiophiles and
+              industrial designers obsessed with one idea: the most personal
+              piece of technology you own should feel like it.
+            </p>
             <Link
               to="/shop"
-              className="btn-magnetic inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/30"
+              className="group inline-flex items-center gap-2 self-start rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm font-semibold text-accent transition hover:bg-accent hover:text-accent-foreground"
             >
-              <Headphones className="h-4 w-4" /> Explore the range
-            </Link>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-6 py-3 text-sm font-semibold transition-colors hover:border-accent hover:text-accent"
-            >
-              Talk to the team →
+              Shop the lineup
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
           </div>
-
-          {/* Live EQ strip */}
-          <div className="mt-10 flex items-end gap-1.5" aria-hidden>
-            {Array.from({ length: 48 }).map((_, i) => (
-              <span
-                key={i}
-                className="about-eq"
-                style={{
-                  height: `${8 + ((i * 13) % 34)}px`,
-                  animationDelay: `${(i % 12) * 0.08}s`,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Stat strip */}
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {STATS.map(([v, l]) => (
-              <div
-                key={l}
-                className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-5 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-accent/60"
-              >
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity group-hover:opacity-100"
-                  style={{ background: "oklch(0.65 0.24 25 / 0.5)" }}
-                />
-                <div className="font-display text-3xl font-bold tracking-tight text-accent sm:text-4xl">{v}</div>
-                <div className="mono mt-1 text-[11px] text-muted-foreground">{l}</div>
-              </div>
-            ))}
-          </div>
-          <style>{`
-            .about-eq {
-              display:inline-block; width:4px; border-radius:2px;
-              background: linear-gradient(180deg, oklch(0.78 0.2 25), oklch(0.55 0.24 25 / 0.35));
-              transform-origin: bottom;
-              animation: about-eq 1.4s ease-in-out infinite;
-              box-shadow: 0 0 10px oklch(0.65 0.24 25 / 0.35);
-            }
-            @keyframes about-eq {
-              0%,100% { transform: scaleY(0.4); }
-              50%     { transform: scaleY(1.6); }
-            }
-            @media (prefers-reduced-motion: reduce) { .about-eq { animation: none; } }
-          `}</style>
         </div>
       </section>
 
-      {/* MISSION */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-[1fr_1.6fr]">
+      {/* MANIFESTO / QUOTE */}
+      <section className="border-b border-border/60">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_2fr]">
+          <div className="mono text-accent">— 01 · Manifesto</div>
           <div>
-            <div className="mono text-accent">— Mission</div>
-            <h2 className="mt-3 font-display text-4xl font-bold leading-tight sm:text-5xl">
-              Sound engineered for the human ear — not the spec sheet.
-            </h2>
-          </div>
-          <div className="space-y-4 text-lg leading-8 text-muted-foreground">
-            <p>
-              A great pair of headphones disappears. The world stays. The music, the
-              caller, the silence — all where they belong. That's the only test we care
-              about.
+            <Quote className="h-8 w-8 text-accent" />
+            <p className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+              We don't build gadgets. We build instruments — objects that
+              disappear the moment the music starts, and reappear only when
+              you notice they're beautiful.
             </p>
-            <p>
-              We build the drivers, the DSP and the app under one roof so nothing is
-              lost in translation. Every PULSE product ships with a signed acoustic
-              certificate from the engineer who tuned it.
-            </p>
+            <div className="mono mt-6 text-xs text-muted-foreground">
+              — LINUS OKONKWO, CO-FOUNDER & HEAD OF ACOUSTICS
+            </div>
           </div>
         </div>
       </section>
 
       {/* PILLARS */}
-      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {PILLARS.map(([Ico, t, d]) => {
-            const Icon = Ico as typeof Cpu;
-            return (
-              <div
-                key={t}
-                className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card p-6 transition-all hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div className="grid h-11 w-11 place-items-center rounded-full border border-accent/40 bg-accent/10 text-accent">
-                  <Icon className="h-5 w-5" />
+      <section className="border-b border-border/60">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+          <div className="mono text-accent">— 02 · What we stand for</div>
+          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Four pillars. No compromises.
+          </h2>
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              [Cpu, "Engineering", "8 acoustic patents and counting — from the hybrid ANC array to the titanium diaphragm."],
+              [Award, "Awards", "iF Design, Red Dot and EISA recognized across three product generations."],
+              [Globe, "Global", "Shipping to 40+ countries with 24-hour metro delivery in 8 cities."],
+              [Leaf, "Sustainability", "100% recycled aluminium housings. Carbon neutral packaging by 2026."],
+            ].map(([Ico, t, d], i) => {
+              const Icon = Ico as typeof Cpu;
+              return (
+                <div key={t as string} className="group relative bg-background p-8 transition-colors hover:bg-card">
+                  <div className="mono text-[10px] text-muted-foreground">0{i + 1}</div>
+                  <Icon className="mt-4 h-6 w-6 text-accent transition-transform group-hover:scale-110" />
+                  <h3 className="mt-6 font-display text-xl font-bold">{t as string}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{d as string}</p>
                 </div>
-                <h3 className="mt-5 font-display text-lg font-bold">{t}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{d}</p>
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-6 -bottom-px h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 transition-opacity group-hover:opacity-100"
-                />
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* TIMELINE */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="mono text-accent">— Milestones</div>
-        <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">Five years, six chapters.</h2>
+      <section className="border-b border-border/60">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+          <div className="mono text-accent">— 03 · The road so far</div>
+          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Five years, three products, one obsession.
+          </h2>
 
-        <div className="relative mt-12">
-          <div
-            aria-hidden
-            className="absolute left-3 top-2 h-full w-px bg-gradient-to-b from-accent via-border/60 to-transparent sm:left-1/2"
-          />
-          <div className="space-y-8">
-            {TIMELINE.map(([y, h, t], i) => (
-              <div
-                key={y}
-                className={`relative grid gap-4 sm:grid-cols-2 sm:gap-10 ${
-                  i % 2 ? "sm:[&>*:first-child]:col-start-2" : ""
-                }`}
-              >
-                <div className="pl-10 sm:pl-0">
-                  <span
-                    aria-hidden
-                    className="absolute left-1 top-2 grid h-5 w-5 place-items-center rounded-full border-2 border-background bg-accent sm:left-1/2 sm:-ml-2.5"
-                  />
-                  <div className="rounded-2xl border border-border/60 bg-card p-5">
-                    <div className="font-display text-3xl font-bold text-accent">{y}</div>
-                    <h3 className="mt-1 font-display text-lg font-bold">{h}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{t}</p>
-                  </div>
+          <ol className="mt-12 relative border-l border-border/60 pl-6 sm:pl-10">
+            {[
+              ["2021", "Founded in Stockholm", "A single product ships from a converted piano workshop. First 500 units sell to friends of friends."],
+              ["2022", "Series 01 goes global", "Distribution opens in 18 markets. First iF Design award."],
+              ["2023", "Series 02 — Sold out in 72h", "Sells out in 72 hours across 20 markets. Waitlist tops 40,000."],
+              ["2024", "Studio Bengaluru", "Second design studio opens, focused on acoustics for tropical climates."],
+              ["2026", "Series 03 — Transparent", "Redefines transparent design with hybrid adaptive ANC and 42-hour battery."],
+            ].map(([y, t, d], i) => (
+              <li key={y} className="relative pb-12 last:pb-0">
+                <span className="absolute -left-[calc(0.75rem+1px)] top-1.5 grid h-3 w-3 place-items-center sm:-left-[calc(1.25rem+1px)]">
+                  <span className="h-3 w-3 rounded-full bg-accent shadow-[0_0_18px_oklch(0.65_0.24_25)]" />
+                </span>
+                <div className="mono text-xs text-muted-foreground">CHAPTER {String(i + 1).padStart(2, "0")}</div>
+                <div className="mt-1 flex flex-wrap items-baseline gap-4">
+                  <div className="font-display text-4xl font-bold text-accent">{y}</div>
+                  <div className="font-display text-2xl font-bold tracking-tight">{t}</div>
                 </div>
+                <p className="mt-2 max-w-xl text-muted-foreground">{d}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* NUMBERS */}
+      <section className="border-b border-border/60">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["1.2M", "Units shipped"],
+              ["4.9★", "Customer rating"],
+              ["40+", "Countries served"],
+              ["72h", "Fastest sell-out"],
+            ].map(([n, l]) => (
+              <div key={l} className="bg-background px-6 py-10">
+                <div className="font-display text-5xl font-bold tracking-tight">{n}</div>
+                <div className="mono mt-2 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">{l}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* VALUES */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="mono text-accent">— Values</div>
-        <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">What we don't compromise on.</h2>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {VALUES.map(([Ico, t, d]) => {
-            const Icon = Ico as typeof Heart;
-            return (
-              <div key={t} className="flex gap-4 rounded-2xl border border-border/60 bg-card p-6">
-                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-accent/40 bg-accent/10 text-accent">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-display text-lg font-bold">{t}</h3>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{d}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* TEAM */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="mono text-accent">— Leadership</div>
-        <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">The people behind PULSE.</h2>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {TEAM.map(([n, r, b]) => (
-            <div key={n} className="group rounded-2xl border border-border/60 bg-card p-6 transition-all hover:-translate-y-1 hover:shadow-xl">
-              <div
-                aria-hidden
-                className="grid h-16 w-16 place-items-center rounded-full text-2xl font-bold text-accent-foreground"
-                style={{ background: "linear-gradient(135deg, oklch(0.65 0.24 25), oklch(0.55 0.24 25))" }}
-              >
-                {n.split(" ").map((s) => s[0]).join("")}
-              </div>
-              <h3 className="mt-4 font-display text-lg font-bold">{n}</h3>
-              <div className="mono text-[11px] text-accent">{r}</div>
-              <p className="mt-2 text-sm text-muted-foreground">{b}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 sm:p-14">
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 sm:p-16">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-70"
+            className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "radial-gradient(600px 300px at 80% 20%, oklch(0.65 0.24 25 / 0.25), transparent 60%), radial-gradient(600px 300px at 10% 100%, oklch(0.6 0.2 260 / 0.18), transparent 60%)",
+                "radial-gradient(500px 300px at 100% 0%, oklch(0.65 0.24 25 / 0.28), transparent 60%)",
             }}
           />
-          <div className="relative grid gap-6 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="mono text-accent">— Come build with us</div>
-              <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
-                Careers, press, partnerships.
-              </h2>
-              <p className="mt-3 max-w-xl text-muted-foreground">
-                Whether you're a producer, a retailer, or a designer looking to join —
-                we'd love to hear from you.
-              </p>
+              <div className="mono text-accent">— Join the labs</div>
+              <h3 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+                We're hiring engineers,<br />designers and audio nerds.
+              </h3>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/careers" className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-background"><Users className="h-4 w-4" /> Careers</Link>
-              <Link to="/press" className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-5 py-3 text-sm font-semibold"><Building2 className="h-4 w-4" /> Press kit</Link>
-              <Link to="/affiliates" className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-5 py-3 text-sm font-semibold"><Rocket className="h-4 w-4" /> Affiliates</Link>
-            </div>
+            <Link
+              to="/careers"
+              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition hover:brightness-110"
+            >
+              See open roles
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
           </div>
         </div>
       </section>
