@@ -40,7 +40,8 @@ export type ReportSummary = {
   returnReasons: { reason: string; count: number }[];
 };
 
-const inr = (n: number) => "Rs. " + Math.round(n).toLocaleString("en-IN");
+const inr = (n: number) =>
+  "Rs. " + Math.round(n).toLocaleString("en-IN");
 
 const fmt = (d: Date) =>
   d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -63,16 +64,22 @@ export function buildSummary(
 
   const totalRevenue = inWindow.reduce((s, o) => s + Number(o.total || 0), 0);
   const totalOrders = inWindow.length;
-  const totalUnits = inWindow.reduce((s, o) => s + o.items.reduce((a, b) => a + b.qty, 0), 0);
+  const totalUnits = inWindow.reduce(
+    (s, o) => s + o.items.reduce((a, b) => a + b.qty, 0),
+    0,
+  );
   const avgOrder = totalOrders ? totalRevenue / totalOrders : 0;
   const returnCount = retWindow.length;
   const returnRate = totalOrders ? (returnCount / totalOrders) * 100 : 0;
-  const refundEstimate = totalOrders ? (totalRevenue / totalOrders) * returnCount : 0;
+  const refundEstimate = totalOrders
+    ? (totalRevenue / totalOrders) * returnCount
+    : 0;
 
   // Build time buckets
   const buckets = new Map<string, { revenue: number; orders: number; sort: number }>();
   const keyOf = (d: Date) => {
-    if (granularity === "day") return d.toISOString().slice(0, 10);
+    if (granularity === "day")
+      return d.toISOString().slice(0, 10);
     if (granularity === "week") {
       const monday = new Date(d);
       const day = (monday.getDay() + 6) % 7;
@@ -81,7 +88,8 @@ export function buildSummary(
     }
     if (granularity === "month")
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    if (granularity === "quarter") return `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+    if (granularity === "quarter")
+      return `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
     return String(d.getFullYear());
   };
   const labelOf = (key: string) => {
@@ -180,7 +188,25 @@ const sub: [number, number, number] = [70, 70, 78];
 const muted: [number, number, number] = [130, 130, 138];
 const hair: [number, number, number] = [225, 225, 230];
 const accent: [number, number, number] = [225, 29, 47];
+const accentDark: [number, number, number] = [170, 20, 36];
 const tint: [number, number, number] = [250, 250, 252];
+
+function drawLogoMark(doc: jsPDF, x: number, y: number, size: number) {
+  const s = size;
+  doc.setDrawColor(...accent);
+  doc.setLineWidth(Math.max(0.8, s * 0.05));
+  doc.roundedRect(x, y, s, s, s * 0.28, s * 0.28, "S");
+  doc.setFillColor(...accent);
+  const heights = [0.28, 0.55, 0.85, 0.55, 0.28];
+  const bw = s * 0.09;
+  const gap = (s - bw * 5) / 6;
+  heights.forEach((h, i) => {
+    const bh = s * h;
+    const bx = x + gap + i * (bw + gap);
+    const by = y + (s - bh) / 2;
+    doc.roundedRect(bx, by, bw, bh, bw / 2, bw / 2, "F");
+  });
+}
 
 export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -190,112 +216,117 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
 
   // ── HEADER BAND ──────────────────────────────────────────
   doc.setFillColor(...ink);
-  doc.rect(0, 0, W, 36, "F");
+  doc.rect(0, 0, W, 42, "F");
+  doc.setFillColor(30, 30, 34);
+  doc.rect(W / 2, 0, W / 2, 42, "F");
   doc.setFillColor(...accent);
-  doc.rect(0, 36, W, 3, "F");
+  doc.rect(0, 42, W, 2, "F");
+  doc.setFillColor(...accentDark);
+  doc.rect(0, 44, W, 1, "F");
+
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.setTextColor(255, 255, 255);
-  doc.text("PULSE · ANALYTICS", M, 23);
+  doc.text("PULSE · ANALYTICS SUITE", M, 26);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(220, 220, 224);
-  doc.text("Performance Report", W - M, 23, { align: "right" });
+  doc.text("Performance Report · www.pulse.audio", W - M, 26, { align: "right" });
 
-  doc.setDrawColor(...accent);
-  doc.setLineWidth(1.4);
-  doc.circle(M + 12, 72, 12, "S");
-  doc.setFillColor(...accent);
-  doc.circle(M + 12, 72, 4, "F");
-
+  drawLogoMark(doc, M, 62, 34);
   doc.setTextColor(...ink);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.text("PULSE", M + 32, 77);
+  doc.setFontSize(26);
+  doc.text("PULSE", M + 44, 82);
+  doc.setTextColor(...accent);
+  doc.text(".", M + 44 + doc.getTextWidth("PULSE"), 82);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(...muted);
-  doc.text("PERFORMANCE REPORT", M + 32, 90);
+  doc.text("BUSINESS PERFORMANCE REPORT", M + 44, 96);
 
+  // Right meta pill
+  const pillW = 210;
+  doc.setFillColor(...tint);
+  doc.roundedRect(W - M - pillW, 62, pillW, 60, 8, 8, "F");
+  doc.setDrawColor(...hair);
+  doc.roundedRect(W - M - pillW, 62, pillW, 60, 8, 8, "S");
+  doc.setFillColor(...accent);
+  doc.rect(W - M - pillW, 62, 3, 60, "F");
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
+  doc.setFontSize(7);
+  doc.setTextColor(...muted);
+  doc.text("REPORT PERIOD", W - M - pillW + 14, 76);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
   doc.setTextColor(...ink);
-  doc.text(s.label.toUpperCase(), W - M, 74, { align: "right" });
+  doc.text(s.label.toUpperCase(), W - M - pillW + 14, 94);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(...sub);
-  doc.text(s.rangeLabel, W - M, 92, { align: "right" });
-  if (customerName) doc.text(`Account: ${customerName}`, W - M, 106, { align: "right" });
+  doc.text(s.rangeLabel, W - M - pillW + 14, 108);
+  if (customerName) {
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text(`Account: ${customerName}`, W - M - pillW + 14, 118);
+  }
 
   doc.setDrawColor(...hair);
   doc.setLineWidth(0.6);
-  doc.line(M, 128, W - M, 128);
+  doc.line(M, 138, W - M, 138);
 
-  // ── EXECUTIVE SUMMARY BAND ───────────────────────────────
-  const topCat = s.byCategory[0]?.name?.toUpperCase() ?? "—";
-  const topProd = s.topProducts[0]?.name ?? "—";
-  const halfIdx = Math.max(1, Math.floor(s.series.length / 2));
-  const firstHalf = s.series.slice(0, halfIdx).reduce((a, b) => a + b.revenue, 0);
-  const secondHalf = s.series.slice(halfIdx).reduce((a, b) => a + b.revenue, 0);
-  const trendPct = firstHalf > 0 ? ((secondHalf - firstHalf) / firstHalf) * 100 : 0;
-  const trendLabel = trendPct >= 0 ? `+${trendPct.toFixed(1)}%` : `${trendPct.toFixed(1)}%`;
-  const trendColor: [number, number, number] = trendPct >= 0 ? [16, 122, 66] : [200, 30, 45];
-
+  // ── EXECUTIVE SUMMARY ────────────────────────────────────
+  let esY = 152;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(7.5);
-  doc.setTextColor(...muted);
-  doc.text("EXECUTIVE SUMMARY", M, 146);
+  doc.setFontSize(9);
+  doc.setTextColor(...accent);
+  doc.text("EXECUTIVE SUMMARY", M, esY);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setTextColor(...sub);
-  const bullets = [
-    `Revenue of ${inr(s.totalRevenue)} across ${s.totalOrders} orders (${s.totalUnits} units) with an average order value of ${inr(s.avgOrder)}.`,
-    `Momentum is ${trendPct >= 0 ? "positive" : "negative"} — second-half revenue tracked ${trendLabel} vs the first half of the period.`,
-    `${topCat} led categories with ${inr(s.byCategory[0]?.revenue ?? 0)}; best-selling SKU: ${topProd}.`,
-    `${s.returnCount} return${s.returnCount === 1 ? "" : "s"} recorded (${s.returnRate.toFixed(1)}% rate); estimated refund exposure ${inr(s.refundEstimate)}.`,
-  ];
-  let bulletY = 160;
-  bullets.forEach((b) => {
-    doc.setFillColor(...accent);
-    doc.circle(M + 3, bulletY - 3, 1.6, "F");
-    const wrap = doc.splitTextToSize(b, W - 2 * M - 14);
-    doc.text(wrap, M + 12, bulletY);
-    bulletY += 12 + (wrap.length - 1) * 12;
-  });
+  const bestCat = s.byCategory[0]?.name ?? "—";
+  const bestProd = s.topProducts[0]?.name ?? "—";
+  const peak = s.series.reduce(
+    (best, cur) => (cur.revenue > best.revenue ? cur : best),
+    { label: "—", revenue: 0, orders: 0 },
+  );
+  const summaryText =
+    `During ${s.rangeLabel.toLowerCase()}, PULSE recorded ${inr(s.totalRevenue)} in gross revenue ` +
+    `across ${s.totalOrders} order${s.totalOrders === 1 ? "" : "s"} and ${s.totalUnits} units. ` +
+    `The strongest category was "${bestCat}", led by "${bestProd}". ` +
+    `${s.returnCount > 0 ? `Returns landed at ${s.returnRate.toFixed(1)}% of orders.` : "No returns were recorded — a clean period."}`;
+  const wrapped = doc.splitTextToSize(summaryText, W - 2 * M);
+  wrapped.forEach((ln: string, i: number) => doc.text(ln, M, esY + 14 + i * 12));
+  esY += 14 + wrapped.length * 12;
+
 
   // ── KPI CARDS ────────────────────────────────────────────
-  let y = bulletY + 12;
+  let y = esY + 12;
   const cardW = (W - 2 * M - 24) / 4;
   const cards: [string, string, string][] = [
     ["REVENUE", inr(s.totalRevenue), `${s.totalOrders} orders`],
     ["AVG ORDER", inr(s.avgOrder), `${s.totalUnits} units sold`],
-    ["MOMENTUM", trendLabel, "vs previous half"],
-    ["RETURN RATE", `${s.returnRate.toFixed(1)}%`, `${s.returnCount} returns · ${inr(s.refundEstimate)}`],
+    ["RETURNS", String(s.returnCount), `${s.returnRate.toFixed(1)}% rate`],
+    ["REFUND EST.", inr(s.refundEstimate), `Across ${s.returnCount} returns`],
   ];
   cards.forEach(([k, v, sub2], i) => {
     const x = M + i * (cardW + 8);
     doc.setFillColor(...tint);
-    doc.rect(x, y, cardW, 84, "F");
+    doc.rect(x, y, cardW, 78, "F");
     doc.setDrawColor(...hair);
-    doc.rect(x, y, cardW, 84, "S");
-    // top accent bar
-    doc.setFillColor(...accent);
-    doc.rect(x, y, cardW, 3, "F");
+    doc.rect(x, y, cardW, 78, "S");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(k, x + 14, y + 22);
+    doc.text(k, x + 14, y + 20);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    if (k === "MOMENTUM") doc.setTextColor(...trendColor);
-    else doc.setTextColor(...ink);
-    doc.text(v, x + 14, y + 50);
+    doc.setTextColor(...ink);
+    doc.text(v, x + 14, y + 46);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...sub);
-    doc.text(sub2, x + 14, y + 70);
+    doc.text(sub2, x + 14, y + 64);
   });
-  y += 6;
-
 
   // ── TREND CHART ──────────────────────────────────────────
   y += 100;
@@ -454,6 +485,70 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
       y += 20;
     });
   }
+
+  // ── KEY INSIGHTS & RECOMMENDATIONS ───────────────────────
+  if (y > H - 220) { doc.addPage(); y = M + 20; }
+  y += 20;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...ink);
+  doc.text("Key Insights & Recommendations", M, y);
+  y += 16;
+
+  const insights: string[] = [];
+  if (s.totalOrders > 0) {
+    insights.push(`Average order value stands at ${inr(s.avgOrder)} — a healthy benchmark for premium audio SKUs.`);
+  }
+  if (s.byCategory[0]) {
+    const share = (s.byCategory[0].revenue / Math.max(1, s.totalRevenue)) * 100;
+    insights.push(`"${s.byCategory[0].name}" drives ${share.toFixed(0)}% of revenue — consider deepening inventory here.`);
+  }
+  if (s.topProducts[0]) {
+    insights.push(`Top mover: "${s.topProducts[0].name}" at ${s.topProducts[0].units} units — bundle candidates.`);
+  }
+  if (peak.revenue > 0) {
+    insights.push(`Peak period was "${peak.label}" with ${inr(peak.revenue)}. Align promos to repeat that spike.`);
+  }
+  if (s.returnRate > 5) {
+    insights.push(`Return rate ${s.returnRate.toFixed(1)}% is above 5% — review packaging and product description accuracy.`);
+  } else if (s.returnCount === 0 && s.totalOrders > 0) {
+    insights.push(`Zero returns — customer satisfaction indicator is strong for this window.`);
+  }
+  if (insights.length === 0) {
+    insights.push("Not enough activity in this window to generate meaningful insights.");
+  }
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9.5);
+  insights.forEach((t) => {
+    doc.setTextColor(...accent);
+    doc.text("▸", M + 4, y);
+    doc.setTextColor(...sub);
+    const lines = doc.splitTextToSize(t, W - 2 * M - 16);
+    lines.forEach((ln: string, i: number) => doc.text(ln, M + 16, y + i * 11));
+    y += lines.length * 11 + 6;
+  });
+
+  // Confidential band
+  y += 6;
+  doc.setFillColor(...tint);
+  doc.rect(M, y, W - 2 * M, 26, "F");
+  doc.setDrawColor(...accent);
+  doc.setLineWidth(0.8);
+  doc.line(M, y, M, y + 26);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...accent);
+  doc.text("CONFIDENTIAL", M + 12, y + 11);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(...sub);
+  doc.text(
+    "This report is intended solely for the account holder. Do not redistribute without written consent.",
+    M + 12,
+    y + 22,
+  );
+
 
   // Footer on each page
   const total = doc.getNumberOfPages();
