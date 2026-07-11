@@ -15,6 +15,7 @@ import {
   Truck,
   User as UserIcon,
 } from "lucide-react";
+import { Copy, Download, Mail, PartyPopper, Receipt, ShoppingBag } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useAuth } from "@/hooks/use-auth";
 import { getProduct } from "@/data/products";
@@ -186,73 +187,100 @@ function Checkout() {
 
   if (placed) {
     return (
-      <div className="relative mx-auto max-w-3xl px-4 py-16 sm:px-6">
+      <div className="relative mx-auto max-w-4xl overflow-hidden px-4 py-16 sm:px-6">
+        {/* Ambient glow */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 opacity-60"
           style={{
             background:
-              "radial-gradient(700px 360px at 50% 10%, oklch(0.65 0.24 25 / 0.22), transparent 60%)",
+              "radial-gradient(700px 320px at 50% 10%, oklch(0.65 0.24 25 / 0.28), transparent 60%), radial-gradient(500px 280px at 50% 100%, oklch(0.65 0.24 25 / 0.15), transparent 70%)",
           }}
         />
-        {/* Confetti dots */}
+
+        {/* Confetti */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 overflow-hidden">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <span
-              key={i}
-              className="absolute block h-1.5 w-1.5 rounded-full opacity-70"
-              style={{
-                left: `${(i * 53) % 100}%`,
-                top: `${(i * 31) % 80}%`,
-                background: i % 2 ? "oklch(0.65 0.24 25)" : "oklch(0.85 0.15 80)",
-                animation: `float 6s ease-in-out ${i * 0.15}s infinite`,
-              }}
-            />
-          ))}
+          {Array.from({ length: 32 }).map((_, i) => {
+            const left = (i * 97) % 100;
+            const delay = (i % 8) * 0.15;
+            const dur = 2.4 + ((i * 13) % 18) / 10;
+            const hue = i % 3 === 0 ? "oklch(0.78 0.2 25)" : i % 3 === 1 ? "oklch(0.85 0.15 90)" : "oklch(0.7 0.18 200)";
+            const size = 6 + (i % 4) * 2;
+            return (
+              <span
+                key={i}
+                className="confetti"
+                style={{
+                  left: `${left}%`,
+                  width: size,
+                  height: size * 0.4,
+                  background: hue,
+                  animationDelay: `${delay}s`,
+                  animationDuration: `${dur}s`,
+                }}
+              />
+            );
+          })}
         </div>
 
+        {/* Hero */}
         <div className="text-center">
-          <div className="mx-auto grid h-20 w-20 place-items-center rounded-full border-2 border-accent bg-accent/10 text-accent shadow-[0_0_60px_-10px_oklch(0.65_0.24_25/0.5)]">
+          <div className="celebrate mx-auto grid h-20 w-20 place-items-center rounded-full border border-accent bg-accent/10 text-accent shadow-[0_0_60px_oklch(0.65_0.24_25/0.45)]">
             <Check className="h-10 w-10" strokeWidth={3} />
           </div>
-          <div className="mono mt-6 text-accent">— Confirmed</div>
+          <div className="mono mt-6 inline-flex items-center gap-2 text-accent">
+            <PartyPopper className="h-3.5 w-3.5" /> ORDER CONFIRMED
+          </div>
           <h1 className="mt-3 font-display text-5xl font-bold tracking-tight sm:text-6xl">
-            Order <span className="shimmer-text">placed.</span>
+            Thank you, <span className="shimmer-text">{form.name.split(" ")[0] || "friend"}</span>.
           </h1>
-          <p className="mt-3 text-muted-foreground">
-            We've sent the receipt to <strong className="text-foreground">{user?.email}</strong>.
+          <p className="mt-4 max-w-xl mx-auto text-muted-foreground">
+            Your order is in the queue. We've emailed the receipt to{" "}
+            <strong className="text-foreground">{user?.email ?? "your inbox"}</strong>.
           </p>
+
+          {/* Copyable order id */}
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(placed.id);
+              toast.success("Order ID copied");
+            }}
+            className="mono mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-4 py-2 text-xs hover:border-accent hover:text-accent"
+          >
+            <Receipt className="h-3.5 w-3.5" />
+            ORDER · {placed.id.slice(0, 8).toUpperCase()}
+            <Copy className="h-3 w-3 opacity-60" />
+          </button>
         </div>
 
-        {/* Summary tiles */}
-        <div className="mt-8 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-border/60 bg-card p-4">
-            <div className="mono text-[10px] text-muted-foreground">ORDER ID</div>
-            <div className="mt-1 font-display text-lg font-bold tracking-tight">
-              #{placed.id.slice(0, 8).toUpperCase()}
-            </div>
-          </div>
+        {/* Summary strip */}
+        <div className="mt-10 grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-border/60 bg-card p-4">
             <div className="mono text-[10px] text-muted-foreground">TOTAL PAID</div>
-            <div className="mt-1 font-display text-lg font-bold tracking-tight">{inr(placed.total)}</div>
+            <div className="mt-1 font-display text-2xl font-bold">{inr(placed.total)}</div>
+            <div className="mono mt-1 text-[10px] uppercase text-muted-foreground">
+              {payment === "cod" ? "Cash on delivery" : payment === "upi" ? "UPI" : "Card"}
+            </div>
           </div>
-          <div className="rounded-2xl border border-accent/40 bg-accent/5 p-4">
-            <div className="mono text-[10px] text-muted-foreground">DELIVERY BY</div>
-            <div className="mt-1 font-display text-lg font-bold tracking-tight text-accent">
-              {eta.serviceable ? etaText.split(" – ")[1] ?? etaText : "—"}
+          <div className="rounded-2xl border border-border/60 bg-card p-4">
+            <div className="mono text-[10px] text-muted-foreground">ETA</div>
+            <div className="mt-1 font-display text-lg font-bold leading-tight">
+              {eta.serviceable ? etaText : "3–5 days"}
+            </div>
+            <div className="mono mt-1 text-[10px] uppercase text-muted-foreground">
+              {eta.serviceable ? eta.zone : "Standard shipping"}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-card p-4">
+            <div className="mono text-[10px] text-muted-foreground">SHIP TO</div>
+            <div className="mt-1 text-sm font-semibold leading-tight">{form.name}</div>
+            <div className="mono mt-1 text-[10px] uppercase text-muted-foreground">
+              {form.city}, {form.state} · {form.pincode}
             </div>
           </div>
         </div>
 
-        {eta.serviceable && (
-          <div className="mt-4 flex items-center justify-center gap-3 rounded-2xl border border-accent/40 bg-accent/5 p-4 text-sm">
-            <Truck className="h-5 w-5 text-accent" />
-            <span>
-              <strong>{etaText}</strong> · {eta.zone} · shipping to {form.city}
-            </span>
-          </div>
-        )}
-
+        {/* Tracking */}
         <div className="mt-8">
           <OrderTracking
             createdAt={placed.createdAt}
@@ -261,9 +289,10 @@ function Checkout() {
           />
         </div>
 
+        {/* Actions */}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
-            onClick={() => {
+            onClick={() =>
               downloadInvoice({
                 id: placed.id,
                 createdAt: placed.createdAt,
@@ -281,34 +310,55 @@ function Checkout() {
                 })),
                 customer: { name: form.name, email: user?.email },
                 shippingAddress: form,
-              });
-              toast.success("Invoice downloaded", {
-                description: `PULSE-${placed.id.slice(0, 8).toUpperCase()}.pdf`,
-              });
-            }}
-            className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
+              })
+            }
+            className="btn-magnetic inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
           >
-            Download invoice
+            <Download className="h-4 w-4" /> Invoice PDF
           </button>
           <Link
             to="/orders"
-            className="rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background"
+            className="btn-magnetic inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background"
           >
-            View orders
-          </Link>
-          <Link
-            to="/track-order"
-            className="rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm text-accent"
-          >
-            Track order
+            <Receipt className="h-4 w-4" /> View orders
           </Link>
           <Link
             to="/shop"
-            className="rounded-full border border-border bg-surface-2 px-5 py-2.5 text-sm"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-5 py-2.5 text-sm hover:border-accent"
           >
-            Keep shopping
+            <ShoppingBag className="h-4 w-4" /> Keep shopping
           </Link>
         </div>
+
+        {/* Support strip */}
+        <div className="mt-10 rounded-2xl border border-border/60 bg-surface-2 p-4 text-center text-xs text-muted-foreground">
+          <Mail className="mr-1.5 inline h-3.5 w-3.5 text-accent" />
+          Questions? Email <span className="font-semibold text-foreground">care@pulse.audio</span> with your order ID and we'll respond within 24 hours.
+        </div>
+
+        <style>{`
+          .confetti {
+            position: absolute; top: -20px; border-radius: 2px;
+            animation: confetti-fall linear forwards;
+            opacity: 0.9;
+          }
+          @keyframes confetti-fall {
+            0%   { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+            10%  { opacity: 1; }
+            100% { transform: translateY(260px) rotate(540deg); opacity: 0; }
+          }
+          .celebrate {
+            animation: celebrate-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+          }
+          @keyframes celebrate-pop {
+            0%   { transform: scale(0.3); opacity: 0; }
+            60%  { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .confetti, .celebrate { animation: none !important; }
+          }
+        `}</style>
       </div>
     );
   }
@@ -583,20 +633,36 @@ function Checkout() {
 
           <div className="rounded-3xl border border-border/60 bg-surface-2 p-5">
             <div className="mono text-[10px] text-muted-foreground">— Why PULSE</div>
-            <ul className="mt-3 space-y-2 text-sm">
+            <ul className="mt-3 space-y-2.5 text-sm">
               {[
-                [ShieldCheck, "2-year warranty"],
-                [Truck, "Free shipping over ₹999"],
-                [Sparkles, "30-day no-questions returns"],
-              ].map(([Ico, t]) => {
+                [ShieldCheck, "2-year warranty", "On every product"],
+                [Truck, "Free shipping", "On orders over ₹999"],
+                [Sparkles, "30-day returns", "No questions asked"],
+                [Lock, "Secure payments", "PCI-DSS compliant"],
+              ].map(([Ico, t, d]) => {
                 const Icon = Ico as typeof ShieldCheck;
                 return (
-                  <li key={t as string} className="flex items-center gap-2 text-muted-foreground">
-                    <Icon className="h-4 w-4 text-accent" /> {t as string}
+                  <li key={t as string} className="flex items-start gap-3">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span>
+                      <div className="text-sm font-semibold text-foreground">{t as string}</div>
+                      <div className="mono text-[10px] text-muted-foreground">{d as string}</div>
+                    </span>
                   </li>
                 );
               })}
             </ul>
+            <div className="mt-4 flex items-center justify-center gap-3 border-t border-border/60 pt-3">
+              <span className="mono text-[9px] text-muted-foreground">VISA</span>
+              <span className="mono text-[9px] text-muted-foreground">•</span>
+              <span className="mono text-[9px] text-muted-foreground">MC</span>
+              <span className="mono text-[9px] text-muted-foreground">•</span>
+              <span className="mono text-[9px] text-muted-foreground">UPI</span>
+              <span className="mono text-[9px] text-muted-foreground">•</span>
+              <span className="mono text-[9px] text-muted-foreground">RUPAY</span>
+            </div>
           </div>
         </aside>
       </div>
