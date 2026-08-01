@@ -164,9 +164,40 @@ function Account() {
           <Stat icon={ShoppingBag} title="Orders" value={String(orderCount)} sub="lifetime" />
           <Stat icon={TrendingUp} title="Total spend" value={inr(totalSpend)} sub="all time" accent />
           <Stat icon={RotateCcw} title="Returns" value={String(returnCount)} sub="requests" />
-          <Stat icon={Heart} title="Wishlist" value="—" sub="curated by you" />
+          <Stat icon={Heart} title="Wishlist" value={String(wishlist.length)} sub="saved items" />
+        </div>
+
+        {/* MEMBERSHIP TIER PROGRESS */}
+        <div className="relative mt-4 rounded-2xl border border-border/60 bg-surface-2 p-5">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <div className="mono text-[10px] text-muted-foreground">— Membership</div>
+              <div className="mt-1 font-display text-lg font-bold">
+                {tier.name} <span className="text-accent">tier</span>
+              </div>
+            </div>
+            <div className="text-right text-xs text-muted-foreground">
+              {tier.next
+                ? <>Spend <span className="font-semibold text-foreground">{inr(Math.max(0, tier.next.at - totalSpend))}</span> more to unlock {tier.next.name}</>
+                : "Top tier unlocked — enjoy every perk."}
+            </div>
+          </div>
+          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-border/60">
+            <span
+              className="block h-full rounded-full bg-gradient-to-r from-accent/60 to-accent transition-[width] duration-700"
+              style={{ width: `${tier.progress}%` }}
+            />
+          </div>
+          <div className="mono mt-2 flex flex-wrap gap-2 text-[10px] text-muted-foreground">
+            {tier.perks.map((p) => (
+              <span key={p} className="rounded-full border border-border bg-card px-2.5 py-1">
+                {p}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
+
 
       {/* QUICK ACCESS GRID */}
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
