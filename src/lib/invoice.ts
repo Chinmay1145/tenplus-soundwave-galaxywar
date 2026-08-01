@@ -388,18 +388,28 @@ export function downloadInvoice(data: InvoiceData) {
   doc.text("INCLUDED WITH YOUR ORDER", M, y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
-  doc.setTextColor(...sub);
   const perks = [
-    "✓  2-year manufacturer warranty",
-    "✓  30-day no-questions returns",
-    "✓  Free doorstep replacement in first 10 days",
-    "✓  Priority customer care · 1800-PULSE-IN",
+    "2-year manufacturer warranty (auto-registered to this invoice)",
+    "30-day no-questions returns, free reverse pickup",
+    "Free doorstep replacement within the first 10 days",
+    "Priority customer care - 1800-PULSE-IN, 8am to 11pm IST",
   ];
   perks.forEach((p, i) => {
     const col = i % 2;
     const rowIdx = Math.floor(i / 2);
-    doc.text(p, M + col * ((W - 2 * M) / 2), y + 14 + rowIdx * 12);
+    const px = M + col * ((W - 2 * M) / 2);
+    const py = y + 14 + rowIdx * 13;
+    // vector check mark (font glyphs like U+2713 are not in the PDF core fonts)
+    doc.setDrawColor(...success);
+    doc.setLineWidth(1.1);
+    doc.line(px, py - 3, px + 2.6, py - 0.4);
+    doc.line(px + 2.6, py - 0.4, px + 7, py - 7);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(...sub);
+    doc.text(p, px + 12, py);
   });
+
 
   // ── TERMS & SIGNATURE ────────────────────────────────────
   y += 46;

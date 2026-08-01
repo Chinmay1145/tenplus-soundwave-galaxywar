@@ -531,16 +531,27 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9.5);
   insights.forEach((t) => {
-    doc.setTextColor(...accent);
-    doc.text("▸", M + 4, y);
+    if (y > H - 90) {
+      doc.addPage();
+      y = M + 20;
+    }
+    // vector bullet triangle (U+25B8 is not available in the PDF core fonts)
+    doc.setFillColor(...accent);
+    doc.triangle(M + 4, y - 6, M + 4, y - 0.5, M + 9, y - 3.2, "F");
     doc.setTextColor(...sub);
     const lines = doc.splitTextToSize(t, W - 2 * M - 16);
     lines.forEach((ln: string, i: number) => doc.text(ln, M + 16, y + i * 11));
     y += lines.length * 11 + 6;
   });
 
+
   // Confidential band
   y += 6;
+  if (y + 32 > H - 60) {
+    doc.addPage();
+    y = M + 20;
+  }
+
   doc.setFillColor(...tint);
   doc.rect(M, y, W - 2 * M, 26, "F");
   doc.setDrawColor(...accent);

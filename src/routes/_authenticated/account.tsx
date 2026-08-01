@@ -29,6 +29,8 @@ import {
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useStore } from "@/lib/store";
+
 import { inr } from "@/lib/format";
 import { toast } from "sonner";
 import { OrderTracking } from "@/components/site/OrderTracking";
@@ -39,7 +41,37 @@ export const Route = createFileRoute("/_authenticated/account")({
   component: Account,
 });
 
+const TIERS = [
+  { name: "Signal", at: 0, perks: ["Free 30-day returns", "2-year warranty"] },
+  { name: "Amplified", at: 15000, perks: ["Priority care", "Free express shipping", "Early drops"] },
+  { name: "Reference", at: 60000, perks: ["Dedicated advisor", "Lifetime tuning", "Studio invites"] },
+] as const;
+
+type Tier = {
+  name: string;
+  progress: number;
+  perks: readonly string[];
+  next: { name: string; at: number } | null;
+};
+
+function memberTier(spend: number): Tier {
+  let i = 0;
+  for (let k = 0; k < TIERS.length; k++) if (spend >= TIERS[k].at) i = k;
+  const current = TIERS[i];
+  const next = TIERS[i + 1] ?? null;
+  const progress = next
+    ? Math.min(100, Math.round(((spend - current.at) / (next.at - current.at)) * 100))
+    : 100;
+  return {
+    name: current.name,
+    perks: current.perks,
+    progress: Math.max(4, progress),
+    next: next ? { name: next.name, at: next.at } : null,
+  };
+}
+
 type Order = {
+
   id: string;
   total: number;
   subtotal?: number;
@@ -54,7 +86,9 @@ type Order = {
 
 function Account() {
   const { user } = useAuth();
+  const { wishlist } = useStore();
   const navigate = useNavigate();
+
   const [tab, setTab] = useState<"overview" | "returns" | "settings">("overview");
 
   const { data: orders } = useQuery({
@@ -102,6 +136,8 @@ function Account() {
   const orderCount = orders?.length ?? 0;
   const returnCount = returns?.length ?? 0;
   const recentOrders = (orders ?? []).slice(0, 3);
+  const tier = memberTier(totalSpend);
+
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -164,9 +200,40 @@ function Account() {
           <Stat icon={ShoppingBag} title="Orders" value={String(orderCount)} sub="lifetime" />
           <Stat icon={TrendingUp} title="Total spend" value={inr(totalSpend)} sub="all time" accent />
           <Stat icon={RotateCcw} title="Returns" value={String(returnCount)} sub="requests" />
-          <Stat icon={Heart} title="Wishlist" value="—" sub="curated by you" />
+          <Stat icon={Heart} title="Wishlist" value={String(wishlist.length)} sub="saved items" />
+        </div>
+
+        {/* MEMBERSHIP TIER PROGRESS */}
+        <div className="relative mt-4 rounded-2xl border border-border/60 bg-surface-2 p-5">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <div className="mono text-[10px] text-muted-foreground">— Membership</div>
+              <div className="mt-1 font-display text-lg font-bold">
+                {tier.name} <span className="text-accent">tier</span>
+              </div>
+            </div>
+            <div className="text-right text-xs text-muted-foreground">
+              {tier.next
+                ? <>Spend <span className="font-semibold text-foreground">{inr(Math.max(0, tier.next.at - totalSpend))}</span> more to unlock {tier.next.name}</>
+                : "Top tier unlocked — enjoy every perk."}
+            </div>
+          </div>
+          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-border/60">
+            <span
+              className="block h-full rounded-full bg-gradient-to-r from-accent/60 to-accent transition-[width] duration-700"
+              style={{ width: `${tier.progress}%` }}
+            />
+          </div>
+          <div className="mono mt-2 flex flex-wrap gap-2 text-[10px] text-muted-foreground">
+            {tier.perks.map((p) => (
+              <span key={p} className="rounded-full border border-border bg-card px-2.5 py-1">
+                {p}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
+
 
       {/* QUICK ACCESS GRID */}
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

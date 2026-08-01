@@ -6,16 +6,20 @@ import { SoundLoader } from "./SoundLoader";
  * short window on the very first paint of a session, then fades out. Runs
  * once per browser session (sessionStorage) so navigations feel instant.
  */
-export function BootSplash({ minDurationMs = 1400 }: { minDurationMs?: number }) {
-  const [visible, setVisible] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return sessionStorage.getItem("pulse-boot-shown") !== "1";
-    } catch {
-      return true;
-    }
-  });
+export function BootSplash({ minDurationMs = 1600 }: { minDurationMs?: number }) {
+  // Start hidden on both server and first client render to keep hydration
+  // identical, then reveal after mount if this session hasn't seen it.
+  const [visible, setVisible] = useState(false);
   const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("pulse-boot-shown") !== "1") setVisible(true);
+    } catch {
+      setVisible(true);
+    }
+  }, []);
+
 
   useEffect(() => {
     if (!visible) return;

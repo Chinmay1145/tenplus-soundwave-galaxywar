@@ -16,12 +16,20 @@ const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial A
 
 export function SoundLoader({ label }: { label?: string }) {
   const [idx, setIdx] = useState(0);
+  const [pct, setPct] = useState(4);
   useEffect(() => {
     if (label) return;
     const id = setInterval(() => setIdx((i) => (i + 1) % PHRASES.length), 1400);
     return () => clearInterval(id);
   }, [label]);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setPct((p) => (p >= 98 ? 98 : p + Math.max(1, Math.round((100 - p) / 9))));
+    }, 160);
+    return () => clearInterval(id);
+  }, []);
   const phrase = label ?? PHRASES[idx];
+
   return (
     <div
       className="fixed inset-0 z-[100] grid place-items-center bg-background/85 backdrop-blur-md"
@@ -99,9 +107,19 @@ export function SoundLoader({ label }: { label?: string }) {
             {phrase.toUpperCase()}
           </div>
           <div className="mono text-[10px] tracking-[0.3em] text-accent/70">PULSE · AUDIO LABS</div>
-          <div className="mt-1 h-[3px] w-40 overflow-hidden rounded-full bg-border/60">
-            <span className="sl-progress block h-full w-1/3 rounded-full bg-gradient-to-r from-accent via-accent/80 to-accent" />
+          <div className="mt-1 w-56">
+            <div className="h-[4px] w-full overflow-hidden rounded-full bg-border/60">
+              <span
+                className="block h-full rounded-full bg-gradient-to-r from-accent/60 via-accent to-accent/60 transition-[width] duration-200 ease-out"
+                style={{ width: `${pct}%`, boxShadow: "0 0 12px oklch(0.65 0.24 25 / 0.7)" }}
+              />
+            </div>
+            <div className="mono mt-2 flex items-center justify-between text-[9px] tracking-[0.25em] text-muted-foreground">
+              <span>BUFFERING</span>
+              <span className="text-accent">{pct}%</span>
+            </div>
           </div>
+
           <div className="mt-3 flex flex-wrap justify-center gap-1.5">
             {TAGS.map((t) => (
               <span
