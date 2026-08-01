@@ -16,12 +16,20 @@ const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial A
 
 export function SoundLoader({ label }: { label?: string }) {
   const [idx, setIdx] = useState(0);
+  const [pct, setPct] = useState(4);
   useEffect(() => {
     if (label) return;
     const id = setInterval(() => setIdx((i) => (i + 1) % PHRASES.length), 1400);
     return () => clearInterval(id);
   }, [label]);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setPct((p) => (p >= 98 ? 98 : p + Math.max(1, Math.round((100 - p) / 9))));
+    }, 160);
+    return () => clearInterval(id);
+  }, []);
   const phrase = label ?? PHRASES[idx];
+
   return (
     <div
       className="fixed inset-0 z-[100] grid place-items-center bg-background/85 backdrop-blur-md"
