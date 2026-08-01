@@ -32,7 +32,10 @@ function AuthPage() {
     if (!loading && user) navigate({ to: search.redirect ?? "/account" });
   }, [user, loading, navigate, search.redirect]);
 
+  const strength = passwordStrength(password);
+
   const validate = (): string | null => {
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Enter a valid email.";
     if (mode === "forgot") return null;
     if (password.length < 8) return "Password must be at least 8 characters.";
