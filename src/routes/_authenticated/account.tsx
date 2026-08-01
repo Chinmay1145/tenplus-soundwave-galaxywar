@@ -39,7 +39,37 @@ export const Route = createFileRoute("/_authenticated/account")({
   component: Account,
 });
 
+const TIERS = [
+  { name: "Signal", at: 0, perks: ["Free 30-day returns", "2-year warranty"] },
+  { name: "Amplified", at: 15000, perks: ["Priority care", "Free express shipping", "Early drops"] },
+  { name: "Reference", at: 60000, perks: ["Dedicated advisor", "Lifetime tuning", "Studio invites"] },
+] as const;
+
+type Tier = {
+  name: string;
+  progress: number;
+  perks: readonly string[];
+  next: { name: string; at: number } | null;
+};
+
+function memberTier(spend: number): Tier {
+  let i = 0;
+  for (let k = 0; k < TIERS.length; k++) if (spend >= TIERS[k].at) i = k;
+  const current = TIERS[i];
+  const next = TIERS[i + 1] ?? null;
+  const progress = next
+    ? Math.min(100, Math.round(((spend - current.at) / (next.at - current.at)) * 100))
+    : 100;
+  return {
+    name: current.name,
+    perks: current.perks,
+    progress: Math.max(4, progress),
+    next: next ? { name: next.name, at: next.at } : null,
+  };
+}
+
 type Order = {
+
   id: string;
   total: number;
   subtotal?: number;
