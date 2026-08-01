@@ -84,7 +84,9 @@ type Order = {
 
 function Account() {
   const { user } = useAuth();
+  const { wishlist } = useStore();
   const navigate = useNavigate();
+
   const [tab, setTab] = useState<"overview" | "returns" | "settings">("overview");
 
   const { data: orders } = useQuery({
