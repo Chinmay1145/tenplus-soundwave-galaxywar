@@ -29,6 +29,8 @@ import {
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useStore } from "@/lib/store";
+
 import { inr } from "@/lib/format";
 import { toast } from "sonner";
 import { OrderTracking } from "@/components/site/OrderTracking";
