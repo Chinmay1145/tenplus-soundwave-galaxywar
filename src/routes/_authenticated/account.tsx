@@ -102,6 +102,8 @@ function Account() {
   const orderCount = orders?.length ?? 0;
   const returnCount = returns?.length ?? 0;
   const recentOrders = (orders ?? []).slice(0, 3);
+  const tier = memberTier(totalSpend);
+
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
