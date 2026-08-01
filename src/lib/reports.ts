@@ -547,6 +547,11 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
 
   // Confidential band
   y += 6;
+  if (y + 32 > H - 60) {
+    doc.addPage();
+    y = M + 20;
+  }
+
   doc.setFillColor(...tint);
   doc.rect(M, y, W - 2 * M, 26, "F");
   doc.setDrawColor(...accent);
