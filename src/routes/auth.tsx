@@ -17,6 +17,22 @@ export const Route = createFileRoute("/auth")({
 
 type Mode = "signin" | "signup" | "forgot";
 
+type Strength = { score: number; label: string; checks: [boolean, string][] };
+
+function passwordStrength(pw: string): Strength {
+  const checks: [boolean, string][] = [
+    [pw.length >= 8, "8+ characters"],
+    [/[A-Z]/.test(pw), "One uppercase letter"],
+    [/[a-z]/.test(pw), "One lowercase letter"],
+    [/[0-9]/.test(pw), "One number"],
+    [/[^A-Za-z0-9]/.test(pw), "One symbol"],
+  ];
+  const score = checks.filter(([ok]) => ok).length;
+  const label = score <= 2 ? "Weak" : score === 3 ? "Fair" : score === 4 ? "Strong" : "Excellent";
+  return { score, label, checks };
+}
+
+
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
