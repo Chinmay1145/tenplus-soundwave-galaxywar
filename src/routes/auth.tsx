@@ -274,6 +274,48 @@ function AuthPage() {
               />
             )}
 
+            {mode === "signup" && password.length > 0 && (
+              <div className="rounded-xl border border-border/60 bg-surface-2 p-3">
+                <div className="flex items-center justify-between">
+                  <span className="mono text-[10px] text-muted-foreground">PASSWORD STRENGTH</span>
+                  <span
+                    className={`mono text-[10px] ${
+                      strength.score >= 4
+                        ? "text-emerald-400"
+                        : strength.score >= 3
+                          ? "text-amber-400"
+                          : "text-accent"
+                    }`}
+                  >
+                    {strength.label.toUpperCase()}
+                  </span>
+                </div>
+                <div className="mt-2 flex gap-1">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <span
+                      key={i}
+                      className={`h-1 flex-1 rounded-full transition-colors ${
+                        i < strength.score
+                          ? strength.score >= 4
+                            ? "bg-emerald-400"
+                            : strength.score >= 3
+                              ? "bg-amber-400"
+                              : "bg-accent"
+                          : "bg-border"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <ul className="mt-2.5 grid gap-1 text-[10px] text-muted-foreground sm:grid-cols-2">
+                  {strength.checks.map(([ok, text]) => (
+                    <li key={text} className={`flex items-center gap-1.5 ${ok ? "text-emerald-400" : ""}`}>
+                      <Check className="h-2.5 w-2.5" /> {text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {mode === "signin" && (
               <div className="flex justify-end pt-1">
                 <button
@@ -285,6 +327,7 @@ function AuthPage() {
                 </button>
               </div>
             )}
+
 
             <button
               type="submit"
