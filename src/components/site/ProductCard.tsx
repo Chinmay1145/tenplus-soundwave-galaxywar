@@ -12,7 +12,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card transition-all duration-500 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[var(--shadow-card)]">
-      <Link to="/product/$id" params={{ id: product.id }} className="relative block aspect-square overflow-hidden bg-surface">
+      <Link to="/product/$id" params={{ id: String(product.id) }} className="relative block aspect-square overflow-hidden bg-surface">
         <img
           src={product.image}
           alt={product.name}
@@ -108,7 +108,7 @@ export function ProductCard({ product }: { product: Product }) {
             {product.rating.toFixed(1)} <span className="opacity-60">({product.reviews})</span>
           </span>
         </div>
-        <Link to="/product/$id" params={{ id: product.id }}>
+        <Link to="/product/$id" params={{ id: String(product.id) }}>
           <h3 className="font-display text-base font-semibold leading-tight">{product.name}</h3>
           <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{product.tagline}</p>
         </Link>
