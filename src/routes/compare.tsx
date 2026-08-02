@@ -133,7 +133,7 @@ function Compare() {
                       >
                         <X className="h-3 w-3" />
                       </button>
-                      <Link to="/product/$id" params={{ id: p.id }} className="relative block">
+                      <Link to="/product/$id" params={{ id: String(p.id) }} className="relative block">
                         <img
                           src={p.image}
                           alt={p.name}

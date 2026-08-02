@@ -38,12 +38,12 @@ function Cart() {
         <div className="divide-y divide-border/60 rounded-2xl border border-border/60 bg-card">
           {items.map((i) => (
             <div key={i.id} className="grid grid-cols-[88px_1fr_auto] items-center gap-4 p-5">
-              <Link to="/product/$id" params={{ id: i.id }} className="overflow-hidden rounded-xl bg-surface">
+              <Link to="/product/$id" params={{ id: String(i.id) }} className="overflow-hidden rounded-xl bg-surface">
                 <img src={i.product.image} alt={i.product.name} className="aspect-square w-full object-cover" />
               </Link>
               <div className="min-w-0">
                 <div className="mono text-muted-foreground">{i.product.brand}</div>
-                <Link to="/product/$id" params={{ id: i.id }} className="font-display text-lg font-semibold leading-tight hover:text-accent">
+                <Link to="/product/$id" params={{ id: String(i.id) }} className="font-display text-lg font-semibold leading-tight hover:text-accent">
                   {i.product.name}
                 </Link>
                 {i.color && <div className="mt-1 text-xs text-muted-foreground">Color: {i.color}</div>}
