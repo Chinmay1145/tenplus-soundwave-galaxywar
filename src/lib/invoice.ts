@@ -308,7 +308,7 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setDrawColor(...hair);
   doc.rect(M, y, W - 2 * M, 64, "S");
 
-  const blockW = (W - 2 * M) / 4;
+  const blockW = (W - 2 * M - 92) / 4;
   const blocks: [string, string][] = [
     ["ORDER ID", `#${shortId}`],
     ["STATUS", (data.status || "confirmed").replace(/_/g, " ").toUpperCase()],
@@ -453,9 +453,9 @@ export function downloadInvoice(data: InvoiceData) {
       H - 20,
     );
     doc.setTextColor(...accent);
-    doc.text("www.pulse.audio", W - M, H - 20, { align: "right" });
+    doc.text("www.pulse.audio", W - M, H - 30, { align: "right" });
     doc.setTextColor(...muted);
-    doc.text(`Page ${p} of ${pageCount}`, W / 2, H - 20, { align: "center" });
+    doc.text(`Page ${p} of ${pageCount}`, W - M, H - 20, { align: "right" });
   }
 
   doc.save(`PULSE-Invoice-${shortId}.pdf`);
