@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { drawPulseLockup, drawPulseMark } from "@/lib/pdf-logo";
 
 export type InvoiceItem = { name: string; qty: number; price?: number };
 export type InvoiceData = {
@@ -55,31 +56,6 @@ const accentDark: [number, number, number] = [170, 20, 36];
 const tint: [number, number, number] = [250, 250, 252];
 const success: [number, number, number] = [16, 128, 74];
 
-// Draws the PULSE waveform mark inside a rounded square.
-function drawLogoMark(
-  doc: jsPDF,
-  x: number,
-  y: number,
-  size: number,
-  onDark = false,
-) {
-  const s = size;
-  const strokeCol = onDark ? [255, 255, 255] : accent;
-  const barCol = onDark ? [255, 255, 255] : accent;
-  doc.setDrawColor(strokeCol[0], strokeCol[1], strokeCol[2]);
-  doc.setLineWidth(Math.max(0.8, s * 0.05));
-  doc.roundedRect(x, y, s, s, s * 0.28, s * 0.28, "S");
-  doc.setFillColor(barCol[0], barCol[1], barCol[2]);
-  const heights = [0.28, 0.55, 0.85, 0.55, 0.28];
-  const bw = s * 0.09;
-  const gap = (s - bw * 5) / 6;
-  heights.forEach((h, i) => {
-    const bh = s * h;
-    const bx = x + gap + i * (bw + gap);
-    const by = y + (s - bh) / 2;
-    doc.roundedRect(bx, by, bw, bh, bw / 2, bw / 2, "F");
-  });
-}
 
 export function downloadInvoice(data: InvoiceData) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -107,23 +83,14 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.setTextColor(255, 255, 255);
-  doc.text("PULSE · AUDIO LABS · EST. 2021", M, 26);
+  drawPulseMark(doc, M, 12, 18, true);
+  doc.text("PULSE · AUDIO LABS · EST. 2021", M + 26, 26);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(220, 220, 224);
   doc.text("Experience Sound Beyond Reality · www.pulse.audio", W - M, 26, { align: "right" });
 
   // Vector logo mark + wordmark
-  drawLogoMark(doc, M, 62, 34);
-  doc.setTextColor(...ink);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(26);
-  doc.text("PULSE", M + 44, 82);
-  doc.setTextColor(...accent);
-  doc.text(".", M + 44 + doc.getTextWidth("PULSE"), 82);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.setTextColor(...muted);
-  doc.text("TAX INVOICE  ·  BILL OF SUPPLY", M + 44, 96);
+  drawPulseLockup(doc, M, 58, "TAX INVOICE  ·  BILL OF SUPPLY");
 
   // Right side: invoice meta
   doc.setFont("helvetica", "bold");

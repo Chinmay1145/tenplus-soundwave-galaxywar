@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { drawPulseLockup, drawPulseMark } from "@/lib/pdf-logo";
 import { getProduct } from "@/data/products";
 
 export type ReportOrder = {
@@ -191,22 +192,6 @@ const accent: [number, number, number] = [225, 29, 47];
 const accentDark: [number, number, number] = [170, 20, 36];
 const tint: [number, number, number] = [250, 250, 252];
 
-function drawLogoMark(doc: jsPDF, x: number, y: number, size: number) {
-  const s = size;
-  doc.setDrawColor(...accent);
-  doc.setLineWidth(Math.max(0.8, s * 0.05));
-  doc.roundedRect(x, y, s, s, s * 0.28, s * 0.28, "S");
-  doc.setFillColor(...accent);
-  const heights = [0.28, 0.55, 0.85, 0.55, 0.28];
-  const bw = s * 0.09;
-  const gap = (s - bw * 5) / 6;
-  heights.forEach((h, i) => {
-    const bh = s * h;
-    const bx = x + gap + i * (bw + gap);
-    const by = y + (s - bh) / 2;
-    doc.roundedRect(bx, by, bw, bh, bw / 2, bw / 2, "F");
-  });
-}
 
 export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -227,22 +212,13 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.setTextColor(255, 255, 255);
-  doc.text("PULSE · ANALYTICS SUITE", M, 26);
+  drawPulseMark(doc, M, 12, 18, true);
+  doc.text("PULSE · ANALYTICS SUITE", M + 26, 26);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(220, 220, 224);
   doc.text("Performance Report · www.pulse.audio", W - M, 26, { align: "right" });
 
-  drawLogoMark(doc, M, 62, 34);
-  doc.setTextColor(...ink);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(26);
-  doc.text("PULSE", M + 44, 82);
-  doc.setTextColor(...accent);
-  doc.text(".", M + 44 + doc.getTextWidth("PULSE"), 82);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.setTextColor(...muted);
-  doc.text("BUSINESS PERFORMANCE REPORT", M + 44, 96);
+  drawPulseLockup(doc, M, 58, "BUSINESS PERFORMANCE REPORT");
 
   // Right meta pill
   const pillW = 210;
