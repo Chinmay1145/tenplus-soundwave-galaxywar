@@ -556,7 +556,8 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...muted);
-    doc.text(`Generated ${fmt(new Date())} · PULSE Analytics`, M, H - 34);
+    drawPulseMark(doc, M, H - 42, 14);
+    doc.text(`Generated ${fmt(new Date())} · PULSE Analytics`, M + 20, H - 34);
     doc.text(`Page ${p} of ${total}`, W - M, H - 34, { align: "right" });
     doc.setTextColor(...accent);
     doc.text("www.pulse.audio", W / 2, H - 22, { align: "center" });

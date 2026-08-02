@@ -438,18 +438,19 @@ export function downloadInvoice(data: InvoiceData) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(...ink);
-    doc.text("Thank you for choosing PULSE — where every beat matters.", M, H - 44);
+    drawPulseMark(doc, M, H - 52, 14);
+    doc.text("Thank you for choosing PULSE — where every beat matters.", M + 20, H - 44);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
     doc.text(
       "Support · care@pulse.audio · 1800-PULSE-IN (toll-free)  ·  Track order at pulse.audio/track/" + shortId,
-      M,
+      M + 20,
       H - 30,
     );
     doc.text(
       "PULSE Audio Pvt. Ltd. · CIN: U74999KA2021PTC145678 · GSTIN: 29ABCDE1234F1Z5",
-      M,
+      M + 20,
       H - 20,
     );
     doc.setTextColor(...accent);
