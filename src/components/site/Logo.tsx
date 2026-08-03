@@ -30,7 +30,10 @@ export function LogoMark({
       width={size}
       height={size}
       aria-hidden
-      className={cn("shrink-0", className)}
+      className={cn(
+        "shrink-0 [filter:drop-shadow(0_0_6px_oklch(0.65_0.24_25/0.65))_drop-shadow(0_0_16px_oklch(0.65_0.24_25/0.35))]",
+        className,
+      )}
     >
       <defs>
         <linearGradient id="pulseRingGrad" x1="0" y1="0" x2="1" y2="1">
@@ -42,6 +45,14 @@ export function LogoMark({
           <stop offset="0%" stopColor="oklch(0.55 0.24 25)" />
           <stop offset="100%" stopColor="oklch(0.88 0.16 25)" />
         </linearGradient>
+        <filter id="pulseGlowF" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="1.7" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
         <radialGradient id="pulseCoreGlow" cx="50%" cy="50%" r="55%">
           <stop offset="0%" stopColor="oklch(0.65 0.24 25 / 0.55)" />
           <stop offset="100%" stopColor="oklch(0.65 0.24 25 / 0)" />
@@ -49,8 +60,13 @@ export function LogoMark({
       </defs>
 
       {/* ambient glow */}
-      <circle cx="26" cy="26" r="24" fill="url(#pulseCoreGlow)" />
+      <circle cx="26" cy="26" r="25" fill="url(#pulseCoreGlow)">
+        {animated && (
+          <animate attributeName="r" values="23;26;23" dur="2.4s" repeatCount="indefinite" />
+        )}
+      </circle>
 
+      <g filter="url(#pulseGlowF)">
       {/* outer ring with break at 4 o'clock */}
       <circle
         cx="26"
@@ -106,6 +122,8 @@ export function LogoMark({
             )}
           </rect>
         ))}
+      </g>
+
       </g>
 
       {/* live pulse dot at the ring break */}
