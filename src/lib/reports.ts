@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { drawPulseLockup, drawPulseMark } from "@/lib/pdf-logo";
+import { drawPulseLockup, drawPulseMark, drawQrPanel, trackingUrl } from "@/lib/pdf-logo";
 import { getProduct } from "@/data/products";
 
 export type ReportOrder = {
@@ -521,8 +521,28 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   });
 
 
-  // Confidential band
+  // ── TRACK YOUR ORDERS (QR) ───────────────────────────────
   y += 6;
+  if (y + 100 > H - 70) {
+    doc.addPage();
+    y = M + 20;
+  }
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...ink);
+  doc.text("Track Your Orders", M, y);
+  y += 12;
+  const qr = drawQrPanel(
+    doc,
+    M,
+    y,
+    trackingUrl(),
+    "SCAN TO TRACK",
+    "Opens the PULSE tracking timeline - live courier status for every order in this report.",
+  );
+  y += qr.h + 10;
+
+  // Confidential band
   if (y + 32 > H - 60) {
     doc.addPage();
     y = M + 20;

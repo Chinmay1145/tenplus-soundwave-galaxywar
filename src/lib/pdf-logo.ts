@@ -1,3 +1,4 @@
+import QRCode from "qrcode";
 import type { jsPDF } from "jspdf";
 
 /**
@@ -67,4 +68,90 @@ export function drawPulseLockup(
   doc.setFontSize(7.5);
   doc.setTextColor(120, 120, 128);
   doc.text(caption, x + markSize + 10, baseline + 14);
+}
+
+/** Public site origin used for QR deep links inside generated PDFs. */
+export function siteOrigin() {
+  try {
+    if (typeof window !== "undefined" && window.location?.origin) {
+      return window.location.origin;
+    }
+  } catch {
+    /* ignore */
+  }
+  return "https://pulse.audio";
+}
+
+/** Deep link to the order tracking timeline for a given order id. */
+export function trackingUrl(orderId?: string) {
+  const base = `${siteOrigin()}/track-order`;
+  return orderId ? `${base}?id=${encodeURIComponent(orderId)}` : base;
+}
+
+/**
+ * Draws a QR code as vector squares (no canvas / raster needed, so it stays
+ * crisp at any zoom and works in every runtime). Returns the drawn size.
+ */
+export function drawQrCode(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  size: number,
+  text: string,
+) {
+  const qr = QRCode.create(text, { errorCorrectionLevel: "M" });
+  const count = qr.modules.size;
+  const data = qr.modules.data;
+  const quiet = size * 0.08;
+  const inner = size - quiet * 2;
+  const cell = inner / count;
+
+  // white plate so the code stays scannable on tinted backgrounds
+  doc.setFillColor(255, 255, 255);
+  doc.rect(x, y, size, size, "F");
+  doc.setFillColor(17, 17, 19);
+  for (let r = 0; r < count; r++) {
+    for (let c = 0; c < count; c++) {
+      if (data[r * count + c]) {
+        doc.rect(x + quiet + c * cell, y + quiet + r * cell, cell + 0.15, cell + 0.15, "F");
+      }
+    }
+  }
+  return size;
+}
+
+/** QR code inside a bordered card with a heading + caption. */
+export function drawQrPanel(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  url: string,
+  heading = "SCAN TO TRACK",
+  caption = "Live order timeline",
+  qrSize = 72,
+) {
+  const padX = 10;
+  const w = qrSize + padX * 2 + 132;
+  const h = qrSize + 20;
+  doc.setFillColor(250, 250, 252);
+  doc.roundedRect(x, y, w, h, 6, 6, "F");
+  doc.setDrawColor(225, 225, 230);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(x, y, w, h, 6, 6, "S");
+  drawQrCode(doc, x + padX, y + 10, qrSize, url);
+
+  const tx = x + padX + qrSize + 12;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(225, 29, 47);
+  doc.text(heading, tx, y + 24);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(60, 60, 68);
+  const lines = doc.splitTextToSize(caption, w - (tx - x) - padX) as string[];
+  lines.slice(0, 4).forEach((ln, i) => doc.text(ln, tx, y + 38 + i * 10));
+  doc.setFontSize(6.5);
+  doc.setTextColor(120, 120, 128);
+  doc.text("Point your camera at the code", tx, y + h - 12);
+  return { w, h };
 }

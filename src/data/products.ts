@@ -169,6 +169,95 @@ function buildGallery(index: number, imageKeys?: ImageRef[]): string[] {
   return [0, 1, 2, 3].map((offset) => resolveImage((index + offset) % IMAGE_KEYS.length));
 }
 
+// ─── PHOTO POOL ──────────────────────────────────────────────────────────────
+// Real product photography (Unsplash CDN) grouped by category so every product
+// gets a distinct, on-theme hero image plus a 4-frame gallery. Local bundled
+// assets remain in the rotation as guaranteed fallbacks.
+const U = (id: string, w = 1200) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+const PHOTOS: Record<string, string[]> = {
+  tws: [
+    U("1590658268037-6bf12165a8df"),
+    U("1606220945770-b5b6c2c55bf1"),
+    U("1600294037681-c80b4cb5b434"),
+    U("1608156639585-b3a032ef9689"),
+  ],
+  anc: [
+    U("1505740420928-5e560c06d30e"),
+    U("1546435770-a3e426bf472b"),
+    U("1583394838336-acd977736f90"),
+    U("1484704849700-f032a568e944"),
+  ],
+  flagship: [
+    U("1599669454699-248893623440"),
+    U("1618366712010-f4ae9c647dcb"),
+    U("1524678606370-a47ad25cb82a"),
+    U("1613040809024-b4ef7ba99bc3"),
+  ],
+  luxury: [
+    U("1613040809024-b4ef7ba99bc3"),
+    U("1545127398-14699f92334b"),
+    U("1610438235354-a6ae5528385c"),
+  ],
+  studio: [
+    U("1583394838336-acd977736f90"),
+    U("1484704849700-f032a568e944"),
+    U("1546435770-a3e426bf472b"),
+  ],
+  gaming: [
+    U("1593305841991-05c297ba4575"),
+    U("1629429407759-01cd3d7cfb38"),
+    U("1616763355603-9755a640a287"),
+  ],
+  sports: [
+    U("1571019613454-1cb2f99b2d8b"),
+    U("1518611012118-696072aa579a"),
+    U("1608156639585-b3a032ef9689"),
+  ],
+  "open-ear": [
+    U("1608156639585-b3a032ef9689"),
+    U("1593697821252-0c9137d9fc45"),
+  ],
+  neckband: [
+    U("1574920162043-b872873f19c8"),
+    U("1613040809024-b4ef7ba99bc3"),
+  ],
+  wired: [
+    U("1572536147248-ac59a8abfa4b"),
+    U("1558537348-c0f8e733989d"),
+  ],
+  business: [
+    U("1550009158-9ebf69173e03"),
+    U("1558537348-c0f8e733989d"),
+  ],
+};
+
+const FALLBACK_PHOTOS = [
+  U("1505740420928-5e560c06d30e"),
+  U("1590658268037-6bf12165a8df"),
+  U("1572536147248-ac59a8abfa4b"),
+  U("1484704849700-f032a568e944"),
+];
+
+/** Deterministic hero photo for a product (stable across reloads). */
+function photoFor(id: number, category: string): string {
+  const pool = PHOTOS[category] ?? FALLBACK_PHOTOS;
+  return pool[id % pool.length];
+}
+
+/** 4-frame gallery: three photo crops of the same style + one local asset. */
+function photoGallery(id: number, category: string): string[] {
+  const pool = PHOTOS[category] ?? FALLBACK_PHOTOS;
+  const local = IMAGE_KEYS[id % IMAGE_KEYS.length];
+  return [
+    pool[id % pool.length],
+    `${pool[(id + 1) % pool.length]}&v=2`,
+    `${pool[(id + 2) % pool.length]}&v=3&crop=entropy`,
+    IMAGES[local],
+  ];
+}
+
 export type ProductSeed = {
   id: number;
   name: string;
@@ -257,7 +346,11 @@ function buildProduct(seed: ProductSeed): Product {
   const batteryLife = seed.batteryLife ?? defaultBatteryLife(id, category);
   const features = seed.features ?? DEFAULT_FEATURES;
   const colors = (seed.colors ?? ["Black", "White", "Red"]).map(normalizeColor);
-  const imgRef = image ?? id;
+  // Explicit URLs always win; local keys/indices are upgraded to real product
+  // photography (the local asset stays in the gallery as a fallback frame).
+  const heroImage = isImageUrl(image) ? image : photoFor(id, category);
+  const galleryFrames =
+    gallery && gallery.some(isImageUrl) ? buildGallery(id, gallery) : photoGallery(id, category);
 
   return {
     id,
@@ -271,8 +364,8 @@ function buildProduct(seed: ProductSeed): Product {
     discount,
     rating: seed.rating ?? 4.2 + ((id * 7) % 8) / 10,
     reviews: seed.reviews ?? 120 + ((id * 113) % 4800),
-    image: resolveImage(imgRef),
-    gallery: buildGallery(id, gallery),
+    image: heroImage,
+    gallery: galleryFrames,
     colors,
     colorNames: colors.map((color) => color.name),
     inStock: seed.inStock ?? id % 9 !== 0,

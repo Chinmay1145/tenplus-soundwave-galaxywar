@@ -196,28 +196,47 @@ function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section id="categories" className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
+      <section id="categories" className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-10 -z-10 h-72 opacity-60"
+          style={{
+            background:
+              "radial-gradient(650px 260px at 20% 0%, oklch(0.65 0.24 25 / 0.16), transparent 70%)",
+          }}
+        />
+        <div className="mb-10 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+          <div className="min-w-0">
             <div className="mono text-accent">— Collections</div>
             <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
               Find your sound.
             </h2>
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground">
+              {PRODUCTS.length} hand-tuned products across {CATEGORIES.length} collections —
+              from reference studio cans to featherweight open-ear runners.
+            </p>
           </div>
-          <Link to="/shop" className="hidden text-sm text-muted-foreground hover:text-accent sm:inline-flex">
-            View all →
+          <Link
+            to="/shop"
+            className="mono hidden shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface-2 px-4 py-2 text-[11px] transition-colors hover:border-accent hover:text-accent sm:inline-flex"
+          >
+            VIEW ALL <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {CATEGORIES.map((c) => {
-            const pick = PRODUCTS.find((p) => p.category === c.slug);
+            const inCat = PRODUCTS.filter((p) => p.category === c.slug);
+            const pick = inCat[0];
+            const from = inCat.length
+              ? Math.min(...inCat.map((p) => p.price))
+              : 0;
             return (
               <Link
               key={c.slug}
               to="/shop"
               search={{ cat: c.slug }}
-              className="group relative aspect-[5/4] overflow-hidden rounded-2xl border border-border/60 bg-card p-5 transition-all hover:-translate-y-1 hover:border-accent/50"
+              className="group relative aspect-[5/4] overflow-hidden rounded-2xl border border-border/60 bg-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/60 hover:shadow-[0_20px_50px_-24px_oklch(0.65_0.24_25/0.65)] sm:p-5"
             >
               {pick && (
                 <img
@@ -225,16 +244,28 @@ function Home() {
                   alt=""
                   aria-hidden
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover opacity-25 transition-all duration-700 group-hover:scale-110 group-hover:opacity-40"
+                  className="absolute inset-0 h-full w-full object-cover opacity-25 transition-all duration-700 group-hover:scale-110 group-hover:opacity-45"
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-tr from-accent/0 to-accent/0 transition-colors group-hover:from-accent/15" />
-              <div className="relative flex h-full flex-col justify-between">
-                <span className="mono text-muted-foreground">{c.slug.toUpperCase()}</span>
-                <div>
-                  <div className="font-display text-xl font-bold leading-tight">{c.name}</div>
-                  <div className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="absolute inset-0 bg-gradient-to-tr from-accent/0 to-accent/0 transition-colors group-hover:from-accent/20" />
+              <div className="relative flex h-full min-w-0 flex-col justify-between">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="mono truncate text-muted-foreground">{c.slug.toUpperCase()}</span>
+                  <span className="mono shrink-0 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] text-accent">
+                    {inCat.length}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate font-display text-lg font-bold leading-tight sm:text-xl">
+                    {c.name}
+                  </div>
+                  {from > 0 && (
+                    <div className="mono mt-0.5 text-[10px] text-muted-foreground">
+                      FROM ₹{from.toLocaleString("en-IN")}
+                    </div>
+                  )}
+                  <div className="mt-1.5 inline-flex items-center gap-1 text-xs text-accent opacity-0 transition-opacity group-hover:opacity-100">
                     Explore <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
@@ -244,6 +275,7 @@ function Home() {
           })}
         </div>
       </section>
+
 
       {/* TRENDING */}
       <section className="bg-surface py-24">

@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { drawPulseLockup, drawPulseMark } from "@/lib/pdf-logo";
+import { drawPulseLockup, drawPulseMark, drawQrPanel, trackingUrl } from "@/lib/pdf-logo";
 
 export type InvoiceItem = { name: string; qty: number; price?: number };
 export type InvoiceData = {
@@ -271,11 +271,26 @@ export function downloadInvoice(data: InvoiceData) {
     y += opts.bold ? 22 : 16;
   };
 
+  // QR panel — links straight to this order's live tracking timeline
+  const qrPanel = drawQrPanel(
+    doc,
+    M,
+    y - 12,
+    trackingUrl(data.id),
+    "SCAN TO TRACK",
+    `Order #${shortId} - live delivery timeline, invoice copy and support.`,
+  );
+
+  const qrBottom = y - 12 + qrPanel.h;
+
   row("Subtotal", inr(subtotal));
   row("CGST (9%)", inr(cgst));
   row("SGST (9%)", inr(sgst));
   row("Shipping", shipFee === 0 ? "FREE" : inr(shipFee));
   row("Total (INR)", inr(data.total), { bold: true, rule: true });
+
+  // Keep the amount-in-words band clear of the QR panel
+  y = Math.max(y, qrBottom + 12);
 
   // Amount in words
   doc.setFillColor(...tint);
