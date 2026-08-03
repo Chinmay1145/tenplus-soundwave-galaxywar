@@ -131,7 +131,7 @@ export function drawQrPanel(
   qrSize = 72,
 ) {
   const padX = 10;
-  const w = qrSize + padX * 2 + 96;
+  const w = qrSize + padX * 2 + 132;
   const h = qrSize + 20;
   doc.setFillColor(250, 250, 252);
   doc.roundedRect(x, y, w, h, 6, 6, "F");
@@ -149,7 +149,7 @@ export function drawQrPanel(
   doc.setFontSize(7.5);
   doc.setTextColor(60, 60, 68);
   const lines = doc.splitTextToSize(caption, w - (tx - x) - padX) as string[];
-  lines.slice(0, 3).forEach((ln, i) => doc.text(ln, tx, y + 38 + i * 10));
+  lines.slice(0, 4).forEach((ln, i) => doc.text(ln, tx, y + 38 + i * 10));
   doc.setFontSize(6.5);
   doc.setTextColor(120, 120, 128);
   doc.text("Point your camera at the code", tx, y + h - 12);

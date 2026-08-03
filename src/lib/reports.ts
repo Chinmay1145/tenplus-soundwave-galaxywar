@@ -538,7 +538,7 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
     y,
     trackingUrl(),
     "SCAN TO TRACK",
-    "Opens the PULSE order tracking timeline - live courier status for every order in this report.",
+    "Opens the PULSE tracking timeline - live courier status for every order in this report.",
   );
   y += qr.h + 10;
 
