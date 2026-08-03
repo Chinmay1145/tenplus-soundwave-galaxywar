@@ -346,8 +346,11 @@ function buildProduct(seed: ProductSeed): Product {
   const batteryLife = seed.batteryLife ?? defaultBatteryLife(id, category);
   const features = seed.features ?? DEFAULT_FEATURES;
   const colors = (seed.colors ?? ["Black", "White", "Red"]).map(normalizeColor);
-  const heroImage = image !== undefined ? resolveImage(image) : photoFor(id, category);
-  const galleryFrames = gallery ? buildGallery(id, gallery) : photoGallery(id, category);
+  // Explicit URLs always win; local keys/indices are upgraded to real product
+  // photography (the local asset stays in the gallery as a fallback frame).
+  const heroImage = isImageUrl(image) ? image : photoFor(id, category);
+  const galleryFrames =
+    gallery && gallery.some(isImageUrl) ? buildGallery(id, gallery) : photoGallery(id, category);
 
   return {
     id,
