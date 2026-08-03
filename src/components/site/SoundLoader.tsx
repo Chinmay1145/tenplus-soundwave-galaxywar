@@ -12,6 +12,13 @@ const PHRASES = [
   "Polishing the soundstage",
 ];
 
+const STAGES = [
+  ["Booting audio core", 20],
+  ["Fetching catalogue", 45],
+  ["Tuning drivers", 70],
+  ["Finalising soundstage", 92],
+] as const;
+
 const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial Audio"];
 
 export function SoundLoader({ label }: { label?: string }) {
@@ -95,8 +102,8 @@ export function SoundLoader({ label }: { label?: string }) {
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <div className="grid place-items-center rounded-2xl border border-accent/30 bg-background/60 p-3 shadow-[0_0_40px_oklch(0.65_0.24_25/0.35)] backdrop-blur">
-            <LogoMark size={56} animated />
+          <div className="grid place-items-center rounded-2xl border border-accent/30 bg-background/60 p-3 shadow-[0_0_70px_oklch(0.65_0.24_25/0.55)] backdrop-blur">
+            <LogoMark size={64} animated />
           </div>
           <div className="flex items-end gap-1" aria-hidden>
             {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -119,6 +126,32 @@ export function SoundLoader({ label }: { label?: string }) {
               <span className="text-accent">{pct}%</span>
             </div>
           </div>
+
+          {/* staged checklist keyed off progress */}
+          <ul className="mt-2 w-56 space-y-1.5" aria-hidden>
+            {STAGES.map(([name, at]) => {
+              const done = pct >= at;
+              return (
+                <li
+                  key={name}
+                  className={`mono flex items-center gap-2 text-[9px] tracking-[0.2em] transition-colors ${
+                    done ? "text-accent" : "text-muted-foreground/60"
+                  }`}
+                >
+                  <span
+                    className={`grid h-3 w-3 shrink-0 place-items-center rounded-full border transition-all ${
+                      done
+                        ? "border-accent bg-accent/20 shadow-[0_0_10px_oklch(0.65_0.24_25/0.7)]"
+                        : "border-border"
+                    }`}
+                  >
+                    <span className={`h-1 w-1 rounded-full ${done ? "bg-accent" : "bg-border"}`} />
+                  </span>
+                  <span className="truncate">{name.toUpperCase()}</span>
+                </li>
+              );
+            })}
+          </ul>
 
           <div className="mt-3 flex flex-wrap justify-center gap-1.5">
             {TAGS.map((t) => (
