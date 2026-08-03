@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { ArrowRight, Check, Eye, EyeOff, Headphones, Mail, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Eye, EyeOff, Headphones, Mail, ShieldCheck, Sparkles, Wifi, WifiOff, Signal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
@@ -33,6 +33,39 @@ function passwordStrength(pw: string): Strength {
 }
 
 
+/**
+ * Reports live connection quality so the auth screen can adapt its messaging
+ * on flaky mobile data (and warn clearly when the device is fully offline).
+ */
+type NetState = { online: boolean; slow: boolean; type: string | null };
+
+function useNetwork(): NetState {
+  const [net, setNet] = useState<NetState>({ online: true, slow: false, type: null });
+  useEffect(() => {
+    const conn = (navigator as unknown as {
+      connection?: { effectiveType?: string; saveData?: boolean; addEventListener?: (t: string, f: () => void) => void; removeEventListener?: (t: string, f: () => void) => void };
+    }).connection;
+    const read = () => {
+      const t = conn?.effectiveType ?? null;
+      setNet({
+        online: navigator.onLine,
+        slow: t === "slow-2g" || t === "2g" || t === "3g" || !!conn?.saveData,
+        type: t,
+      });
+    };
+    read();
+    window.addEventListener("online", read);
+    window.addEventListener("offline", read);
+    conn?.addEventListener?.("change", read);
+    return () => {
+      window.removeEventListener("online", read);
+      window.removeEventListener("offline", read);
+      conn?.removeEventListener?.("change", read);
+    };
+  }, []);
+  return net;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -48,6 +81,7 @@ function AuthPage() {
     if (!loading && user) navigate({ to: search.redirect ?? "/account" });
   }, [user, loading, navigate, search.redirect]);
 
+  const net = useNetwork();
   const strength = passwordStrength(password);
 
   const validate = (): string | null => {
@@ -190,7 +224,7 @@ function AuthPage() {
       </aside>
 
       {/* RIGHT — Form panel */}
-      <main className="relative flex items-center justify-center px-4 py-16 sm:px-10">
+      <main className="relative flex items-center justify-center px-4 py-10 sm:px-10 sm:py-16">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 opacity-40 lg:hidden"
@@ -207,8 +241,35 @@ function AuthPage() {
             ← Back to PULSE
           </Link>
 
+          {/* connection-aware status — mobile data vs wifi vs offline */}
+          <div
+            className={`mono mb-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border px-3 py-2 text-[10px] leading-relaxed ${
+              !net.online
+                ? "border-destructive/40 bg-destructive/10 text-destructive"
+                : net.slow
+                  ? "border-amber-500/40 bg-amber-500/10 text-amber-500"
+                  : "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+            }`}
+            role="status"
+          >
+            {!net.online ? (
+              <WifiOff className="h-3.5 w-3.5 shrink-0" />
+            ) : net.slow ? (
+              <Signal className="h-3.5 w-3.5 shrink-0" />
+            ) : (
+              <Wifi className="h-3.5 w-3.5 shrink-0" />
+            )}
+            <span className="min-w-0">
+              {!net.online
+                ? "YOU'RE OFFLINE — RECONNECT TO SIGN IN. YOUR DETAILS STAY TYPED."
+                : net.slow
+                  ? `SLOW CONNECTION${net.type ? ` (${net.type.toUpperCase()})` : ""} — LIGHT MODE ON, SIGN-IN MAY TAKE A FEW SECONDS.`
+                  : "SECURE CONNECTION · ENCRYPTED END-TO-END"}
+            </span>
+          </div>
+
           <div className="mono text-accent">— {t.tag}</div>
-          <h1 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-5xl">
             {t.heading}
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">{t.sub}</p>
