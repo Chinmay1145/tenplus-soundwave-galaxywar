@@ -2,13 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PlayCircle } from "lucide-react";
+import { nextOrderStatus, ORDER_FLOW, statusMeta } from "@/lib/order-status";
+import { StatusBadge, StatusStrip, StatusHint } from "@/components/site/OrderStatus";
 
-const FLOW = ["confirmed", "packed", "shipped", "out_for_delivery", "delivered"] as const;
-export function nextStatus(s: string): string | null {
-  const i = FLOW.indexOf(s as typeof FLOW[number]);
-  if (i < 0 || i >= FLOW.length - 1) return null;
-  return FLOW[i + 1];
-}
+export const nextStatus = nextOrderStatus;
 import {
   BarChart3,
   ChevronRight,
@@ -27,6 +24,7 @@ import { inr } from "@/lib/format";
 import { OrderTracking } from "@/components/site/OrderTracking";
 import { downloadInvoice } from "@/lib/invoice";
 import { LogoMark } from "@/components/site/Logo";
+
 
 export const Route = createFileRoute("/_authenticated/orders")({
   head: () => ({ meta: [{ title: "My Orders — PULSE" }, { name: "robots", content: "noindex" }] }),
@@ -143,20 +141,34 @@ function OrdersPage() {
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`mono rounded-full border px-3 py-1.5 text-[11px] capitalize transition-colors ${
-                filter === s
-                  ? "border-accent bg-accent text-accent-foreground"
-                  : "border-border bg-card hover:border-accent hover:text-accent"
-              }`}
-            >
-              {s.replace(/_/g, " ")}
-            </button>
-          ))}
+          {STATUSES.map((s) => {
+            const count =
+              s === "all"
+                ? (orders ?? []).length
+                : (orders ?? []).filter((o) => o.status === s).length;
+            return (
+              <button
+                key={s}
+                onClick={() => setFilter(s)}
+                className={`mono inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] capitalize transition-colors ${
+                  filter === s
+                    ? "border-accent bg-accent text-accent-foreground"
+                    : "border-border bg-card hover:border-accent hover:text-accent"
+                }`}
+              >
+                {s === "all" ? "All" : statusMeta(s).short}
+                <span
+                  className={`rounded-full px-1.5 text-[9px] ${
+                    filter === s ? "bg-background/25" : "bg-surface-2 text-muted-foreground"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
+
       </div>
 
       <div className="mt-8 space-y-4">
@@ -226,9 +238,7 @@ function OrderRow({ o, user }: { o: Order; user: ReturnType<typeof useAuth>["use
             <span className="mono text-[10px] text-muted-foreground">
               {new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
             </span>
-            <span className="mono ml-1 rounded-full bg-accent/10 px-3 py-1 text-[10px] capitalize text-accent">
-              {o.status.replace(/_/g, " ")}
-            </span>
+            <StatusBadge status={o.status} size="sm" />
           </div>
           <div className="mt-2 font-display text-2xl font-bold tracking-tight">{inr(Number(o.total))}</div>
           <div className="mt-1 text-sm text-muted-foreground">
@@ -241,7 +251,14 @@ function OrderRow({ o, user }: { o: Order; user: ReturnType<typeof useAuth>["use
               SHIP TO · {o.shipping_address.city}, {o.shipping_address.state} {o.shipping_address.pincode}
             </div>
           )}
+          <div className="mt-4 max-w-md">
+            <StatusStrip status={o.status} />
+            <div className="mt-2">
+              <StatusHint status={o.status} />
+            </div>
+          </div>
         </div>
+
         <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
           <button
             onClick={() => setExpand((x) => !x)}

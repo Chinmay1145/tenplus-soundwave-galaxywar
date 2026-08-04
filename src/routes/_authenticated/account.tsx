@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { StatusBadge, StatusStrip, StatusHint } from "@/components/site/OrderStatus";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BarChart3,
@@ -763,10 +765,18 @@ function OrderCard({ o, user }: { o: Order; user: ReturnType<typeof useAuth>["us
             {o.items.length > 3 && ` +${o.items.length - 3} more`}
           </div>
         </div>
-        <span className="mono rounded-full bg-accent/10 px-3 py-1 text-xs capitalize text-accent">
-          {o.status.replace(/_/g, " ")}
-        </span>
+        <StatusBadge status={o.status} size="sm" />
       </div>
+
+      <div className="mt-4">
+        <StatusStrip status={o.status} />
+        <div className="mt-2">
+          <StatusHint status={o.status} />
+        </div>
+      </div>
+
+
+
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button
