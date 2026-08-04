@@ -238,9 +238,7 @@ function OrderRow({ o, user }: { o: Order; user: ReturnType<typeof useAuth>["use
             <span className="mono text-[10px] text-muted-foreground">
               {new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
             </span>
-            <span className="mono ml-1 rounded-full bg-accent/10 px-3 py-1 text-[10px] capitalize text-accent">
-              {o.status.replace(/_/g, " ")}
-            </span>
+            <StatusBadge status={o.status} size="sm" />
           </div>
           <div className="mt-2 font-display text-2xl font-bold tracking-tight">{inr(Number(o.total))}</div>
           <div className="mt-1 text-sm text-muted-foreground">
@@ -253,7 +251,14 @@ function OrderRow({ o, user }: { o: Order; user: ReturnType<typeof useAuth>["use
               SHIP TO · {o.shipping_address.city}, {o.shipping_address.state} {o.shipping_address.pincode}
             </div>
           )}
+          <div className="mt-4 max-w-md">
+            <StatusStrip status={o.status} />
+            <div className="mt-2">
+              <StatusHint status={o.status} />
+            </div>
+          </div>
         </div>
+
         <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
           <button
             onClick={() => setExpand((x) => !x)}
