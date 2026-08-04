@@ -141,20 +141,34 @@ function OrdersPage() {
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`mono rounded-full border px-3 py-1.5 text-[11px] capitalize transition-colors ${
-                filter === s
-                  ? "border-accent bg-accent text-accent-foreground"
-                  : "border-border bg-card hover:border-accent hover:text-accent"
-              }`}
-            >
-              {s.replace(/_/g, " ")}
-            </button>
-          ))}
+          {STATUSES.map((s) => {
+            const count =
+              s === "all"
+                ? (orders ?? []).length
+                : (orders ?? []).filter((o) => o.status === s).length;
+            return (
+              <button
+                key={s}
+                onClick={() => setFilter(s)}
+                className={`mono inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] capitalize transition-colors ${
+                  filter === s
+                    ? "border-accent bg-accent text-accent-foreground"
+                    : "border-border bg-card hover:border-accent hover:text-accent"
+                }`}
+              >
+                {s === "all" ? "All" : statusMeta(s).short}
+                <span
+                  className={`rounded-full px-1.5 text-[9px] ${
+                    filter === s ? "bg-background/25" : "bg-surface-2 text-muted-foreground"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
+
       </div>
 
       <div className="mt-8 space-y-4">
