@@ -20,6 +20,7 @@ import { inr } from "@/lib/format";
 import { downloadInvoice } from "@/lib/invoice";
 import { LogoMark } from "@/components/site/Logo";
 import { buildTracking } from "@/lib/delivery";
+import { StatusBadge, StatusStrip } from "@/components/site/OrderStatus";
 
 export const Route = createFileRoute("/track-order")({
   head: () => ({
@@ -250,7 +251,7 @@ function TrackOrderPage() {
       </section>
 
       {/* Signed-in user's recent orders — one-tap tracking */}
-      {user && myOrders && myOrders.length > 0 && !order && (
+      {user && myOrders && myOrders.length > 0 && (
         <section className="mx-auto max-w-4xl px-4 pb-4 sm:px-6">
           <div className="flex items-end justify-between">
             <div>
@@ -283,9 +284,7 @@ function TrackOrderPage() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="mono rounded-full bg-accent/10 px-2 py-0.5 text-[10px] capitalize text-accent">
-                    {o.status.replace(/_/g, " ")}
-                  </span>
+<StatusBadge status={o.status} size="sm" />
                   <span className="text-xs text-accent opacity-0 transition-opacity group-hover:opacity-100">
                     Track →
                   </span>
@@ -337,9 +336,7 @@ function TrackOrderPage() {
                 )}
               </div>
               <div className="flex flex-col items-end gap-2">
-                <span className="mono rounded-full bg-accent/10 px-3 py-1 text-xs capitalize text-accent">
-                  {order.status.replace(/_/g, " ")}
-                </span>
+<StatusBadge status={order.status} />
                 {next ? (
                   <button
                     onClick={simulate}
@@ -388,6 +385,10 @@ function TrackOrderPage() {
                   </button>
                 </div>
               </div>
+            </div>
+
+            <div className="mt-6 max-w-xl">
+              <StatusStrip status={order.status} />
             </div>
 
             {/* Animated courier bar */}
