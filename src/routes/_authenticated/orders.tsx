@@ -2,13 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PlayCircle } from "lucide-react";
+import { nextOrderStatus, ORDER_FLOW, statusMeta } from "@/lib/order-status";
+import { StatusBadge, StatusStrip, StatusHint } from "@/components/site/OrderStatus";
 
-const FLOW = ["confirmed", "packed", "shipped", "out_for_delivery", "delivered"] as const;
-export function nextStatus(s: string): string | null {
-  const i = FLOW.indexOf(s as typeof FLOW[number]);
-  if (i < 0 || i >= FLOW.length - 1) return null;
-  return FLOW[i + 1];
-}
+export const nextStatus = nextOrderStatus;
 import {
   BarChart3,
   ChevronRight,
@@ -27,6 +24,7 @@ import { inr } from "@/lib/format";
 import { OrderTracking } from "@/components/site/OrderTracking";
 import { downloadInvoice } from "@/lib/invoice";
 import { LogoMark } from "@/components/site/Logo";
+
 
 export const Route = createFileRoute("/_authenticated/orders")({
   head: () => ({ meta: [{ title: "My Orders — PULSE" }, { name: "robots", content: "noindex" }] }),
