@@ -771,6 +771,9 @@ function OrderCard({ o, user }: { o: Order; user: ReturnType<typeof useAuth>["us
         <div className="mt-2">
           <StatusHint status={o.status} />
         </div>
+      </div>
+
+
 
 
       <div className="mt-4 flex flex-wrap gap-2">
