@@ -6,7 +6,7 @@ import { SoundLoader } from "./SoundLoader";
  * short window on the very first paint of a session, then fades out. Runs
  * once per browser session (sessionStorage) so navigations feel instant.
  */
-export function BootSplash({ minDurationMs = 1600 }: { minDurationMs?: number }) {
+export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number }) {
   // Start hidden on both server and first client render to keep hydration
   // identical, then reveal after mount if this session hasn't seen it.
   const [visible, setVisible] = useState(false);
@@ -36,7 +36,7 @@ export function BootSplash({ minDurationMs = 1600 }: { minDurationMs?: number })
           } catch {
             /* ignore */
           }
-        }, 500);
+        }, 900);
       }, wait);
     };
     if (document.readyState === "complete") finish();
@@ -54,12 +54,18 @@ export function BootSplash({ minDurationMs = 1600 }: { minDurationMs?: number })
   if (!visible) return null;
   return (
     <div
-      className={`fixed inset-0 z-[200] transition-opacity duration-500 ${
-        fading ? "opacity-0" : "opacity-100"
-      }`}
+      className="fixed inset-0 z-[200]"
       aria-hidden={fading}
+      style={{
+        opacity: fading ? 0 : 1,
+        transform: fading ? "scale(1.06)" : "none",
+        filter: fading ? "blur(10px)" : "none",
+        transition:
+          "opacity 900ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1), filter 900ms ease-out",
+        pointerEvents: fading ? "none" : "auto",
+      }}
     >
-      <SoundLoader label="Warming up your sound" />
+      <SoundLoader label={undefined} />
     </div>
   );
 }
