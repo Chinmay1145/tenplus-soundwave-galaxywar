@@ -30,8 +30,8 @@ export function PolicyPage({
             "radial-gradient(900px 420px at 15% 0%, oklch(0.65 0.24 25 / 0.18), transparent 65%)",
         }}
       />
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <nav className="mono mb-6 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-20">
+        <nav className="mono mb-5 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           <Link to="/" className="hover:text-accent">
             Home
           </Link>
@@ -40,21 +40,27 @@ export function PolicyPage({
         </nav>
 
         <div className="flex items-center gap-3">
-          <LogoMark size={30} animated />
-          <div className="mono text-accent">— {eyebrow}</div>
+          <LogoMark size={26} animated />
+          <div className="mono text-[11px] uppercase tracking-[0.2em] text-accent">{eyebrow}</div>
         </div>
-        <h1 className="mt-4 font-display text-5xl font-bold tracking-tight sm:text-6xl">{title}</h1>
-        <p className="mt-5 max-w-2xl text-lg text-muted-foreground">{intro}</p>
+        <h1 className="mt-3 max-w-3xl font-display text-[2rem] font-bold leading-[1.08] tracking-tight sm:mt-4 sm:text-5xl lg:text-6xl">
+          {title}
+        </h1>
+        <p className="mt-4 max-w-2xl text-[15px] leading-7 text-muted-foreground sm:mt-5 sm:text-lg sm:leading-8">
+          {intro}
+        </p>
 
         {highlights && highlights.length > 0 && (
-          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-7 grid grid-cols-2 gap-2.5 sm:mt-10 sm:gap-3 lg:grid-cols-4">
             {highlights.map((h) => (
               <div
                 key={h.label}
-                className="rounded-2xl border border-border/60 bg-card p-5 transition-colors hover:border-accent/50"
+                className="rounded-2xl border border-border/60 bg-card p-4 transition-colors hover:border-accent/50 sm:p-5"
               >
-                <div className="font-display text-2xl font-bold tracking-tight text-accent">{h.value}</div>
-                <div className="mono mt-1 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                <div className="font-display text-xl font-bold tracking-tight text-accent sm:text-2xl">
+                  {h.value}
+                </div>
+                <div className="mono mt-1 text-[9px] uppercase leading-4 tracking-[0.14em] text-muted-foreground sm:text-[10px]">
                   {h.label}
                 </div>
               </div>
@@ -63,12 +69,12 @@ export function PolicyPage({
         )}
 
         {toc && toc.length > 0 && (
-          <div className="mt-8 flex flex-wrap gap-2">
+          <div className="-mx-4 mt-6 flex snap-x gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:mt-8 sm:flex-wrap sm:overflow-visible sm:px-0">
             {toc.map((t) => (
               <a
                 key={t.href}
                 href={t.href}
-                className="mono rounded-full border border-border bg-card px-3.5 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+                className="mono shrink-0 snap-start rounded-full border border-border bg-card px-3.5 py-2 text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
               >
                 {t.label}
               </a>
@@ -76,8 +82,9 @@ export function PolicyPage({
           </div>
         )}
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[2fr_1fr]">
-          <div className="space-y-12">{children}</div>
+        <div className="mt-10 grid gap-8 sm:mt-14 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] lg:gap-10">
+          <div className="min-w-0 space-y-10 sm:space-y-14">{children}</div>
+
           <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
             <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card to-accent/10 p-6">
               <div
@@ -163,10 +170,16 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-28">
-      {kicker && <div className="mono text-[10px] uppercase tracking-[0.2em] text-accent">— {kicker}</div>}
-      <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">{title}</h2>
-      <div className="prose-pulse mt-4 space-y-3 text-[15px] leading-7 text-foreground/80">{children}</div>
+    <section id={id} className="scroll-mt-24 border-t border-border/40 pt-8 first:border-0 first:pt-0">
+      {kicker && (
+        <div className="mono text-[10px] uppercase tracking-[0.2em] text-accent">— {kicker}</div>
+      )}
+      <h2 className="mt-1.5 font-display text-[1.4rem] font-bold leading-tight tracking-tight sm:text-3xl">
+        {title}
+      </h2>
+      <div className="prose-pulse mt-4 max-w-[68ch] space-y-4 text-[15px] leading-[1.75] text-foreground/80 sm:mt-5">
+        {children}
+      </div>
     </section>
   );
 }
@@ -247,8 +260,8 @@ export function DataTable({
   rows: (readonly [string, string, string?])[];
 }) {
   return (
-    <div className="not-prose overflow-hidden rounded-2xl border border-border/60">
-      <table className="w-full text-left text-sm">
+    <div className="not-prose -mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-hidden sm:rounded-2xl sm:border sm:border-border/60 sm:px-0">
+      <table className="w-full min-w-[420px] overflow-hidden rounded-2xl border border-border/60 text-left text-sm sm:min-w-0 sm:rounded-none sm:border-0">
         <thead className="bg-surface-2/70">
           <tr className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
             {head.filter(Boolean).map((h) => (

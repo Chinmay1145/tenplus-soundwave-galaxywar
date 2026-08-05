@@ -1,278 +1,274 @@
 import { useEffect, useState } from "react";
 import { LogoMark } from "./Logo";
 
-const PHRASES = [
-  "Tuning the experience",
-  "Calibrating drivers",
-  "Warming the amplifier",
-  "Aligning spatial audio",
-  "Priming the low-end",
-  "Syncing multipoint",
-  "Loading reference tracks",
-  "Polishing the soundstage",
-];
-
-const STAGES = [
-  ["Booting audio core", 20],
-  ["Fetching catalogue", 45],
-  ["Tuning drivers", 70],
-  ["Finalising soundstage", 92],
+/** Cinematic acts — each act owns a headline, a subline and a progress ceiling. */
+const ACTS = [
+  { title: "Booting audio core", sub: "Initialising DSP · 24-bit pipeline", to: 26 },
+  { title: "Fetching catalogue", sub: "150 hand-tuned products", to: 52 },
+  { title: "Tuning drivers", sub: "Adaptive ANC · spatial engine", to: 78 },
+  { title: "Finalising soundstage", sub: "Reference calibration complete", to: 97 },
 ] as const;
 
 const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial Audio"];
 
 export function SoundLoader({ label }: { label?: string }) {
-  const [idx, setIdx] = useState(0);
-  const [pct, setPct] = useState(4);
-  useEffect(() => {
-    if (label) return;
-    const id = setInterval(() => setIdx((i) => (i + 1) % PHRASES.length), 1400);
-    return () => clearInterval(id);
-  }, [label]);
+  const [pct, setPct] = useState(3);
+
   useEffect(() => {
     const id = setInterval(() => {
-      setPct((p) => (p >= 98 ? 98 : p + Math.max(1, Math.round((100 - p) / 9))));
-    }, 160);
+      setPct((p) => (p >= 97 ? 97 : p + Math.max(1, Math.round((100 - p) / 11))));
+    }, 130);
     return () => clearInterval(id);
   }, []);
-  const phrase = label ?? PHRASES[idx];
+
+  const actIdx = Math.min(ACTS.length - 1, ACTS.findIndex((a) => pct <= a.to) === -1 ? ACTS.length - 1 : ACTS.findIndex((a) => pct <= a.to));
+  const act = ACTS[actIdx];
+  const headline = label ?? act.title;
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center bg-background/85 backdrop-blur-md"
+      className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-background"
       role="status"
       aria-live="polite"
+      aria-busy="true"
     >
+      {/* ambient cinematic wash */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-70"
+        className="pointer-events-none absolute inset-0 sl-wash"
         style={{
           background:
-            "radial-gradient(800px 420px at 50% 50%, oklch(0.65 0.24 25 / 0.22), transparent 70%), conic-gradient(from 0deg at 50% 50%, transparent 0deg, oklch(0.65 0.24 25 / 0.08) 90deg, transparent 180deg, oklch(0.65 0.24 25 / 0.08) 270deg, transparent 360deg)",
+            "radial-gradient(900px 500px at 50% 42%, oklch(0.65 0.24 25 / 0.22), transparent 72%), radial-gradient(600px 400px at 12% 100%, oklch(0.65 0.24 25 / 0.12), transparent 70%)",
         }}
       />
       {/* fine grid */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
         style={{
           backgroundImage:
             "linear-gradient(oklch(0.65 0.24 25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.65 0.24 25) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-          maskImage: "radial-gradient(closest-side at 50% 50%, black, transparent 80%)",
+          backgroundSize: "48px 48px",
+          maskImage: "radial-gradient(closest-side at 50% 50%, black, transparent 82%)",
         }}
       />
-      {/* scanline */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-full overflow-hidden">
+      {/* sweeping scanline */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <span className="sl-scan" />
       </div>
-      {/* drifting particles */}
+      {/* drifting motes */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        {Array.from({ length: 14 }).map((_, i) => (
+        {Array.from({ length: 18 }).map((_, i) => (
           <span
             key={i}
             className="sl-particle"
             style={{
-              left: `${(i * 73) % 100}%`,
-              top: `${(i * 37) % 100}%`,
-              animationDelay: `${(i % 7) * 0.4}s`,
-              animationDuration: `${4 + (i % 5)}s`,
+              left: `${(i * 61) % 100}%`,
+              top: `${55 + ((i * 29) % 45)}%`,
+              animationDelay: `${(i % 9) * 0.45}s`,
+              animationDuration: `${5 + (i % 6)}s`,
             }}
           />
         ))}
       </div>
-      <div className="relative flex flex-col items-center gap-8">
-        <div className="sl-orbit" aria-hidden>
-          <span className="sl-dot sl-dot-a" />
-          <span className="sl-dot sl-dot-b" />
-          <span className="sl-dot sl-dot-c" />
-        </div>
-        <div className="sl-scene">
-          <div className="sl-cube">
-            <span className="sl-face sl-front" />
-            <span className="sl-face sl-back" />
-            <span className="sl-face sl-right" />
-            <span className="sl-face sl-left" />
-            <span className="sl-face sl-top" />
-            <span className="sl-face sl-bottom" />
+      {/* letterbox bars — the cinematic frame */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[7vh] bg-background sl-bar-top" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[7vh] bg-background sl-bar-bottom" />
+      {/* vignette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ boxShadow: "inset 0 0 220px 60px oklch(0.14 0 0 / 0.75)" }}
+      />
+
+      <div className="relative flex w-full max-w-md flex-col items-center px-6">
+        {/* glowing logo lockup */}
+        <div className="sl-lockup relative flex flex-col items-center">
+          <div aria-hidden className="sl-halo" />
+          <div className="relative grid place-items-center rounded-[26px] border border-accent/30 bg-background/50 p-5 shadow-[0_0_90px_oklch(0.65_0.24_25/0.5),inset_0_0_40px_oklch(0.65_0.24_25/0.15)] backdrop-blur-md">
+            <span aria-hidden className="sl-sheen" />
+            <LogoMark size={72} animated />
           </div>
-          <div className="sl-ring sl-ring-a" />
-          <div className="sl-ring sl-ring-b" />
-          <div className="sl-ring sl-ring-c" />
+          <div className="mt-6 font-display text-4xl font-bold tracking-[0.22em] sl-word">
+            PULSE<span className="text-accent">.</span>
+          </div>
+          <div className="mono mt-2 text-[10px] tracking-[0.42em] text-accent/70">AUDIO LABS</div>
         </div>
 
-        <div className="flex flex-col items-center gap-4">
-          <div className="grid place-items-center rounded-2xl border border-accent/30 bg-background/60 p-3 shadow-[0_0_70px_oklch(0.65_0.24_25/0.55)] backdrop-blur">
-            <LogoMark size={64} animated />
-          </div>
-          <div className="flex items-end gap-1" aria-hidden>
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <span key={i} className="sl-bar" style={{ animationDelay: `${i * 0.12}s` }} />
-            ))}
-          </div>
-          <div className="mono text-xs tracking-[0.4em] text-muted-foreground sl-shimmer">
-            {phrase.toUpperCase()}
-          </div>
-          <div className="mono text-[10px] tracking-[0.3em] text-accent/70">PULSE · AUDIO LABS</div>
-          <div className="mt-1 w-56">
-            <div className="h-[4px] w-full overflow-hidden rounded-full bg-border/60">
-              <span
-                className="block h-full rounded-full bg-gradient-to-r from-accent/60 via-accent to-accent/60 transition-[width] duration-200 ease-out"
-                style={{ width: `${pct}%`, boxShadow: "0 0 12px oklch(0.65 0.24 25 / 0.7)" }}
-              />
-            </div>
-            <div className="mono mt-2 flex items-center justify-between text-[9px] tracking-[0.25em] text-muted-foreground">
-              <span>BUFFERING</span>
-              <span className="text-accent">{pct}%</span>
-            </div>
-          </div>
+        {/* equaliser */}
+        <div className="mt-8 flex items-end gap-1.5" aria-hidden>
+          {Array.from({ length: 13 }).map((_, i) => (
+            <span
+              key={i}
+              className="sl-eqbar"
+              style={{ animationDelay: `${i * 0.09}s`, animationDuration: `${0.9 + (i % 4) * 0.14}s` }}
+            />
+          ))}
+        </div>
 
-          {/* staged checklist keyed off progress */}
-          <ul className="mt-2 w-56 space-y-1.5" aria-hidden>
-            {STAGES.map(([name, at]) => {
-              const done = pct >= at;
-              return (
-                <li
-                  key={name}
-                  className={`mono flex items-center gap-2 text-[9px] tracking-[0.2em] transition-colors ${
-                    done ? "text-accent" : "text-muted-foreground/60"
+        {/* act headline with crossfade */}
+        <div className="mt-8 h-12 text-center">
+          <div key={headline} className="sl-act">
+            <div className="mono text-[11px] tracking-[0.4em] text-foreground/85">
+              {headline.toUpperCase()}
+            </div>
+            <div className="mono mt-1.5 text-[9px] tracking-[0.22em] text-muted-foreground">
+              {(label ? "PREPARING YOUR SESSION" : act.sub).toUpperCase()}
+            </div>
+          </div>
+        </div>
+
+        {/* progress */}
+        <div className="mt-2 w-full">
+          <div className="relative h-[5px] w-full overflow-hidden rounded-full bg-border/50">
+            <span
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-accent/50 via-accent to-accent/60 transition-[width] duration-500 ease-out"
+              style={{ width: `${pct}%`, boxShadow: "0 0 16px oklch(0.65 0.24 25 / 0.85)" }}
+            />
+            <span aria-hidden className="sl-shine" />
+          </div>
+          <div className="mono mt-2.5 flex items-center justify-between text-[9px] tracking-[0.26em] text-muted-foreground">
+            <span>
+              ACT {actIdx + 1} / {ACTS.length}
+            </span>
+            <span className="text-accent">{pct}%</span>
+          </div>
+        </div>
+
+        {/* act ticks */}
+        <ul className="mt-5 grid w-full grid-cols-4 gap-1.5" aria-hidden>
+          {ACTS.map((a, i) => {
+            const done = pct >= a.to;
+            const live = i === actIdx && !done;
+            return (
+              <li key={a.title} className="flex flex-col items-center gap-1.5">
+                <span
+                  className={`h-[3px] w-full rounded-full transition-all duration-500 ${
+                    done
+                      ? "bg-accent shadow-[0_0_10px_oklch(0.65_0.24_25/0.8)]"
+                      : live
+                        ? "bg-accent/60"
+                        : "bg-border/70"
+                  }`}
+                />
+                <span
+                  className={`mono truncate text-[8px] tracking-[0.14em] transition-colors ${
+                    done ? "text-accent" : live ? "text-foreground/70" : "text-muted-foreground/45"
                   }`}
                 >
-                  <span
-                    className={`grid h-3 w-3 shrink-0 place-items-center rounded-full border transition-all ${
-                      done
-                        ? "border-accent bg-accent/20 shadow-[0_0_10px_oklch(0.65_0.24_25/0.7)]"
-                        : "border-border"
-                    }`}
-                  >
-                    <span className={`h-1 w-1 rounded-full ${done ? "bg-accent" : "bg-border"}`} />
-                  </span>
-                  <span className="truncate">{name.toUpperCase()}</span>
-                </li>
-              );
-            })}
-          </ul>
+                  {a.title.split(" ")[0].toUpperCase()}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
 
-          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-            {TAGS.map((t) => (
-              <span
-                key={t}
-                className="mono rounded-full border border-accent/25 bg-accent/5 px-2.5 py-1 text-[9px] tracking-[0.25em] text-accent/80"
-              >
-                {t.toUpperCase()}
-              </span>
-            ))}
-          </div>
+        <div className="mt-7 flex flex-wrap justify-center gap-1.5">
+          {TAGS.map((t, i) => (
+            <span
+              key={t}
+              className="mono sl-tag rounded-full border border-accent/25 bg-accent/[0.06] px-2.5 py-1 text-[9px] tracking-[0.22em] text-accent/80"
+              style={{ animationDelay: `${0.5 + i * 0.12}s` }}
+            >
+              {t.toUpperCase()}
+            </span>
+          ))}
         </div>
       </div>
 
       <style>{`
-        .sl-orbit {
-          position: absolute; left: 50%; top: 50%; width: 260px; height: 260px;
-          margin-left: -130px; margin-top: -130px; pointer-events: none;
-          animation: sl-orbit-spin 6s linear infinite;
-        }
-        .sl-dot {
-          position: absolute; width: 8px; height: 8px; border-radius: 999px;
-          background: oklch(0.65 0.24 25);
-          box-shadow: 0 0 18px oklch(0.65 0.24 25 / 0.9);
-        }
-        .sl-dot-a { top: -4px; left: 50%; margin-left: -4px; }
-        .sl-dot-b { bottom: -4px; left: 50%; margin-left: -4px; opacity: 0.7; }
-        .sl-dot-c { top: 50%; right: -4px; margin-top: -4px; opacity: 0.5; }
+        .sl-wash { animation: sl-breathe 6s ease-in-out infinite; }
+        @keyframes sl-breathe { 0%,100% { opacity: .75; } 50% { opacity: 1; } }
 
-        .sl-scene { position: relative; width: 140px; height: 140px; perspective: 800px; }
-        .sl-cube {
-          position: absolute; inset: 30px; transform-style: preserve-3d;
-          animation: sl-spin 4s linear infinite;
-        }
-        .sl-face {
-          position: absolute; inset: 0; border: 1px solid oklch(0.65 0.24 25 / 0.6);
-          background:
-            linear-gradient(135deg, oklch(0.65 0.24 25 / 0.28), oklch(0.65 0.24 25 / 0.04)),
-            radial-gradient(circle at 30% 30%, oklch(0.65 0.24 25 / 0.4), transparent 60%);
-          box-shadow: 0 0 30px oklch(0.65 0.24 25 / 0.35) inset;
-          border-radius: 14px;
-          backdrop-filter: blur(4px);
-        }
-        .sl-front  { transform: translateZ(40px); }
-        .sl-back   { transform: rotateY(180deg) translateZ(40px); }
-        .sl-right  { transform: rotateY(90deg)  translateZ(40px); }
-        .sl-left   { transform: rotateY(-90deg) translateZ(40px); }
-        .sl-top    { transform: rotateX(90deg)  translateZ(40px); }
-        .sl-bottom { transform: rotateX(-90deg) translateZ(40px); }
+        .sl-bar-top    { animation: sl-open-top 1.1s cubic-bezier(.16,1,.3,1) both; }
+        .sl-bar-bottom { animation: sl-open-bottom 1.1s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes sl-open-top    { from { height: 52vh; } to { height: 7vh; } }
+        @keyframes sl-open-bottom { from { height: 52vh; } to { height: 7vh; } }
 
-        .sl-ring {
-          position: absolute; left: 50%; top: 50%;
-          border: 1px solid oklch(0.65 0.24 25 / 0.5);
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          animation: sl-pulse 2.4s ease-out infinite;
+        .sl-lockup { animation: sl-rise 1.1s cubic-bezier(.16,1,.3,1) .25s both; }
+        @keyframes sl-rise {
+          from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(6px); }
+          to   { opacity: 1; transform: none; filter: none; }
         }
-        .sl-ring-a { width: 90px; height: 90px; }
-        .sl-ring-b { width: 90px; height: 90px; animation-delay: 0.8s; }
-        .sl-ring-c { width: 90px; height: 90px; animation-delay: 1.6s; }
+        .sl-halo {
+          position: absolute; left: 50%; top: 46px; width: 300px; height: 300px;
+          margin-left: -150px; margin-top: -150px; border-radius: 999px; pointer-events: none;
+          background: radial-gradient(circle, oklch(0.65 0.24 25 / 0.35), transparent 66%);
+          filter: blur(14px);
+          animation: sl-halo 3.2s ease-in-out infinite;
+        }
+        @keyframes sl-halo {
+          0%,100% { transform: scale(.92); opacity: .7; }
+          50%     { transform: scale(1.08); opacity: 1; }
+        }
+        .sl-sheen {
+          position: absolute; inset: 0; border-radius: 26px; overflow: hidden;
+          background: linear-gradient(115deg, transparent 35%, oklch(1 0 0 / 0.16) 50%, transparent 65%);
+          background-size: 260% 100%;
+          animation: sl-sheen 3.4s ease-in-out infinite;
+        }
+        @keyframes sl-sheen { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
 
-        .sl-bar {
-          display: inline-block; width: 4px; height: 22px; border-radius: 999px;
-          background: linear-gradient(180deg, oklch(0.78 0.2 25), oklch(0.55 0.24 25 / 0.4));
-          box-shadow: 0 0 8px oklch(0.65 0.24 25 / 0.6);
-          animation: sl-eq 1s ease-in-out infinite;
+        .sl-word {
+          background: linear-gradient(100deg, oklch(0.9 0 0), oklch(0.78 0.2 25), oklch(0.9 0 0));
+          background-size: 220% 100%;
+          -webkit-background-clip: text; background-clip: text; color: transparent;
+          text-shadow: 0 0 34px oklch(0.65 0.24 25 / 0.35);
+          animation: sl-shimmer 3.6s linear infinite;
         }
+        @keyframes sl-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .sl-eqbar {
+          display: inline-block; width: 4px; height: 26px; border-radius: 999px;
+          background: linear-gradient(180deg, oklch(0.82 0.2 25), oklch(0.55 0.24 25 / 0.35));
+          box-shadow: 0 0 10px oklch(0.65 0.24 25 / 0.6);
+          transform-origin: bottom;
+          animation-name: sl-eq; animation-timing-function: cubic-bezier(.36,.07,.19,.97);
+          animation-iteration-count: infinite;
+        }
+        @keyframes sl-eq { 0%,100% { transform: scaleY(.22); } 50% { transform: scaleY(1.7); } }
+
+        .sl-act { animation: sl-act-in .55s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes sl-act-in {
+          from { opacity: 0; transform: translateY(8px); filter: blur(4px); }
+          to   { opacity: 1; transform: none; filter: none; }
+        }
+
+        .sl-shine {
+          position: absolute; inset: 0; border-radius: 999px;
+          background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.35), transparent);
+          width: 40%;
+          animation: sl-shine 1.9s ease-in-out infinite;
+        }
+        @keyframes sl-shine { 0% { transform: translateX(-120%); } 100% { transform: translateX(320%); } }
+
+        .sl-tag { animation: sl-tag-in .7s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes sl-tag-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
         .sl-particle {
           position: absolute; width: 3px; height: 3px; border-radius: 999px;
-          background: oklch(0.65 0.24 25 / 0.7);
-          animation: sl-float linear infinite;
-        }
-        .sl-shimmer {
-          background: linear-gradient(90deg, oklch(0.5 0 0 / 0.7), oklch(0.78 0.2 25), oklch(0.5 0 0 / 0.7));
-          background-size: 200% 100%;
-          -webkit-background-clip: text; background-clip: text;
-          color: transparent;
-          animation: sl-shimmer 2.4s linear infinite;
-        }
-
-        @keyframes sl-spin {
-          0%   { transform: rotateX(0)    rotateY(0); }
-          100% { transform: rotateX(360deg) rotateY(360deg); }
-        }
-        @keyframes sl-orbit-spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes sl-pulse {
-          0%   { width: 70px; height: 70px; opacity: 0.9; }
-          100% { width: 180px; height: 180px; opacity: 0; }
-        }
-        @keyframes sl-eq {
-          0%, 100% { transform: scaleY(0.3); }
-          50%      { transform: scaleY(1.8); }
+          background: oklch(0.65 0.24 25 / 0.75);
+          box-shadow: 0 0 8px oklch(0.65 0.24 25 / 0.8);
+          animation-name: sl-float; animation-timing-function: linear; animation-iteration-count: infinite;
         }
         @keyframes sl-float {
           0%   { transform: translateY(0) scale(1); opacity: 0; }
-          20%  { opacity: 1; }
-          100% { transform: translateY(-160px) scale(0.4); opacity: 0; }
-        }
-        @keyframes sl-shimmer {
-          0%   { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        .sl-progress { animation: sl-progress 1.6s ease-in-out infinite; }
-        @keyframes sl-progress {
-          0%   { transform: translateX(-120%); }
-          100% { transform: translateX(320%); }
-        }
-        .sl-scan {
-          position: absolute; left: 0; right: 0; top: -20%; height: 40%;
-          background: linear-gradient(180deg, transparent, oklch(0.65 0.24 25 / 0.10), transparent);
-          animation: sl-scan 3.4s ease-in-out infinite;
-        }
-        @keyframes sl-scan {
-          0%   { transform: translateY(0); }
-          100% { transform: translateY(320%); }
+          15%  { opacity: 1; }
+          100% { transform: translateY(-220px) scale(.35); opacity: 0; }
         }
 
+        .sl-scan {
+          position: absolute; left: 0; right: 0; top: -25%; height: 45%;
+          background: linear-gradient(180deg, transparent, oklch(0.65 0.24 25 / 0.10), transparent);
+          animation: sl-scan 4s ease-in-out infinite;
+        }
+        @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
+
         @media (prefers-reduced-motion: reduce) {
-          .sl-cube, .sl-ring, .sl-bar, .sl-orbit, .sl-particle, .sl-shimmer { animation: none !important; }
+          .sl-wash, .sl-halo, .sl-sheen, .sl-word, .sl-eqbar, .sl-particle, .sl-scan,
+          .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag {
+            animation: none !important;
+          }
         }
       `}</style>
     </div>

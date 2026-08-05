@@ -224,113 +224,8 @@ function Home() {
           </Link>
         </div>
 
-        {/* Shop by need — one-tap intent shortcuts */}
-        <div className="mb-6 flex flex-wrap gap-2">
-          {[
-            { label: "Silence the commute", cat: "anc" },
-            { label: "Zero-lag gaming", cat: "gaming" },
-            { label: "Run & sweat", cat: "sports" },
-            { label: "Studio reference", cat: "studio" },
-            { label: "All-day calls", cat: "business" },
-          ].map((n) => (
-            <Link
-              key={n.cat}
-              to="/shop"
-              search={{ cat: n.cat }}
-              className="mono rounded-full border border-border bg-card px-3.5 py-1.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-accent hover:text-accent"
-            >
-              {n.label}
-            </Link>
-          ))}
-        </div>
+        <FindYourSound />
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {CATEGORIES.map((c, ci) => {
-            const inCat = PRODUCTS.filter((p) => p.category === c.slug);
-            const pick = inCat[0];
-            const from = inCat.length ? Math.min(...inCat.map((p) => p.price)) : 0;
-            const topRated = inCat.reduce(
-              (best, p) => (!best || (p.rating ?? 0) > (best.rating ?? 0) ? p : best),
-              inCat[0],
-            );
-            const avg = inCat.length
-              ? inCat.reduce((s, p) => s + (p.rating ?? 0), 0) / inCat.length
-              : 0;
-            const brands = Array.from(new Set(inCat.map((p) => p.brand))).slice(0, 3);
-            return (
-              <Link
-                key={c.slug}
-                to="/shop"
-                search={{ cat: c.slug }}
-                className="group relative flex aspect-[5/4] flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/60 hover:shadow-[0_20px_50px_-24px_oklch(0.65_0.24_25/0.65)] sm:p-5"
-                style={{ animationDelay: `${ci * 40}ms` }}
-              >
-                {pick && (
-                  <img
-                    src={pick.image}
-                    alt=""
-                    aria-hidden
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover opacity-25 transition-all duration-700 group-hover:scale-110 group-hover:opacity-50"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-transparent" />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{
-                    background:
-                      "radial-gradient(320px 200px at 80% 0%, oklch(0.65 0.24 25 / 0.28), transparent 70%)",
-                  }}
-                />
-                <div className="relative flex h-full min-w-0 flex-col justify-between">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="mono truncate text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                      {c.slug.replace(/-/g, " ")}
-                    </span>
-                    <span className="mono shrink-0 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] text-accent">
-                      {inCat.length}
-                    </span>
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="truncate font-display text-lg font-bold leading-tight sm:text-xl">
-                      {c.name}
-                    </div>
-                    <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-muted-foreground">
-                      {"tagline" in c && c.tagline ? c.tagline : `Curated ${c.name.toLowerCase()} picks.`}
-                    </div>
-
-                    <div className="mono mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[9px] uppercase tracking-[0.12em] text-muted-foreground">
-                      {from > 0 && <span>From ₹{from.toLocaleString("en-IN")}</span>}
-                      {avg > 0 && (
-                        <span className="inline-flex items-center gap-1 text-accent">
-                          <Star className="h-2.5 w-2.5 fill-current" />
-                          {avg.toFixed(1)}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="mono mt-1.5 hidden truncate text-[9px] uppercase tracking-[0.12em] text-muted-foreground/80 sm:block">
-                      {brands.join(" · ")}
-                    </div>
-
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-accent opacity-0 transition-opacity group-hover:opacity-100">
-                        Explore <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-                      </span>
-                      {topRated && (
-                        <span className="mono hidden max-w-[52%] truncate text-[9px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 lg:block">
-                          ★ {topRated.name}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/60 bg-surface-2/40 p-5">
           <div>
@@ -534,6 +429,225 @@ function SpecChip({ label, value }: { label: string; value: string }) {
     <div className="glass rounded-2xl px-4 py-2.5">
       <div className="mono text-[10px] text-muted-foreground">{label}</div>
       <div className="font-display text-lg font-bold leading-none">{value}</div>
+    </div>
+  );
+}
+
+/** Use-case lenses — each one is a real predicate over the catalogue. */
+const USE_CASES = [
+  {
+    key: "all",
+    label: "Everything",
+    blurb: "The full catalogue, every collection.",
+    match: () => true,
+  },
+  {
+    key: "commute",
+    label: "Silence the commute",
+    blurb: "Deep active noise cancellation for flights, metros and open offices.",
+    match: (p: (typeof PRODUCTS)[number]) => p.anc,
+  },
+  {
+    key: "gaming",
+    label: "Zero-lag gaming",
+    blurb: "Low-latency links and positional audio for competitive play.",
+    match: (p: (typeof PRODUCTS)[number]) => p.category === "gaming",
+  },
+  {
+    key: "sports",
+    label: "Run & sweat",
+    blurb: "Secure fits with sweat and rain resistance for training.",
+    match: (p: (typeof PRODUCTS)[number]) => p.category === "sports",
+  },
+  {
+    key: "studio",
+    label: "Studio reference",
+    blurb: "Flat, honest tuning for mixing and critical listening.",
+    match: (p: (typeof PRODUCTS)[number]) =>
+      p.category === "studio" || p.category === "flagship",
+  },
+  {
+    key: "calls",
+    label: "All-day calls",
+    blurb: "Clear mics and multipoint pairing for back-to-back meetings.",
+    match: (p: (typeof PRODUCTS)[number]) =>
+      p.category === "business" || p.category === "tws",
+  },
+  {
+    key: "value",
+    label: "Under ₹5,000",
+    blurb: "Everything great that stays comfortably under five thousand.",
+    match: (p: (typeof PRODUCTS)[number]) => p.price <= 5000,
+  },
+] as const;
+
+function FindYourSound() {
+  const [lens, setLens] = useState<(typeof USE_CASES)[number]["key"]>("all");
+  const active = USE_CASES.find((u) => u.key === lens) ?? USE_CASES[0];
+  const pool = PRODUCTS.filter(active.match);
+
+  const cats = CATEGORIES.map((c) => {
+    const inCat = pool.filter((p) => p.category === c.slug);
+    return { c, inCat };
+  }).filter((x) => x.inCat.length > 0);
+
+  // Accurate, mutually-exclusive recommendation labels for this lens.
+  const bestValue = pool.reduce<(typeof PRODUCTS)[number] | undefined>(
+    (b, p) => (!b || p.price < b.price ? p : b),
+    undefined,
+  );
+  const topRated = pool.reduce<(typeof PRODUCTS)[number] | undefined>(
+    (b, p) => (!b || p.rating > b.rating ? p : b),
+    undefined,
+  );
+  const mostReviewed = pool.reduce<(typeof PRODUCTS)[number] | undefined>(
+    (b, p) => (!b || p.reviews > b.reviews ? p : b),
+    undefined,
+  );
+
+  return (
+    <div>
+      {/* Use-case lenses */}
+      <div className="-mx-4 mb-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+        {USE_CASES.map((u) => {
+          const count = u.key === "all" ? PRODUCTS.length : PRODUCTS.filter(u.match).length;
+          const on = lens === u.key;
+          return (
+            <button
+              key={u.key}
+              type="button"
+              aria-pressed={on}
+              onClick={() => setLens(u.key)}
+              className={`mono shrink-0 snap-start rounded-full border px-3.5 py-2 text-[10px] uppercase tracking-[0.14em] transition-all ${
+                on
+                  ? "border-accent bg-accent text-accent-foreground shadow-[0_10px_30px_-16px_oklch(0.65_0.24_25/0.9)]"
+                  : "border-border bg-card text-muted-foreground hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+              }`}
+            >
+              {u.label}
+              <span
+                className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[9px] ${
+                  on ? "bg-background/25" : "bg-surface-2"
+                }`}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="mb-6 text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">{pool.length} products</span> match “
+        {active.label}” · {active.blurb}
+      </p>
+
+      {/* Recommendation rail */}
+      <div className="mb-6 grid gap-3 sm:grid-cols-3">
+        {[
+          { pick: topRated, tag: "Highest rated", note: (p: (typeof PRODUCTS)[number]) => `${p.rating.toFixed(1)}★ from ${p.reviews.toLocaleString("en-IN")} reviews` },
+          { pick: bestValue, tag: "Lowest price", note: (p: (typeof PRODUCTS)[number]) => `₹${p.price.toLocaleString("en-IN")} · ${p.discount}% off MRP` },
+          { pick: mostReviewed, tag: "Most reviewed", note: (p: (typeof PRODUCTS)[number]) => `${p.reviews.toLocaleString("en-IN")} verified buyers` },
+        ].map(
+          ({ pick, tag, note }) =>
+            pick && (
+              <Link
+                key={tag}
+                to="/product/$id"
+                params={{ id: String(pick.id) }}
+                className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 transition-all hover:-translate-y-0.5 hover:border-accent/60"
+              >
+                <img
+                  src={pick.image}
+                  alt=""
+                  aria-hidden
+                  loading="lazy"
+                  className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                />
+                <span className="min-w-0">
+                  <span className="mono block text-[9px] uppercase tracking-[0.16em] text-accent">
+                    {tag}
+                  </span>
+                  <span className="block truncate text-sm font-semibold">{pick.name}</span>
+                  <span className="mono block truncate text-[9px] uppercase tracking-[0.12em] text-muted-foreground">
+                    {note(pick)}
+                  </span>
+                </span>
+                <ArrowRight className="ml-auto hidden h-4 w-4 shrink-0 text-accent transition-transform group-hover:translate-x-1 sm:block" />
+              </Link>
+            ),
+        )}
+      </div>
+
+      {/* Collection cards, scoped to the lens */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {cats.map(({ c, inCat }) => {
+          const pick = inCat[0];
+          const from = Math.min(...inCat.map((p) => p.price));
+          const avg = inCat.reduce((s, p) => s + p.rating, 0) / inCat.length;
+          const brands = Array.from(new Set(inCat.map((p) => p.brand))).slice(0, 3);
+          const best = inCat.reduce((b, p) => (p.rating > b.rating ? p : b), inCat[0]);
+          return (
+            <Link
+              key={c.slug}
+              to="/shop"
+              search={{ cat: c.slug }}
+              className="group relative flex aspect-[5/4] flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/60 hover:shadow-[0_20px_50px_-24px_oklch(0.65_0.24_25/0.65)] sm:p-5"
+            >
+              {pick && (
+                <img
+                  src={pick.image}
+                  alt=""
+                  aria-hidden
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover opacity-25 transition-all duration-700 group-hover:scale-110 group-hover:opacity-50"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-transparent" />
+              <div
+                aria-hidden
+                className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background:
+                    "radial-gradient(320px 200px at 80% 0%, oklch(0.65 0.24 25 / 0.28), transparent 70%)",
+                }}
+              />
+              <div className="relative flex h-full min-w-0 flex-col justify-between">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="mono truncate text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                    {c.slug.replace(/-/g, " ")}
+                  </span>
+                  <span className="mono shrink-0 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] text-accent">
+                    {inCat.length}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate font-display text-lg font-bold leading-tight sm:text-xl">
+                    {c.name}
+                  </div>
+                  <div className="mono mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[9px] uppercase tracking-[0.12em] text-muted-foreground">
+                    <span>From ₹{from.toLocaleString("en-IN")}</span>
+                    <span className="inline-flex items-center gap-1 text-accent">
+                      <Star className="h-2.5 w-2.5 fill-current" />
+                      {avg.toFixed(1)} avg
+                    </span>
+                  </div>
+                  <div className="mono mt-1 hidden truncate text-[9px] uppercase tracking-[0.12em] text-muted-foreground/80 sm:block">
+                    {brands.join(" · ")}
+                  </div>
+                  <div className="mono mt-1.5 truncate text-[9px] uppercase tracking-[0.12em] text-foreground/60">
+                    Best here · {best.name}
+                  </div>
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-accent">
+                    Shop {c.name}
+                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

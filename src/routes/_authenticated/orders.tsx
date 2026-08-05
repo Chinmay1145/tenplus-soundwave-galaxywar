@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PlayCircle } from "lucide-react";
 import { nextOrderStatus, ORDER_FLOW, statusMeta } from "@/lib/order-status";
-import { StatusBadge, StatusStrip, StatusHint } from "@/components/site/OrderStatus";
+import { StatusBadge, StatusStrip, StatusHint, StageCards } from "@/components/site/OrderStatus";
 
 export const nextStatus = nextOrderStatus;
 import {
@@ -313,8 +313,43 @@ function OrderRow({ o, user }: { o: Order; user: ReturnType<typeof useAuth>["use
         </div>
       </div>
       {expand && (
-        <div className="border-t border-border/60 bg-surface-2/40 p-6">
-          <OrderTracking createdAt={o.created_at} status={o.status} pincode={o.shipping_address?.pincode} compact />
+        <div className="animate-fade-in space-y-6 border-t border-border/60 bg-surface-2/40 p-6">
+          <div>
+            <div className="mono mb-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              — Stage detail
+            </div>
+            <StageCards status={o.status} createdAt={o.created_at} />
+          </div>
+          <div>
+            <div className="mono mb-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              — Live timeline
+            </div>
+            <OrderTracking createdAt={o.created_at} status={o.status} pincode={o.shipping_address?.pincode} compact />
+          </div>
+          <div>
+            <div className="mono mb-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              — Items in this order
+            </div>
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {o.items.map((i, ix) => (
+                <li
+                  key={`${i.id ?? i.name}-${ix}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-4 py-3 text-sm"
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold">{i.name}</span>
+                    <span className="mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                      QTY {i.qty}
+                      {i.color ? ` · ${i.color}` : ""}
+                    </span>
+                  </span>
+                  {i.price !== undefined && (
+                    <span className="shrink-0 font-semibold">{inr(Number(i.price) * i.qty)}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </div>
