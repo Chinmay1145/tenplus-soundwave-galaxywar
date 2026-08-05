@@ -260,8 +260,8 @@ export function DataTable({
   rows: (readonly [string, string, string?])[];
 }) {
   return (
-    <div className="not-prose overflow-hidden rounded-2xl border border-border/60">
-      <table className="w-full text-left text-sm">
+    <div className="not-prose -mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-hidden sm:rounded-2xl sm:border sm:border-border/60 sm:px-0">
+      <table className="w-full min-w-[420px] overflow-hidden rounded-2xl border border-border/60 text-left text-sm sm:min-w-0 sm:rounded-none sm:border-0">
         <thead className="bg-surface-2/70">
           <tr className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
             {head.filter(Boolean).map((h) => (
