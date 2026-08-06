@@ -233,6 +233,58 @@ function ReportsPage() {
         <KPI icon={FileBarChart2} label="Refund Est." value={inr(summary.refundEstimate)} sub="lifetime value at risk" />
       </div>
 
+      {/* Executive insights */}
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        {(() => {
+          const peak = summary.series.reduce(
+            (b, d) => (!b || d.revenue > b.revenue ? d : b),
+            undefined as (typeof summary.series)[number] | undefined,
+          );
+          const topCat = summary.byCategory[0];
+          const topProd = summary.topProducts[0];
+          const cards: [string, string, string][] = [
+            [
+              "Peak period",
+              peak ? peak.label : "—",
+              peak ? `${inr(peak.revenue)} across ${peak.orders} order(s)` : "No activity yet",
+            ],
+            [
+              "Leading category",
+              topCat ? topCat.name : "—",
+              topCat
+                ? `${inr(topCat.revenue)} · ${((topCat.revenue / (summary.totalRevenue || 1)) * 100).toFixed(0)}% of spend`
+                : "No category data",
+            ],
+            [
+              "Most bought product",
+              topProd ? topProd.name : "—",
+              topProd ? `${topProd.units} unit(s) · ${inr(topProd.revenue)}` : "No products yet",
+            ],
+          ];
+          return cards.map(([tag, head, sub]) => (
+            <div
+              key={tag}
+              className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-4"
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-40 blur-2xl"
+                style={{
+                  background: "radial-gradient(circle, oklch(0.65 0.24 25 / 0.35), transparent 70%)",
+                }}
+              />
+              <div className="mono relative text-[9px] uppercase tracking-[0.18em] text-accent">
+                {tag}
+              </div>
+              <div className="relative mt-1.5 truncate font-display text-lg font-bold">{head}</div>
+              <div className="relative mono mt-1 truncate text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+                {sub}
+              </div>
+            </div>
+          ));
+        })()}
+      </div>
+
 
       {/* Trend */}
       <Section title="Revenue trend" subtitle={`Grouped by ${gran}`}>
