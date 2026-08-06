@@ -182,54 +182,89 @@ const PHOTOS: Record<string, string[]> = {
     U("1606220945770-b5b6c2c55bf1"),
     U("1600294037681-c80b4cb5b434"),
     U("1608156639585-b3a032ef9689"),
+    U("1590658165737-15a047b0b8b3"),
+    U("1631867675167-90a456a90863"),
+    U("1610438235354-a6ae5528385c"),
+    U("1574920162043-b872873f19c8"),
   ],
   anc: [
     U("1505740420928-5e560c06d30e"),
     U("1546435770-a3e426bf472b"),
     U("1583394838336-acd977736f90"),
     U("1484704849700-f032a568e944"),
+    U("1577174881658-0f30ed549adc"),
+    U("1618366712010-f4ae9c647dcb"),
+    U("1524678606370-a47ad25cb82a"),
+    U("1558756520-22cfe5d382ca"),
   ],
   flagship: [
     U("1599669454699-248893623440"),
     U("1618366712010-f4ae9c647dcb"),
     U("1524678606370-a47ad25cb82a"),
     U("1613040809024-b4ef7ba99bc3"),
+    U("1545127398-14699f92334b"),
+    U("1505740420928-5e560c06d30e"),
+    U("1577174881658-0f30ed549adc"),
   ],
   luxury: [
     U("1613040809024-b4ef7ba99bc3"),
     U("1545127398-14699f92334b"),
     U("1610438235354-a6ae5528385c"),
+    U("1599669454699-248893623440"),
+    U("1546435770-a3e426bf472b"),
+    U("1558756520-22cfe5d382ca"),
   ],
   studio: [
     U("1583394838336-acd977736f90"),
     U("1484704849700-f032a568e944"),
     U("1546435770-a3e426bf472b"),
+    U("1520166012956-add9ba0835cb"),
+    U("1478737270239-2f02b77fc618"),
+    U("1519508234439-4f23643125c1"),
   ],
   gaming: [
     U("1593305841991-05c297ba4575"),
     U("1629429407759-01cd3d7cfb38"),
     U("1616763355603-9755a640a287"),
+    U("1591370874773-6702e8f12fd8"),
+    U("1542751371-adc38448a05e"),
+    U("1603481588273-2f908a9a7a1b"),
   ],
   sports: [
     U("1571019613454-1cb2f99b2d8b"),
     U("1518611012118-696072aa579a"),
     U("1608156639585-b3a032ef9689"),
+    U("1552674605-db6ffd4facb5"),
+    U("1517836357463-d25dfeac3438"),
+    U("1584735935682-2f2b69dff9d2"),
   ],
   "open-ear": [
     U("1608156639585-b3a032ef9689"),
     U("1593697821252-0c9137d9fc45"),
+    U("1590658165737-15a047b0b8b3"),
+    U("1571019613454-1cb2f99b2d8b"),
+    U("1600294037681-c80b4cb5b434"),
   ],
   neckband: [
     U("1574920162043-b872873f19c8"),
     U("1613040809024-b4ef7ba99bc3"),
+    U("1631867675167-90a456a90863"),
+    U("1606220945770-b5b6c2c55bf1"),
+    U("1518611012118-696072aa579a"),
   ],
   wired: [
     U("1572536147248-ac59a8abfa4b"),
     U("1558537348-c0f8e733989d"),
+    U("1520166012956-add9ba0835cb"),
+    U("1478737270239-2f02b77fc618"),
+    U("1519508234439-4f23643125c1"),
   ],
   business: [
     U("1550009158-9ebf69173e03"),
     U("1558537348-c0f8e733989d"),
+    U("1577174881658-0f30ed549adc"),
+    U("1505740420928-5e560c06d30e"),
+    U("1524678606370-a47ad25cb82a"),
   ],
 };
 
@@ -238,6 +273,8 @@ const FALLBACK_PHOTOS = [
   U("1590658268037-6bf12165a8df"),
   U("1572536147248-ac59a8abfa4b"),
   U("1484704849700-f032a568e944"),
+  U("1546435770-a3e426bf472b"),
+  U("1613040809024-b4ef7ba99bc3"),
 ];
 
 /** Deterministic hero photo for a product (stable across reloads). */
@@ -246,14 +283,21 @@ function photoFor(id: number, category: string): string {
   return pool[id % pool.length];
 }
 
-/** 4-frame gallery: three photo crops of the same style + one local asset. */
+/**
+ * 4-frame gallery. With larger per-category pools every product now gets four
+ * genuinely different photographs (no repeated crop of the same frame), and a
+ * bundled local asset only steps in when a pool is small.
+ */
 function photoGallery(id: number, category: string): string[] {
   const pool = PHOTOS[category] ?? FALLBACK_PHOTOS;
   const local = IMAGE_KEYS[id % IMAGE_KEYS.length];
+  if (pool.length >= 4) {
+    return [0, 1, 2, 3].map((o) => pool[(id + o) % pool.length]);
+  }
   return [
     pool[id % pool.length],
-    `${pool[(id + 1) % pool.length]}&v=2`,
-    `${pool[(id + 2) % pool.length]}&v=3&crop=entropy`,
+    pool[(id + 1) % pool.length],
+    pool[(id + 2) % pool.length],
     IMAGES[local],
   ];
 }
