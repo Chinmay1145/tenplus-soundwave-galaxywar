@@ -275,7 +275,7 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   esY += 14 + wrapped.length * 12;
 
   // ── KEY INSIGHTS (bulleted, scannable) ───────────────────
-  const insights: string[] = [
+  const keyInsights: string[] = [
     `Peak period: ${peak.label} at ${inr(peak.revenue)} from ${peak.orders} order${peak.orders === 1 ? "" : "s"}.`,
     s.byCategory[0]
       ? `Category mix: "${s.byCategory[0].name}" contributed ${((s.byCategory[0].revenue / (s.totalRevenue || 1)) * 100).toFixed(0)}% of revenue across ${s.byCategory.length} categor${s.byCategory.length === 1 ? "y" : "ies"}.`
@@ -294,7 +294,7 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(...sub);
-  insights.forEach((line) => {
+  keyInsights.forEach((line) => {
     const lines = doc.splitTextToSize(line, W - 2 * M - 16) as string[];
     doc.setFillColor(...accent);
     doc.circle(M + 3, esY + 8, 1.6, "F");
