@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const trending = PRODUCTS.slice(0, 8);
+  
   const newArrivals = PRODUCTS.filter((p) => p.isNew).slice(0, 4);
   const [listeners, setListeners] = useState(12480);
   useEffect(() => {
