@@ -307,6 +307,46 @@ export function downloadInvoice(data: InvoiceData) {
   doc.text(amountInWords(data.total), M + 12, y + 22);
   y += 34;
 
+  // ── ORDER SNAPSHOT (three quick-read cells) ──────────────
+  const units = data.items.reduce((s, it) => s + Number(it.qty ?? 1), 0);
+  const snapCells: [string, string, string][] = [
+    ["LINE ITEMS", String(data.items.length), `${units} unit${units === 1 ? "" : "s"} total`],
+    [
+      "TAX (GST)",
+      inr(data.tax ?? 0),
+      "Inclusive · CGST + SGST split as applicable",
+    ],
+    [
+      "SHIPPING",
+      (data.shipping ?? 0) === 0 ? "FREE" : inr(data.shipping ?? 0),
+      "Insured courier · signature on delivery",
+    ],
+  ];
+  const snapW = (W - 2 * M - 16) / 3;
+  snapCells.forEach(([k, v, note], i) => {
+    const x = M + i * (snapW + 8);
+    doc.setFillColor(...tint);
+    doc.rect(x, y, snapW, 54, "F");
+    doc.setDrawColor(...hair);
+    doc.rect(x, y, snapW, 54, "S");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...muted);
+    doc.text(k, x + 10, y + 15);
+    doc.setFontSize(13);
+    doc.setTextColor(...ink);
+    doc.text(v, x + 10, y + 33);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.8);
+    doc.setTextColor(...muted);
+    (doc.splitTextToSize(note, snapW - 20) as string[])
+      .slice(0, 2)
+      .forEach((ln, li) => doc.text(ln, x + 10, y + 44 + li * 8));
+  });
+  y += 66;
+
+
+
   // Page-break guard before payment summary block
   if (y + 220 > H - 60) {
     doc.addPage();
