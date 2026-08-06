@@ -30,10 +30,7 @@ export function LogoMark({
       width={size}
       height={size}
       aria-hidden
-      className={cn(
-        "shrink-0 [filter:drop-shadow(0_0_6px_oklch(0.65_0.24_25/0.65))_drop-shadow(0_0_16px_oklch(0.65_0.24_25/0.35))]",
-        className,
-      )}
+      className={cn("shrink-0", className)}
     >
       <defs>
         <linearGradient id="pulseRingGrad" x1="0" y1="0" x2="1" y2="1">
@@ -59,14 +56,7 @@ export function LogoMark({
         </radialGradient>
       </defs>
 
-      {/* ambient glow */}
-      <circle cx="26" cy="26" r="25" fill="url(#pulseCoreGlow)">
-        {animated && (
-          <animate attributeName="r" values="23;26;23" dur="2.4s" repeatCount="indefinite" />
-        )}
-      </circle>
-
-      <g filter="url(#pulseGlowF)">
+      <g>
       {/* outer ring with break at 4 o'clock */}
       <circle
         cx="26"
