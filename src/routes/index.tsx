@@ -254,26 +254,8 @@ function Home() {
 
 
       {/* TRENDING */}
-      <section className="bg-surface py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-12 flex items-end justify-between">
-            <div>
-              <div className="mono text-accent">— Trending now</div>
-              <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-                Hand-picked.
-              </h2>
-            </div>
-            <Link to="/shop" className="text-sm text-muted-foreground hover:text-accent">
-              See all products →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {trending.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <TrendingNow />
+
 
       {/* FEATURE STRIP */}
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
@@ -309,7 +291,16 @@ function Home() {
           />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-24 sm:px-6 md:grid-cols-2 md:items-center">
             <div>
-              <div className="mono text-accent">— New launch</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="mono text-accent">— New launch</span>
+                <span className="mono inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[9px] tracking-[0.18em] text-accent">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+                  </span>
+                  {newArrivals.length} JUST DROPPED
+                </span>
+              </div>
               <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-6xl">
                 Made to be<br />heard, not seen.
               </h2>
@@ -317,6 +308,36 @@ function Home() {
                 The new Series 03 pushes acoustic design into transparent territory.
                 Smaller. Lighter. Astonishingly loud.
               </p>
+
+              <dl className="mt-8 grid max-w-md grid-cols-3 gap-4 border-y border-border/60 py-5 text-xs">
+                {[
+                  [`₹${Math.min(...newArrivals.map((p) => p.price)).toLocaleString("en-IN")}`, "Launch price from"],
+                  [
+                    (newArrivals.reduce((s, p) => s + p.rating, 0) / newArrivals.length).toFixed(1),
+                    "Early review avg",
+                  ],
+                  ["48h", "Priority dispatch"],
+                ].map(([k, v]) => (
+                  <div key={v}>
+                    <dt className="font-display text-xl font-bold">{k}</dt>
+                    <dd className="mono text-muted-foreground">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <ul className="mt-6 grid gap-2 text-sm text-muted-foreground">
+                {[
+                  "Launch-window pricing, locked for the first 14 days",
+                  "Free engraving + 2 extra ear-tip sizes in the box",
+                  "Extended 3-year warranty on every launch unit",
+                ].map((l) => (
+                  <li key={l} className="flex items-start gap-2">
+                    <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                    {l}
+                  </li>
+                ))}
+              </ul>
+
               <Link
                 to="/shop"
                 className="btn-magnetic mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground"
@@ -325,13 +346,14 @@ function Home() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {newArrivals.slice(0, 2).map((p) => (
+              {newArrivals.slice(0, 4).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
           </div>
         </section>
       )}
+
 
       {/* TESTIMONIALS */}
       <section className="relative overflow-hidden py-24">
