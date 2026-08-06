@@ -85,9 +85,23 @@ export function SoundLoader({ label }: { label?: string }) {
         {/* glowing logo lockup */}
         <div className="sl-lockup relative flex flex-col items-center">
           <div aria-hidden className="sl-halo" />
-          <div className="relative grid place-items-center rounded-[26px] border border-accent/30 bg-background/50 p-5 shadow-[0_0_90px_oklch(0.65_0.24_25/0.5),inset_0_0_40px_oklch(0.65_0.24_25/0.15)] backdrop-blur-md">
-            <span aria-hidden className="sl-sheen" />
-            <LogoMark size={72} animated />
+          {/* circular progress ring wrapping the mark */}
+          <div className="relative grid place-items-center">
+            <div
+              aria-hidden
+              className="absolute h-[148px] w-[148px] rounded-full"
+              style={{
+                background: `conic-gradient(oklch(0.72 0.24 25) ${pct * 3.6}deg, oklch(0.65 0.24 25 / 0.12) 0deg)`,
+                mask: "radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 3px))",
+                WebkitMask:
+                  "radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 3px))",
+                transition: "background 400ms linear",
+              }}
+            />
+            <div className="relative grid place-items-center rounded-full border border-accent/25 bg-background/60 p-7 backdrop-blur-md">
+              <span aria-hidden className="sl-sheen" />
+              <LogoMark size={64} animated />
+            </div>
           </div>
           <div className="mt-6 font-display text-4xl font-bold tracking-[0.22em] sl-word">
             PULSE<span className="text-accent">.</span>
