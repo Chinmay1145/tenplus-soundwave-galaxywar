@@ -541,7 +541,7 @@ function FindYourSound() {
       {/* Use-case lenses */}
       <div className="-mx-4 mb-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
         {USE_CASES.map((u) => {
-          const count = u.key === "all" ? PRODUCTS.length : PRODUCTS.filter(u.match).length;
+          const count = PRODUCTS.filter((p) => u.match(p) && p.price <= cap.max).length;
           const on = lens === u.key;
           return (
             <button
