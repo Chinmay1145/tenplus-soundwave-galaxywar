@@ -274,6 +274,36 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   wrapped.forEach((ln: string, i: number) => doc.text(ln, M, esY + 14 + i * 12));
   esY += 14 + wrapped.length * 12;
 
+  // ── KEY INSIGHTS (bulleted, scannable) ───────────────────
+  const insights: string[] = [
+    `Peak period: ${peak.label} at ${inr(peak.revenue)} from ${peak.orders} order${peak.orders === 1 ? "" : "s"}.`,
+    s.byCategory[0]
+      ? `Category mix: "${s.byCategory[0].name}" contributed ${((s.byCategory[0].revenue / (s.totalRevenue || 1)) * 100).toFixed(0)}% of revenue across ${s.byCategory.length} categor${s.byCategory.length === 1 ? "y" : "ies"}.`
+      : "Category mix: no categorised revenue in this window.",
+    `Basket profile: average order ${inr(s.avgOrder)} with ${(s.totalUnits / (s.totalOrders || 1)).toFixed(1)} units per order.`,
+    s.returnReasons[0]
+      ? `Leading return reason: ${s.returnReasons[0].reason} (${s.returnReasons[0].count}).`
+      : "Return health: no returns raised — quality and fit expectations met.",
+  ];
+  esY += 8;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...accent);
+  doc.text("KEY INSIGHTS", M, esY);
+  esY += 6;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...sub);
+  insights.forEach((line) => {
+    const lines = doc.splitTextToSize(line, W - 2 * M - 16) as string[];
+    doc.setFillColor(...accent);
+    doc.circle(M + 3, esY + 8, 1.6, "F");
+    lines.forEach((ln, i) => doc.text(ln, M + 12, esY + 11 + i * 11));
+    esY += lines.length * 11 + 5;
+  });
+
+
+
 
   // ── KPI CARDS ────────────────────────────────────────────
   let y = esY + 12;
