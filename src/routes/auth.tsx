@@ -5,6 +5,7 @@ import { ArrowRight, Check, Eye, EyeOff, Headphones, Mail, ShieldCheck, Sparkles
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
+import { Logo } from "@/components/site/Logo";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -172,13 +173,8 @@ function AuthPage() {
           style={{ background: "radial-gradient(circle, var(--color-accent), transparent 70%)" }}
         />
         <div className="relative flex h-full flex-col justify-between p-12 xl:p-16">
-          <Link to="/" className="inline-flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-full border border-accent/60 bg-accent/10 text-accent">
-              <span className="h-2 w-2 rounded-full bg-accent" />
-            </span>
-            <span className="font-display text-xl font-bold tracking-tight">
-              PULSE<span className="text-accent">.</span>
-            </span>
+          <Link to="/" className="inline-flex w-fit items-center rounded-full border border-border/60 bg-surface-2/60 px-3 py-2 backdrop-blur transition-colors hover:border-accent/60">
+            <Logo size={34} />
           </Link>
 
           <div className="max-w-md">
@@ -234,12 +230,17 @@ function AuthPage() {
           }}
         />
         <div className="w-full max-w-md">
-          <Link
-            to="/"
-            className="mono mb-8 inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-accent lg:hidden"
-          >
-            ← Back to PULSE
-          </Link>
+          <div className="mb-7 flex items-center justify-between gap-3 lg:hidden">
+            <Link to="/" aria-label="PULSE home" className="inline-flex items-center">
+              <Logo size={34} />
+            </Link>
+            <Link
+              to="/"
+              className="mono inline-flex items-center gap-1 rounded-full border border-border/60 bg-surface-2 px-3 py-1.5 text-[10px] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+            >
+              ← Back to store
+            </Link>
+          </div>
 
           {/* connection-aware status — mobile data vs wifi vs offline */}
           <div

@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const trending = PRODUCTS.slice(0, 8);
+  
   const newArrivals = PRODUCTS.filter((p) => p.isNew).slice(0, 4);
   const [listeners, setListeners] = useState(12480);
   useEffect(() => {
@@ -254,26 +254,8 @@ function Home() {
 
 
       {/* TRENDING */}
-      <section className="bg-surface py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-12 flex items-end justify-between">
-            <div>
-              <div className="mono text-accent">— Trending now</div>
-              <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-                Hand-picked.
-              </h2>
-            </div>
-            <Link to="/shop" className="text-sm text-muted-foreground hover:text-accent">
-              See all products →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {trending.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <TrendingNow />
+
 
       {/* FEATURE STRIP */}
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
@@ -309,7 +291,16 @@ function Home() {
           />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-24 sm:px-6 md:grid-cols-2 md:items-center">
             <div>
-              <div className="mono text-accent">— New launch</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="mono text-accent">— New launch</span>
+                <span className="mono inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[9px] tracking-[0.18em] text-accent">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+                  </span>
+                  {newArrivals.length} JUST DROPPED
+                </span>
+              </div>
               <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-6xl">
                 Made to be<br />heard, not seen.
               </h2>
@@ -317,6 +308,36 @@ function Home() {
                 The new Series 03 pushes acoustic design into transparent territory.
                 Smaller. Lighter. Astonishingly loud.
               </p>
+
+              <dl className="mt-8 grid max-w-md grid-cols-3 gap-4 border-y border-border/60 py-5 text-xs">
+                {[
+                  [`₹${Math.min(...newArrivals.map((p) => p.price)).toLocaleString("en-IN")}`, "Launch price from"],
+                  [
+                    (newArrivals.reduce((s, p) => s + p.rating, 0) / newArrivals.length).toFixed(1),
+                    "Early review avg",
+                  ],
+                  ["48h", "Priority dispatch"],
+                ].map(([k, v]) => (
+                  <div key={v}>
+                    <dt className="font-display text-xl font-bold">{k}</dt>
+                    <dd className="mono text-muted-foreground">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <ul className="mt-6 grid gap-2 text-sm text-muted-foreground">
+                {[
+                  "Launch-window pricing, locked for the first 14 days",
+                  "Free engraving + 2 extra ear-tip sizes in the box",
+                  "Extended 3-year warranty on every launch unit",
+                ].map((l) => (
+                  <li key={l} className="flex items-start gap-2">
+                    <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                    {l}
+                  </li>
+                ))}
+              </ul>
+
               <Link
                 to="/shop"
                 className="btn-magnetic mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground"
@@ -325,13 +346,14 @@ function Home() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {newArrivals.slice(0, 2).map((p) => (
+              {newArrivals.slice(0, 4).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
           </div>
         </section>
       )}
+
 
       {/* TESTIMONIALS */}
       <section className="relative overflow-hidden py-24">
@@ -481,10 +503,19 @@ const USE_CASES = [
   },
 ] as const;
 
+const BUDGETS = [
+  { key: "any", label: "Any budget", max: Infinity },
+  { key: "5k", label: "Under ₹5k", max: 5000 },
+  { key: "15k", label: "Under ₹15k", max: 15000 },
+  { key: "30k", label: "Under ₹30k", max: 30000 },
+] as const;
+
 function FindYourSound() {
   const [lens, setLens] = useState<(typeof USE_CASES)[number]["key"]>("all");
+  const [budget, setBudget] = useState<(typeof BUDGETS)[number]["key"]>("any");
   const active = USE_CASES.find((u) => u.key === lens) ?? USE_CASES[0];
-  const pool = PRODUCTS.filter(active.match);
+  const cap = BUDGETS.find((b) => b.key === budget) ?? BUDGETS[0];
+  const pool = PRODUCTS.filter((p) => active.match(p) && p.price <= cap.max);
 
   const cats = CATEGORIES.map((c) => {
     const inCat = pool.filter((p) => p.category === c.slug);
@@ -510,7 +541,7 @@ function FindYourSound() {
       {/* Use-case lenses */}
       <div className="-mx-4 mb-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
         {USE_CASES.map((u) => {
-          const count = u.key === "all" ? PRODUCTS.length : PRODUCTS.filter(u.match).length;
+          const count = PRODUCTS.filter((p) => u.match(p) && p.price <= cap.max).length;
           const on = lens === u.key;
           return (
             <button
@@ -537,10 +568,63 @@ function FindYourSound() {
         })}
       </div>
 
-      <p className="mb-6 text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">{pool.length} products</span> match “
-        {active.label}” · {active.blurb}
-      </p>
+      {/* Budget ceiling */}
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <span className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          Budget
+        </span>
+        <div className="inline-flex flex-wrap items-center gap-1 rounded-full border border-border bg-surface-2 p-1">
+          {BUDGETS.map((b) => (
+            <button
+              key={b.key}
+              type="button"
+              aria-pressed={budget === b.key}
+              onClick={() => setBudget(b.key)}
+              className={`mono rounded-full px-3 py-1.5 text-[10px] uppercase tracking-[0.12em] transition-all ${
+                budget === b.key
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {pool.length === 0 ? (
+        <div className="mb-6 rounded-2xl border border-border/60 bg-surface-2/50 p-6 text-center">
+          <div className="font-display text-lg font-bold">Nothing fits that combination.</div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Try lifting the budget ceiling or switching the use-case lens.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setLens("all");
+              setBudget("any");
+            }}
+            className="mono mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[10px] uppercase tracking-[0.14em] text-accent-foreground"
+          >
+            Reset filters
+          </button>
+        </div>
+      ) : (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-surface-2/40 px-4 py-3">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">{pool.length} products</span> match “
+            {active.label}”{cap.max !== Infinity ? ` ${cap.label.toLowerCase()}` : ""} ·{" "}
+            {active.blurb}
+          </p>
+          <Link
+            to="/shop"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground transition-transform hover:-translate-y-0.5"
+          >
+            Shop these {pool.length} <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
+
 
       {/* Recommendation rail */}
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
@@ -649,5 +733,118 @@ function FindYourSound() {
         })}
       </div>
     </div>
+  );
+}
+
+/** Trending lenses — each ranks the catalogue by a different signal. */
+const TRENDING_VIEWS = [
+  {
+    key: "hot",
+    label: "Hot right now",
+    note: "Ranked by review volume this week",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) => b.reviews - a.reviews,
+  },
+  {
+    key: "rated",
+    label: "Top rated",
+    note: "Highest verified owner ratings",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) => b.rating - a.rating,
+  },
+  {
+    key: "deals",
+    label: "Biggest drops",
+    note: "Deepest discounts off MRP",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) => b.discount - a.discount,
+  },
+  {
+    key: "fresh",
+    label: "Just landed",
+    note: "Newest additions to the lineup",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) =>
+      Number(!!b.isNew) - Number(!!a.isNew) || b.id - a.id,
+  },
+] as const;
+
+function TrendingNow() {
+  const [view, setView] = useState<(typeof TRENDING_VIEWS)[number]["key"]>("hot");
+  const active = TRENDING_VIEWS.find((v) => v.key === view) ?? TRENDING_VIEWS[0];
+  const list = [...PRODUCTS].sort(active.sort).slice(0, 8);
+
+  return (
+    <section className="relative overflow-hidden bg-surface py-24">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-72 opacity-60"
+        style={{
+          background:
+            "radial-gradient(700px 280px at 78% 0%, oklch(0.65 0.24 25 / 0.14), transparent 70%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mono text-accent">— Trending now</span>
+              <span className="mono inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[9px] tracking-[0.18em] text-muted-foreground">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+                </span>
+                UPDATED HOURLY
+              </span>
+            </div>
+            <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+              Hand-picked.
+            </h2>
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground">{active.note}</p>
+          </div>
+          <Link
+            to="/shop"
+            className="mono inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-[11px] transition-colors hover:border-accent hover:text-accent"
+          >
+            SEE ALL <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+
+        <div className="-mx-4 mt-6 mb-8 flex snap-x gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+          {TRENDING_VIEWS.map((v) => {
+            const on = v.key === view;
+            return (
+              <button
+                key={v.key}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setView(v.key)}
+                className={`mono shrink-0 snap-start rounded-full border px-3.5 py-2 text-[10px] uppercase tracking-[0.14em] transition-all ${
+                  on
+                    ? "border-accent bg-accent text-accent-foreground shadow-[0_10px_30px_-16px_oklch(0.65_0.24_25/0.9)]"
+                    : "border-border bg-card text-muted-foreground hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+                }`}
+              >
+                {v.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((p, i) => (
+            <div key={p.id} className="relative">
+              <span
+                className={`mono pointer-events-none absolute -left-1 -top-1 z-10 grid h-7 w-7 place-items-center rounded-full text-[10px] font-bold ${
+                  i < 3
+                    ? "bg-accent text-accent-foreground"
+                    : "border border-border bg-card text-muted-foreground"
+                }`}
+                aria-hidden
+              >
+                {i + 1}
+              </span>
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

@@ -127,13 +127,37 @@ export function Footer() {
           ]} />
         </div>
 
+        {/* Payments + assurances */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 py-6">
+          <div className="flex flex-wrap items-center gap-2">
+            {["VISA", "MASTERCARD", "RUPAY", "UPI", "NETBANKING", "EMI", "COD"].map((p) => (
+              <span
+                key={p}
+                className="mono rounded-md border border-border/70 bg-surface-2 px-2.5 py-1.5 text-[9px] tracking-[0.14em] text-muted-foreground"
+              >
+                {p}
+              </span>
+            ))}
+          </div>
+          <div className="mono flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> PCI-DSS SECURE CHECKOUT
+            </span>
+            <span>256-BIT TLS</span>
+            <span>GST INVOICE ON EVERY ORDER</span>
+          </div>
+        </div>
+
         <div className="flex flex-col items-start justify-between gap-4 border-t border-border/60 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
           <div className="mono">© {new Date().getFullYear()} PULSE AUDIO LABS</div>
           <div className="mono flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              SECURE PAYMENTS · UPI · CARDS · EMI
-            </span>
+            <Link to="/shipping" className="hover:text-accent">SHIPPING</Link>
+            <span className="opacity-40">·</span>
+            <Link to="/returns" className="hover:text-accent">RETURNS</Link>
+            <span className="opacity-40">·</span>
+            <Link to="/warranty" className="hover:text-accent">WARRANTY</Link>
+            <span className="opacity-40">·</span>
+            <Link to="/faq" className="hover:text-accent">FAQ</Link>
           </div>
           <div className="mono">DESIGNED IN STOCKHOLM · ASSEMBLED IN INDIA</div>
         </div>
