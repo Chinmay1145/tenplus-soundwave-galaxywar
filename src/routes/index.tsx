@@ -673,3 +673,116 @@ function FindYourSound() {
     </div>
   );
 }
+
+/** Trending lenses — each ranks the catalogue by a different signal. */
+const TRENDING_VIEWS = [
+  {
+    key: "hot",
+    label: "Hot right now",
+    note: "Ranked by review volume this week",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) => b.reviews - a.reviews,
+  },
+  {
+    key: "rated",
+    label: "Top rated",
+    note: "Highest verified owner ratings",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) => b.rating - a.rating,
+  },
+  {
+    key: "deals",
+    label: "Biggest drops",
+    note: "Deepest discounts off MRP",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) => b.discount - a.discount,
+  },
+  {
+    key: "fresh",
+    label: "Just landed",
+    note: "Newest additions to the lineup",
+    sort: (a: (typeof PRODUCTS)[number], b: (typeof PRODUCTS)[number]) =>
+      Number(!!b.isNew) - Number(!!a.isNew) || b.id - a.id,
+  },
+] as const;
+
+function TrendingNow() {
+  const [view, setView] = useState<(typeof TRENDING_VIEWS)[number]["key"]>("hot");
+  const active = TRENDING_VIEWS.find((v) => v.key === view) ?? TRENDING_VIEWS[0];
+  const list = [...PRODUCTS].sort(active.sort).slice(0, 8);
+
+  return (
+    <section className="relative overflow-hidden bg-surface py-24">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-72 opacity-60"
+        style={{
+          background:
+            "radial-gradient(700px 280px at 78% 0%, oklch(0.65 0.24 25 / 0.14), transparent 70%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mono text-accent">— Trending now</span>
+              <span className="mono inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[9px] tracking-[0.18em] text-muted-foreground">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+                </span>
+                UPDATED HOURLY
+              </span>
+            </div>
+            <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+              Hand-picked.
+            </h2>
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground">{active.note}</p>
+          </div>
+          <Link
+            to="/shop"
+            className="mono inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-[11px] transition-colors hover:border-accent hover:text-accent"
+          >
+            SEE ALL <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+
+        <div className="-mx-4 mt-6 mb-8 flex snap-x gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+          {TRENDING_VIEWS.map((v) => {
+            const on = v.key === view;
+            return (
+              <button
+                key={v.key}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setView(v.key)}
+                className={`mono shrink-0 snap-start rounded-full border px-3.5 py-2 text-[10px] uppercase tracking-[0.14em] transition-all ${
+                  on
+                    ? "border-accent bg-accent text-accent-foreground shadow-[0_10px_30px_-16px_oklch(0.65_0.24_25/0.9)]"
+                    : "border-border bg-card text-muted-foreground hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+                }`}
+              >
+                {v.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((p, i) => (
+            <div key={p.id} className="relative">
+              <span
+                className={`mono pointer-events-none absolute -left-1 -top-1 z-10 grid h-7 w-7 place-items-center rounded-full text-[10px] font-bold ${
+                  i < 3
+                    ? "bg-accent text-accent-foreground"
+                    : "border border-border bg-card text-muted-foreground"
+                }`}
+                aria-hidden
+              >
+                {i + 1}
+              </span>
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
