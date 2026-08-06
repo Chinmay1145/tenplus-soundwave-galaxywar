@@ -503,10 +503,19 @@ const USE_CASES = [
   },
 ] as const;
 
+const BUDGETS = [
+  { key: "any", label: "Any budget", max: Infinity },
+  { key: "5k", label: "Under ₹5k", max: 5000 },
+  { key: "15k", label: "Under ₹15k", max: 15000 },
+  { key: "30k", label: "Under ₹30k", max: 30000 },
+] as const;
+
 function FindYourSound() {
   const [lens, setLens] = useState<(typeof USE_CASES)[number]["key"]>("all");
+  const [budget, setBudget] = useState<(typeof BUDGETS)[number]["key"]>("any");
   const active = USE_CASES.find((u) => u.key === lens) ?? USE_CASES[0];
-  const pool = PRODUCTS.filter(active.match);
+  const cap = BUDGETS.find((b) => b.key === budget) ?? BUDGETS[0];
+  const pool = PRODUCTS.filter((p) => active.match(p) && p.price <= cap.max);
 
   const cats = CATEGORIES.map((c) => {
     const inCat = pool.filter((p) => p.category === c.slug);
