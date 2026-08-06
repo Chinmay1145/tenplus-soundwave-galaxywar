@@ -216,7 +216,7 @@ export function SoundLoader({ label }: { label?: string }) {
           50%     { transform: scale(1.08); opacity: 1; }
         }
         .sl-sheen {
-          position: absolute; inset: 0; border-radius: 26px; overflow: hidden;
+          position: absolute; inset: 0; border-radius: 999px; overflow: hidden;
           background: linear-gradient(115deg, transparent 35%, oklch(1 0 0 / 0.16) 50%, transparent 65%);
           background-size: 260% 100%;
           animation: sl-sheen 3.4s ease-in-out infinite;
