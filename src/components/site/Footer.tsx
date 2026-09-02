@@ -11,7 +11,7 @@ import {
   Mail,
   ArrowRight,
 } from "lucide-react";
-import { Logo } from "./Logo";
+import { Logo, LogoMark } from "./Logo";
 
 const PROMISES = [
   [Truck, "Free express shipping", "On every order, pan-India"],
@@ -33,6 +33,17 @@ export function Footer() {
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-6 border-b border-border/60 py-10 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:py-14">
+          <div className="min-w-0">
+            <div className="mono text-accent">PULSE / LISTEN DIFFERENTLY</div>
+            <div className="mt-3 font-display text-4xl font-bold leading-none sm:text-6xl">
+              Your next favourite<br />sound starts here.
+            </div>
+          </div>
+          <Link to="/shop" className="group inline-flex shrink-0 items-center gap-3 border border-foreground bg-foreground px-5 py-3 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
+            Explore all collections <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
         {/* Promise strip */}
         <div className="grid gap-4 border-b border-border/60 py-10 sm:grid-cols-2 lg:grid-cols-4">
           {PROMISES.map(([Ico, title, sub]) => (
@@ -51,7 +62,7 @@ export function Footer() {
         <div className="grid gap-12 py-14 md:grid-cols-12">
           <div className="md:col-span-4">
             <Link to="/" className="inline-flex items-center" aria-label="PULSE home">
-              <Logo size={40} animated />
+              <Logo size={40} />
             </Link>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               The world's most premium wireless earbuds — engineered for music,
@@ -146,6 +157,11 @@ export function Footer() {
             <span>256-BIT TLS</span>
             <span>GST INVOICE ON EVERY ORDER</span>
           </div>
+        </div>
+
+        <div className="flex items-center gap-4 border-t border-border/60 py-6">
+          <LogoMark size={48} />
+          <div className="font-display text-[clamp(3rem,10vw,8rem)] font-bold leading-none text-foreground/10">PULSE.</div>
         </div>
 
         <div className="flex flex-col items-start justify-between gap-4 border-t border-border/60 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center">

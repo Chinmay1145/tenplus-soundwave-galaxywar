@@ -58,10 +58,10 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
       aria-hidden={fading}
       style={{
         opacity: fading ? 0 : 1,
-        transform: fading ? "scale(1.06)" : "none",
-        filter: fading ? "blur(10px)" : "none",
+        transform: fading ? "translateY(-1.5rem) scale(1.015)" : "none",
+        filter: fading ? "blur(4px)" : "none",
         transition:
-          "opacity 900ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1), filter 900ms ease-out",
+          "opacity 800ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1), filter 700ms ease-out",
         pointerEvents: fading ? "none" : "auto",
       }}
     >
