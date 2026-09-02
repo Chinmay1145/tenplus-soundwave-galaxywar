@@ -48,8 +48,8 @@ function Contact() {
               <LogoMark size={28} />
               <div className="mono text-accent">— Contact · 24h response</div>
             </div>
-            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-[104px]">
-              Say <span className="shimmer-text italic">hello.</span>
+            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.9] tracking-tight sm:text-[104px]">
+              Start with<br /><span className="text-accent">one question.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
               Questions about a product, an order, or a partnership? We're a
@@ -58,7 +58,7 @@ function Contact() {
             </p>
           </div>
           <div className="flex items-end lg:col-span-4">
-            <div className="grid w-full grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60">
+             <div className="grid w-full grid-cols-2 gap-px overflow-hidden border border-border/60 bg-border/60">
               {[
                 ["< 24h", "Reply time"],
                 ["9–9", "Live chat IST"],
@@ -81,7 +81,7 @@ function Contact() {
           {/* Form */}
           <form
             onSubmit={submit}
-            className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-8 sm:p-10"
+            className="relative overflow-hidden border border-border/60 bg-card p-8 sm:p-10"
           >
             <div
               aria-hidden
@@ -90,7 +90,7 @@ function Contact() {
             />
             <div className="relative">
               <div className="mono text-accent">— Send us a note</div>
-              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight">Start a conversation.</h2>
+                <h2 className="mt-2 font-display text-4xl font-bold tracking-tight">Tell us what you need.</h2>
 
               <div className="mt-8 space-y-5">
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -171,21 +171,21 @@ function Contact() {
                 <a
                   key={label as string}
                   href={href as string}
-                  className="group flex items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 transition hover:border-accent/50 hover:bg-card/80"
+                   className="group flex items-center gap-4 border border-border/60 bg-card p-4 transition hover:border-accent/50 hover:bg-card/80"
                 >
                   {inner}
                 </a>
               ) : (
                 <div
                   key={label as string}
-                  className="group flex items-center gap-4 rounded-2xl border border-border/60 bg-card p-4"
+                   className="group flex items-center gap-4 border border-border/60 bg-card p-4"
                 >
                   {inner}
                 </div>
               );
             })}
 
-            <div className="mt-2 rounded-2xl border border-border/60 bg-card p-5">
+            <div className="mt-2 border border-border/60 bg-card p-5">
               <div className="mono mb-3 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Hours</div>
               <div className="space-y-1.5 text-sm">
                 <Row k="Mon – Fri" v="9:00 – 21:00 IST" />
@@ -210,7 +210,7 @@ function Contact() {
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-px overflow-hidden border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [Truck, "Track order", "See where your package is right now.", "/track-order"],
               [ShieldCheck, "Warranty", "24-month cover on every product.", "/warranty"],

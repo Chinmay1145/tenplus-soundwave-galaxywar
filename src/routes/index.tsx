@@ -196,7 +196,7 @@ function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section id="categories" className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6">
+      <section id="categories" className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-10 -z-10 h-72 opacity-60"
@@ -207,9 +207,9 @@ function Home() {
         />
         <div className="mb-10 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
           <div className="min-w-0">
-            <div className="mono text-accent">— Collections</div>
-            <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-              Find your sound.
+            <div className="mono text-accent">— 01 / Collections</div>
+            <h2 className="mt-2 font-display text-4xl font-bold leading-none tracking-tight sm:text-6xl">
+              Built around<br />how you listen.
             </h2>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground">
               {PRODUCTS.length} hand-tuned products across {CATEGORIES.length} collections —
@@ -227,7 +227,7 @@ function Home() {
         <FindYourSound />
 
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/60 bg-surface-2/40 p-5">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-y border-border/60 bg-surface-2/40 p-5">
           <div>
             <div className="font-display text-lg font-bold">Not sure which is right for you?</div>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -664,8 +664,8 @@ function FindYourSound() {
       </div>
 
       {/* Collection cards, scoped to the lens */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {cats.map(({ c, inCat }) => {
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
+        {cats.map(({ c, inCat }, index) => {
           const pick = inCat[0];
           const from = Math.min(...inCat.map((p) => p.price));
           const avg = inCat.reduce((s, p) => s + p.rating, 0) / inCat.length;
@@ -676,7 +676,7 @@ function FindYourSound() {
               key={c.slug}
               to="/shop"
               search={{ cat: c.slug }}
-              className="group relative flex aspect-[5/4] flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/60 hover:shadow-[0_20px_50px_-24px_oklch(0.65_0.24_25/0.65)] sm:p-5"
+              className={`group relative flex min-h-72 flex-col overflow-hidden border border-border/60 bg-card p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 sm:min-h-80 ${index % 5 === 0 ? "lg:col-span-7" : index % 5 === 1 ? "lg:col-span-5" : "lg:col-span-4"}`}
             >
               {pick && (
                 <img
@@ -684,7 +684,7 @@ function FindYourSound() {
                   alt=""
                   aria-hidden
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover opacity-25 transition-all duration-700 group-hover:scale-110 group-hover:opacity-50"
+                  className="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-700 group-hover:scale-105 group-hover:opacity-65"
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-transparent" />
@@ -698,15 +698,15 @@ function FindYourSound() {
               />
               <div className="relative flex h-full min-w-0 flex-col justify-between">
                 <div className="flex items-start justify-between gap-2">
-                  <span className="mono truncate text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                    {c.slug.replace(/-/g, " ")}
+                  <span className="mono truncate text-[10px] uppercase tracking-[0.16em] text-foreground/80">
+                    {String(index + 1).padStart(2, "0")} / {c.slug.replace(/-/g, " ")}
                   </span>
                   <span className="mono shrink-0 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] text-accent">
                     {inCat.length}
                   </span>
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate font-display text-lg font-bold leading-tight sm:text-xl">
+                  <div className="font-display text-2xl font-bold leading-tight sm:text-3xl">
                     {c.name}
                   </div>
                   <div className="mono mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[9px] uppercase tracking-[0.12em] text-muted-foreground">

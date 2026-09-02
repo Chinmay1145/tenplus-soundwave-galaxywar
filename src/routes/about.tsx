@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, Cpu, Globe, Leaf, ArrowUpRight, Quote } from "lucide-react";
 import { LogoMark } from "@/components/site/Logo";
+import studioImage from "@/assets/product-headphones.jpg";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -28,19 +29,24 @@ function About() {
               "radial-gradient(1000px 520px at 10% -10%, oklch(0.65 0.24 25 / 0.25), transparent 60%)",
           }}
         />
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:grid-cols-12">
-          <div className="lg:col-span-8">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7">
             <div className="flex items-center gap-3">
               <LogoMark size={28} />
               <div className="mono text-accent">— Our story · Est. 2021</div>
             </div>
-            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-[112px]">
-              Sound you
-              <br />
-              can almost <span className="shimmer-text italic">touch.</span>
+            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.9] tracking-tight sm:text-[96px]">
+              We make sound<br />feel <span className="text-accent">physical.</span>
             </h1>
           </div>
-          <div className="flex flex-col justify-end gap-6 lg:col-span-4">
+          <div className="flex flex-col justify-end gap-6 lg:col-span-5">
+            <div className="relative aspect-[4/3] overflow-hidden border border-border/60 bg-surface">
+              <img src={studioImage} alt="PULSE over-ear headphones showcasing precision industrial design" className="h-full w-full object-cover" />
+              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-background/85 px-4 py-3 backdrop-blur-md">
+                <span className="mono text-[9px] text-muted-foreground">OBJECT 03 / REFERENCE</span>
+                <span className="mono text-[9px] text-accent">STOCKHOLM × BENGALURU</span>
+              </div>
+            </div>
             <p className="text-lg leading-relaxed text-muted-foreground">
               PULSE was founded by a small group of engineers, audiophiles and
               industrial designers obsessed with one idea: the most personal
@@ -82,7 +88,7 @@ function About() {
           <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
             Four pillars. No compromises.
           </h2>
-          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-px overflow-hidden border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [Cpu, "Engineering", "8 acoustic patents and counting — from the hybrid ANC array to the titanium diaphragm."],
               [Award, "Awards", "iF Design, Red Dot and EISA recognized across three product generations."],
@@ -121,7 +127,7 @@ function About() {
             ].map(([y, t, d], i) => (
               <li key={y} className="relative pb-12 last:pb-0">
                 <span className="absolute -left-[calc(0.75rem+1px)] top-1.5 grid h-3 w-3 place-items-center sm:-left-[calc(1.25rem+1px)]">
-                  <span className="h-3 w-3 rounded-full bg-accent shadow-[0_0_18px_oklch(0.65_0.24_25)]" />
+                  <span className="h-3 w-3 rounded-full bg-accent" />
                 </span>
                 <div className="mono text-xs text-muted-foreground">CHAPTER {String(i + 1).padStart(2, "0")}</div>
                 <div className="mt-1 flex flex-wrap items-baseline gap-4">
@@ -138,7 +144,7 @@ function About() {
       {/* NUMBERS */}
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-          <div className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-px overflow-hidden border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
             {[
               ["1.2M", "Units shipped"],
               ["4.9★", "Customer rating"],
@@ -156,7 +162,7 @@ function About() {
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 sm:p-16">
+        <div className="relative overflow-hidden border border-border/60 bg-card p-10 sm:p-16">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"

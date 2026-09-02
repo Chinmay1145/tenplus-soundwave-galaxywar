@@ -30,7 +30,7 @@ export function PolicyPage({
             "radial-gradient(900px 420px at 15% 0%, oklch(0.65 0.24 25 / 0.18), transparent 65%)",
         }}
       />
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-20">
         <nav className="mono mb-5 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           <Link to="/" className="hover:text-accent">
             Home
@@ -39,23 +39,27 @@ export function PolicyPage({
           <span className="text-accent">{eyebrow}</span>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <LogoMark size={26} animated />
-          <div className="mono text-[11px] uppercase tracking-[0.2em] text-accent">{eyebrow}</div>
+        <div className="grid gap-8 border-y border-border/60 py-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] lg:items-end lg:py-12">
+          <div>
+            <div className="flex items-center gap-3">
+              <LogoMark size={26} />
+              <div className="mono text-[11px] uppercase tracking-[0.2em] text-accent">{eyebrow}</div>
+            </div>
+            <h1 className="mt-3 max-w-4xl font-display text-[2.35rem] font-bold leading-[1.03] tracking-tight sm:mt-4 sm:text-6xl lg:text-7xl">
+              {title}
+            </h1>
+          </div>
+          <p className="max-w-xl border-l border-accent/50 pl-5 text-[15px] leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+            {intro}
+          </p>
         </div>
-        <h1 className="mt-3 max-w-3xl font-display text-[2rem] font-bold leading-[1.08] tracking-tight sm:mt-4 sm:text-5xl lg:text-6xl">
-          {title}
-        </h1>
-        <p className="mt-4 max-w-2xl text-[15px] leading-7 text-muted-foreground sm:mt-5 sm:text-lg sm:leading-8">
-          {intro}
-        </p>
 
         {highlights && highlights.length > 0 && (
           <div className="mt-7 grid grid-cols-2 gap-2.5 sm:mt-10 sm:gap-3 lg:grid-cols-4">
             {highlights.map((h) => (
               <div
                 key={h.label}
-                className="rounded-2xl border border-border/60 bg-card p-4 transition-colors hover:border-accent/50 sm:p-5"
+                className="border border-border/60 bg-card p-4 transition-colors hover:border-accent/50 sm:p-5"
               >
                 <div className="font-display text-xl font-bold tracking-tight text-accent sm:text-2xl">
                   {h.value}
@@ -82,11 +86,11 @@ export function PolicyPage({
           </div>
         )}
 
-        <div className="mt-10 grid gap-8 sm:mt-14 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] lg:gap-10">
+        <div className="mt-10 grid gap-10 sm:mt-14 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] lg:gap-16">
           <div className="min-w-0 space-y-10 sm:space-y-14">{children}</div>
 
           <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-            <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card to-accent/10 p-6">
+            <div className="relative overflow-hidden border border-border/60 bg-gradient-to-br from-card via-card to-accent/10 p-6">
               <div
                 aria-hidden
                 className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-50 blur-3xl"
@@ -124,7 +128,7 @@ export function PolicyPage({
               </div>
             </div>
 
-            <div className="rounded-3xl border border-border/60 bg-card p-6">
+            <div className="border border-border/60 bg-card p-6">
               <div className="mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                 — Our promise
               </div>
@@ -170,11 +174,11 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-border/40 pt-8 first:border-0 first:pt-0">
+    <section id={id} className="scroll-mt-24 border-t border-border/60 pt-8 first:border-0 first:pt-0">
       {kicker && (
         <div className="mono text-[10px] uppercase tracking-[0.2em] text-accent">— {kicker}</div>
       )}
-      <h2 className="mt-1.5 font-display text-[1.4rem] font-bold leading-tight tracking-tight sm:text-3xl">
+      <h2 className="mt-1.5 font-display text-[1.65rem] font-bold leading-tight tracking-tight sm:text-4xl">
         {title}
       </h2>
       <div className="prose-pulse mt-4 max-w-[68ch] space-y-4 text-[15px] leading-[1.75] text-foreground/80 sm:mt-5">
@@ -213,7 +217,7 @@ export function Steps({ items }: { items: { title: string; body: string }[] }) {
       {items.map((s, i) => (
         <li
           key={s.title}
-          className="rounded-2xl border border-border/60 bg-card p-5 transition-colors hover:border-accent/50"
+          className="border border-border/60 bg-card p-5 transition-colors hover:border-accent/50"
         >
           <span className="mono grid h-7 w-7 place-items-center rounded-full border border-accent/40 bg-accent/10 text-[11px] font-bold text-accent">
             {i + 1}
@@ -235,7 +239,7 @@ export function InfoCards({
   return (
     <div className="not-prose grid gap-3 sm:grid-cols-2">
       {items.map((c) => (
-        <div key={c.title} className="rounded-2xl border border-border/60 bg-card p-5">
+        <div key={c.title} className="border border-border/60 bg-card p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="font-display text-base font-bold">{c.title}</div>
             {c.badge && (

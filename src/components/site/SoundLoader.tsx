@@ -32,13 +32,13 @@ export function SoundLoader({ label }: { label?: string }) {
       aria-live="polite"
       aria-busy="true"
     >
-      {/* ambient cinematic wash */}
+      {/* cinematic colour field */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 sl-wash"
         style={{
           background:
-            "radial-gradient(900px 500px at 50% 42%, oklch(0.65 0.24 25 / 0.22), transparent 72%), radial-gradient(600px 400px at 12% 100%, oklch(0.65 0.24 25 / 0.12), transparent 70%)",
+            "linear-gradient(115deg, transparent 0 46%, oklch(0.65 0.24 25 / 0.08) 46% 47%, transparent 47%), radial-gradient(900px 500px at 50% 42%, oklch(0.65 0.24 25 / 0.16), transparent 72%)",
         }}
       />
       {/* fine grid */}
@@ -56,62 +56,38 @@ export function SoundLoader({ label }: { label?: string }) {
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <span className="sl-scan" />
       </div>
-      {/* drifting motes */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        {Array.from({ length: 18 }).map((_, i) => (
-          <span
-            key={i}
-            className="sl-particle"
-            style={{
-              left: `${(i * 61) % 100}%`,
-              top: `${55 + ((i * 29) % 45)}%`,
-              animationDelay: `${(i % 9) * 0.45}s`,
-              animationDuration: `${5 + (i % 6)}s`,
-            }}
-          />
-        ))}
-      </div>
       {/* letterbox bars — the cinematic frame */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[7vh] bg-background sl-bar-top" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[7vh] bg-background sl-bar-bottom" />
-      {/* vignette */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ boxShadow: "inset 0 0 220px 60px oklch(0.14 0 0 / 0.75)" }}
-      />
+      <div aria-hidden className="pointer-events-none absolute inset-x-6 top-[11vh] flex items-center justify-between border-b border-border/60 pb-3 sm:inset-x-12">
+        <span className="mono text-[8px] text-muted-foreground">PULSE AUDIO LABS / STARTUP SEQUENCE</span>
+        <span className="mono text-[8px] text-muted-foreground">DSP CORE 03.26</span>
+      </div>
 
-      <div className="relative flex w-full max-w-md flex-col items-center px-6">
-        {/* glowing logo lockup */}
+      <div className="relative flex w-full max-w-lg flex-col items-center px-6">
+        {/* logo lockup */}
         <div className="sl-lockup relative flex flex-col items-center">
-          <div aria-hidden className="sl-halo" />
-          {/* circular progress ring wrapping the mark */}
-          <div className="relative grid place-items-center">
+          <div className="relative grid h-36 w-36 place-items-center border border-border bg-surface/60 backdrop-blur-md">
             <div
               aria-hidden
-              className="absolute h-[148px] w-[148px] rounded-full"
+              className="absolute inset-x-0 bottom-0 h-1 bg-border/60"
               style={{
-                background: `conic-gradient(oklch(0.72 0.24 25) ${pct * 3.6}deg, oklch(0.65 0.24 25 / 0.12) 0deg)`,
-                mask: "radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 3px))",
-                WebkitMask:
-                  "radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 3px))",
-                transition: "background 400ms linear",
+                background: `linear-gradient(90deg, var(--color-accent) ${pct}%, transparent ${pct}%)`,
               }}
             />
-            <div className="relative grid place-items-center rounded-full border border-accent/25 bg-background/60 p-7 backdrop-blur-md">
-              <span aria-hidden className="sl-sheen" />
-              <LogoMark size={64} animated />
-            </div>
+            <span aria-hidden className="absolute left-2 top-2 h-3 w-3 border-l border-t border-accent" />
+            <span aria-hidden className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent" />
+            <LogoMark size={72} animated />
           </div>
-          <div className="mt-6 font-display text-4xl font-bold tracking-[0.22em] sl-word">
+          <div className="mt-6 font-display text-4xl font-bold tracking-[0.22em]">
             PULSE<span className="text-accent">.</span>
           </div>
           <div className="mono mt-2 text-[10px] tracking-[0.42em] text-accent/70">AUDIO LABS</div>
         </div>
 
         {/* equaliser */}
-        <div className="mt-8 flex items-end gap-1.5" aria-hidden>
-          {Array.from({ length: 13 }).map((_, i) => (
+        <div className="mt-7 flex h-8 items-center gap-1" aria-hidden>
+          {Array.from({ length: 21 }).map((_, i) => (
             <span
               key={i}
               className="sl-eqbar"
@@ -133,11 +109,11 @@ export function SoundLoader({ label }: { label?: string }) {
         </div>
 
         {/* progress */}
-        <div className="mt-2 w-full">
-          <div className="relative h-[5px] w-full overflow-hidden rounded-full bg-border/50">
+        <div className="mt-3 w-full">
+          <div className="relative h-px w-full overflow-hidden bg-border/70">
             <span
-              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-accent/50 via-accent to-accent/60 transition-[width] duration-500 ease-out"
-              style={{ width: `${pct}%`, boxShadow: "0 0 16px oklch(0.65 0.24 25 / 0.85)" }}
+              className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-500 ease-out"
+              style={{ width: `${pct}%` }}
             />
             <span aria-hidden className="sl-shine" />
           </div>
@@ -177,11 +153,11 @@ export function SoundLoader({ label }: { label?: string }) {
           })}
         </ul>
 
-        <div className="mt-7 flex flex-wrap justify-center gap-1.5">
+        <div className="mt-7 grid w-full grid-cols-2 border border-border/60 sm:grid-cols-4">
           {TAGS.map((t, i) => (
             <span
               key={t}
-              className="mono sl-tag rounded-full border border-accent/25 bg-accent/[0.06] px-2.5 py-1 text-[9px] tracking-[0.22em] text-accent/80"
+              className="mono sl-tag border-r border-border/60 px-2.5 py-2 text-center text-[8px] tracking-[0.16em] text-muted-foreground last:border-r-0"
               style={{ animationDelay: `${0.5 + i * 0.12}s` }}
             >
               {t.toUpperCase()}
@@ -204,17 +180,6 @@ export function SoundLoader({ label }: { label?: string }) {
           from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(6px); }
           to   { opacity: 1; transform: none; filter: none; }
         }
-        .sl-halo {
-          position: absolute; left: 50%; top: 46px; width: 300px; height: 300px;
-          margin-left: -150px; margin-top: -150px; border-radius: 999px; pointer-events: none;
-          background: radial-gradient(circle, oklch(0.65 0.24 25 / 0.35), transparent 66%);
-          filter: blur(14px);
-          animation: sl-halo 3.2s ease-in-out infinite;
-        }
-        @keyframes sl-halo {
-          0%,100% { transform: scale(.92); opacity: .7; }
-          50%     { transform: scale(1.08); opacity: 1; }
-        }
         .sl-sheen {
           position: absolute; inset: 0; border-radius: 999px; overflow: hidden;
           background: linear-gradient(115deg, transparent 35%, oklch(1 0 0 / 0.16) 50%, transparent 65%);
@@ -223,20 +188,10 @@ export function SoundLoader({ label }: { label?: string }) {
         }
         @keyframes sl-sheen { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
 
-        .sl-word {
-          background: linear-gradient(100deg, oklch(0.9 0 0), oklch(0.78 0.2 25), oklch(0.9 0 0));
-          background-size: 220% 100%;
-          -webkit-background-clip: text; background-clip: text; color: transparent;
-          text-shadow: 0 0 34px oklch(0.65 0.24 25 / 0.35);
-          animation: sl-shimmer 3.6s linear infinite;
-        }
-        @keyframes sl-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
         .sl-eqbar {
-          display: inline-block; width: 4px; height: 26px; border-radius: 999px;
-          background: linear-gradient(180deg, oklch(0.82 0.2 25), oklch(0.55 0.24 25 / 0.35));
-          box-shadow: 0 0 10px oklch(0.65 0.24 25 / 0.6);
-          transform-origin: bottom;
+          display: inline-block; width: 3px; height: 22px;
+          background: oklch(0.65 0.24 25);
+          transform-origin: center;
           animation-name: sl-eq; animation-timing-function: cubic-bezier(.36,.07,.19,.97);
           animation-iteration-count: infinite;
         }
@@ -259,18 +214,6 @@ export function SoundLoader({ label }: { label?: string }) {
         .sl-tag { animation: sl-tag-in .7s cubic-bezier(.16,1,.3,1) both; }
         @keyframes sl-tag-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-        .sl-particle {
-          position: absolute; width: 3px; height: 3px; border-radius: 999px;
-          background: oklch(0.65 0.24 25 / 0.75);
-          box-shadow: 0 0 8px oklch(0.65 0.24 25 / 0.8);
-          animation-name: sl-float; animation-timing-function: linear; animation-iteration-count: infinite;
-        }
-        @keyframes sl-float {
-          0%   { transform: translateY(0) scale(1); opacity: 0; }
-          15%  { opacity: 1; }
-          100% { transform: translateY(-220px) scale(.35); opacity: 0; }
-        }
-
         .sl-scan {
           position: absolute; left: 0; right: 0; top: -25%; height: 45%;
           background: linear-gradient(180deg, transparent, oklch(0.65 0.24 25 / 0.10), transparent);
@@ -279,7 +222,7 @@ export function SoundLoader({ label }: { label?: string }) {
         @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
 
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-halo, .sl-sheen, .sl-word, .sl-eqbar, .sl-particle, .sl-scan,
+          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan,
           .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag {
             animation: none !important;
           }
