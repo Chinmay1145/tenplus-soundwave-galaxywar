@@ -239,7 +239,7 @@ function Contact() {
                 </Link>
               );
             })}
-          </div>
+          </Reveal>
         </div>
       </section>
     </div>
