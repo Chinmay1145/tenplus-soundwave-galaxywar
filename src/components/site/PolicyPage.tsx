@@ -174,14 +174,14 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-border/60 pt-8 first:border-0 first:pt-0">
+    <section id={id} className="scroll-mt-24 border-t border-border/60 pt-9 first:border-0 first:pt-0 sm:pt-12">
       {kicker && (
-        <div className="mono text-[10px] uppercase tracking-[0.2em] text-accent">— {kicker}</div>
+        <div className="mono text-[10px] uppercase tracking-[0.24em] text-accent">— {kicker}</div>
       )}
-      <h2 className="mt-1.5 font-display text-[1.65rem] font-bold leading-tight tracking-tight sm:text-4xl">
+      <h2 className="mt-2 font-display text-[1.8rem] font-bold leading-[1.05] tracking-tight sm:text-[2.6rem]">
         {title}
       </h2>
-      <div className="prose-pulse mt-4 max-w-[68ch] space-y-4 text-[15px] leading-[1.75] text-foreground/80 sm:mt-5">
+      <div className="prose-pulse mt-5 max-w-[66ch] space-y-4 text-[15.5px] leading-[1.8] text-foreground/80 sm:mt-6 sm:text-base">
         {children}
       </div>
     </section>
