@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, Cpu, Globe, Leaf, ArrowUpRight, Quote } from "lucide-react";
 import { LogoMark } from "@/components/site/Logo";
 import studioImage from "@/assets/product-headphones.jpg";
+import { Reveal, SectionMast } from "@/components/site/Editorial";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -65,29 +66,36 @@ function About() {
 
       {/* MANIFESTO / QUOTE */}
       <section className="border-b border-border/60">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_2fr]">
-          <div className="mono text-accent">— 01 · Manifesto</div>
-          <div>
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] lg:gap-16">
+          <div className="ed-rule items-start gap-4">
+            <span className="ed-numeral text-5xl sm:text-6xl">01</span>
+            <span className="mono text-[10px] uppercase tracking-[0.24em] text-accent">
+              Manifesto
+            </span>
+          </div>
+          <Reveal>
             <Quote className="h-8 w-8 text-accent" />
-            <p className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+            <p className="mt-5 max-w-3xl font-display text-[1.9rem] font-bold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">
               We don't build gadgets. We build instruments — objects that
               disappear the moment the music starts, and reappear only when
               you notice they're beautiful.
             </p>
-            <div className="mono mt-6 text-xs text-muted-foreground">
-              — LINUS OKONKWO, CO-FOUNDER & HEAD OF ACOUSTICS
+            <div className="mono mt-7 border-t border-border/60 pt-3 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              Linus Okonkwo · Co-founder & head of acoustics
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* PILLARS */}
       <section className="border-b border-border/60">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-          <div className="mono text-accent">— 02 · What we stand for</div>
-          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Four pillars. No compromises.
-          </h2>
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+          <SectionMast
+            index="02"
+            kicker="What we stand for"
+            title={<>Four pillars.<br />No compromises.</>}
+            standfirst="Every decision at PULSE routes back through these four filters — engineering rigour, recognised design, global reach and material honesty."
+          />
           <div className="mt-12 grid gap-px overflow-hidden border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [Cpu, "Engineering", "8 acoustic patents and counting — from the hybrid ANC array to the titanium diaphragm."],
@@ -111,11 +119,13 @@ function About() {
 
       {/* TIMELINE */}
       <section className="border-b border-border/60">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-          <div className="mono text-accent">— 03 · The road so far</div>
-          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Five years, three products, one obsession.
-          </h2>
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+          <SectionMast
+            index="03"
+            kicker="The road so far"
+            title={<>Five years, three products,<br />one obsession.</>}
+          />
+
 
           <ol className="mt-12 relative border-l border-border/60 pl-6 sm:pl-10">
             {[
@@ -129,12 +139,16 @@ function About() {
                 <span className="absolute -left-[calc(0.75rem+1px)] top-1.5 grid h-3 w-3 place-items-center sm:-left-[calc(1.25rem+1px)]">
                   <span className="h-3 w-3 rounded-full bg-accent" />
                 </span>
-                <div className="mono text-xs text-muted-foreground">CHAPTER {String(i + 1).padStart(2, "0")}</div>
-                <div className="mt-1 flex flex-wrap items-baseline gap-4">
-                  <div className="font-display text-4xl font-bold text-accent">{y}</div>
-                  <div className="font-display text-2xl font-bold tracking-tight">{t}</div>
-                </div>
-                <p className="mt-2 max-w-xl text-muted-foreground">{d}</p>
+                <Reveal delay={i * 70}>
+                  <div className="mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                    Chapter {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-baseline gap-x-5 gap-y-1">
+                    <div className="font-display text-4xl font-bold leading-none text-accent sm:text-5xl">{y}</div>
+                    <div className="font-display text-xl font-bold tracking-tight sm:text-2xl">{t}</div>
+                  </div>
+                  <p className="mt-2.5 max-w-xl text-[15px] leading-7 text-muted-foreground">{d}</p>
+                </Reveal>
               </li>
             ))}
           </ol>

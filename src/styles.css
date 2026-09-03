@@ -280,3 +280,53 @@
 }
 .btn-magnetic:hover::before { opacity: 1; }
 .btn-magnetic:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+
+/* ---------- Editorial contrast utilities ---------- */
+
+/* Full-bleed hairline rule with a mono label sitting on it */
+@utility ed-rule {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+  padding-top: 0.85rem;
+}
+
+/* Oversized editorial index numeral */
+@utility ed-numeral {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--color-accent) 55%, transparent);
+}
+
+/* Editorial drop cap on the first paragraph of a block */
+@utility ed-dropcap {
+  &::first-letter {
+    float: left;
+    margin: 0.08em 0.5rem 0 0;
+    font-family: var(--font-display);
+    font-size: 3.1em;
+    font-weight: 700;
+    line-height: 0.78;
+    color: var(--color-accent);
+  }
+}
+
+/* Scroll reveal — moderate register */
+@utility ed-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+@utility ed-reveal-in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ed-reveal { opacity: 1; transform: none; transition: none; }
+}
