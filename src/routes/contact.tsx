@@ -218,7 +218,7 @@ function Contact() {
           />
 
 
-          <div className="mt-10 grid gap-px overflow-hidden border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
+          <Reveal className="mt-10 grid gap-px overflow-hidden border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [Truck, "Track order", "See where your package is right now.", "/track-order"],
               [ShieldCheck, "Warranty", "24-month cover on every product.", "/warranty"],
