@@ -5,6 +5,7 @@ import hero from "@/assets/hero-earbuds.jpg";
 import { PRODUCTS, CATEGORIES, BRANDS } from "@/data/products";
 import { ProductCard } from "@/components/site/ProductCard";
 import { brandLogo } from "@/lib/brand-logo";
+import { SectionMast } from "@/components/site/Editorial";
 
 export const Route = createFileRoute("/")({
   head: () => ({
