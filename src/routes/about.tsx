@@ -139,12 +139,16 @@ function About() {
                 <span className="absolute -left-[calc(0.75rem+1px)] top-1.5 grid h-3 w-3 place-items-center sm:-left-[calc(1.25rem+1px)]">
                   <span className="h-3 w-3 rounded-full bg-accent" />
                 </span>
-                <div className="mono text-xs text-muted-foreground">CHAPTER {String(i + 1).padStart(2, "0")}</div>
-                <div className="mt-1 flex flex-wrap items-baseline gap-4">
-                  <div className="font-display text-4xl font-bold text-accent">{y}</div>
-                  <div className="font-display text-2xl font-bold tracking-tight">{t}</div>
-                </div>
-                <p className="mt-2 max-w-xl text-muted-foreground">{d}</p>
+                <Reveal delay={i * 70}>
+                  <div className="mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                    Chapter {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-baseline gap-x-5 gap-y-1">
+                    <div className="font-display text-4xl font-bold leading-none text-accent sm:text-5xl">{y}</div>
+                    <div className="font-display text-xl font-bold tracking-tight sm:text-2xl">{t}</div>
+                  </div>
+                  <p className="mt-2.5 max-w-xl text-[15px] leading-7 text-muted-foreground">{d}</p>
+                </Reveal>
               </li>
             ))}
           </ol>
