@@ -205,26 +205,25 @@ function Home() {
               "radial-gradient(650px 260px at 20% 0%, oklch(0.65 0.24 25 / 0.16), transparent 70%)",
           }}
         />
-        <div className="mb-10 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
-          <div className="min-w-0">
-            <div className="mono text-accent">— 01 / Collections</div>
-            <h2 className="mt-2 font-display text-4xl font-bold leading-none tracking-tight sm:text-6xl">
-              Built around<br />how you listen.
-            </h2>
-            <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-              {PRODUCTS.length} hand-tuned products across {CATEGORIES.length} collections —
-              from reference studio cans to featherweight open-ear runners.
-            </p>
-          </div>
-          <Link
-            to="/shop"
-            className="mono hidden shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface-2 px-4 py-2 text-[11px] transition-colors hover:border-accent hover:text-accent sm:inline-flex"
-          >
-            VIEW ALL <ArrowRight className="h-3 w-3" />
-          </Link>
+        <SectionMast
+          index="01"
+          kicker="Collections"
+          title={<>Built around<br />how you listen.</>}
+          standfirst={`${PRODUCTS.length} hand-tuned products across ${CATEGORIES.length} collections — from reference studio cans to featherweight open-ear runners.`}
+          aside={
+            <Link
+              to="/shop"
+              className="mono hidden shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface-2 px-4 py-2 text-[10px] uppercase tracking-[0.2em] transition-colors hover:border-accent hover:text-accent sm:inline-flex"
+            >
+              View all <ArrowRight className="h-3 w-3" />
+            </Link>
+          }
+        />
+
+        <div className="mt-12">
+          <FindYourSound />
         </div>
 
-        <FindYourSound />
 
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-y border-border/60 bg-surface-2/40 p-5">
