@@ -76,8 +76,9 @@ function Contact() {
       </section>
 
       {/* FORM + CHANNELS */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+        <BandRule label="01 / Write to us" />
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-12">
           {/* Form */}
           <form
             onSubmit={submit}
