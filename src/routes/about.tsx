@@ -119,11 +119,13 @@ function About() {
 
       {/* TIMELINE */}
       <section className="border-b border-border/60">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-          <div className="mono text-accent">— 03 · The road so far</div>
-          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Five years, three products, one obsession.
-          </h2>
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+          <SectionMast
+            index="03"
+            kicker="The road so far"
+            title={<>Five years, three products,<br />one obsession.</>}
+          />
+
 
           <ol className="mt-12 relative border-l border-border/60 pl-6 sm:pl-10">
             {[
