@@ -3,6 +3,7 @@ import { ArrowUpRight, Clock, Mail, MapPin, MessageCircle, Phone, ShieldCheck, T
 import { useState } from "react";
 import { toast } from "sonner";
 import { LogoMark } from "@/components/site/Logo";
+import { BandRule, Reveal, SectionMast } from "@/components/site/Editorial";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
