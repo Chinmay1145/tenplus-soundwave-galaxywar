@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, Cpu, Globe, Leaf, ArrowUpRight, Quote } from "lucide-react";
 import { LogoMark } from "@/components/site/Logo";
 import studioImage from "@/assets/product-headphones.jpg";
+import { Reveal, SectionMast } from "@/components/site/Editorial";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
