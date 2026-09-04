@@ -10,8 +10,10 @@ import {
   RotateCcw,
   Mail,
   ArrowRight,
+  LockKeyhole,
 } from "lucide-react";
 import { Logo, LogoMark } from "./Logo";
+import { Button } from "@/components/ui/button";
 
 const PROMISES = [
   [Truck, "Free express shipping", "On every order, pan-India"],
@@ -23,74 +25,88 @@ const PROMISES = [
 export function Footer() {
   return (
     <footer className="relative overflow-hidden border-t border-border/60 bg-surface">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 -top-24 h-56 opacity-50"
-        style={{
-          background:
-            "radial-gradient(700px 240px at 50% 0%, oklch(0.65 0.24 25 / 0.18), transparent 70%)",
-        }}
-      />
-
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="grid gap-6 border-b border-border/60 py-10 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:py-14">
+        <div className="grid gap-8 border-b border-border/60 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="min-w-0">
-            <div className="mono text-accent">PULSE / LISTEN DIFFERENTLY</div>
-            <div className="mt-3 font-display text-4xl font-bold leading-none sm:text-6xl">
-              Your next favourite<br />sound starts here.
+            <div className="flex items-center gap-3">
+              <span className="h-px w-10 bg-accent" />
+              <span className="mono text-accent">The listening room / 2026</span>
             </div>
+            <h2 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-[0.98] sm:text-6xl lg:text-7xl">
+              Find the sound you’ll<br className="hidden sm:block" /> want to live in.
+            </h2>
+            <p className="mt-5 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
+              Compare signatures, explore new releases and choose audio built
+              around the way you actually listen.
+            </p>
           </div>
-          <Link to="/shop" className="group inline-flex shrink-0 items-center gap-3 border border-foreground bg-foreground px-5 py-3 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
-            Explore all collections <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+          <Button asChild size="lg" className="group h-12 w-fit rounded-none px-6">
+            <Link to="/shop">
+              Explore all collections
+              <ArrowRight className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Button>
         </div>
+
         {/* Promise strip */}
-        <div className="grid gap-4 border-b border-border/60 py-10 sm:grid-cols-2 lg:grid-cols-4">
-          {PROMISES.map(([Ico, title, sub]) => (
-            <div key={title} className="flex min-w-0 items-start gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-accent/30 bg-accent/10 text-accent">
+        <div className="grid border-b border-border/60 sm:grid-cols-2 lg:grid-cols-4">
+          {PROMISES.map(([Ico, title, sub], index) => (
+            <div
+              key={title}
+              className="flex min-w-0 items-start gap-3 border-border/60 py-6 sm:px-5 sm:odd:border-r lg:border-r lg:px-6 lg:first:pl-0 lg:last:border-r-0 lg:last:pr-0"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center border border-accent/30 bg-accent/10 text-accent">
                 <Ico className="h-4 w-4" />
               </span>
               <div className="min-w-0">
-                <div className="truncate text-sm font-semibold">{title}</div>
-                <div className="truncate text-xs text-muted-foreground">{sub}</div>
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <span className="mono text-[9px] text-muted-foreground">0{index + 1}</span>
+                  {title}
+                </div>
+                <div className="mt-1 text-xs leading-5 text-muted-foreground">{sub}</div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="grid gap-12 py-14 md:grid-cols-12">
-          <div className="md:col-span-4">
-            <Link to="/" className="inline-flex items-center" aria-label="PULSE home">
-              <Logo size={40} />
+        <div className="grid gap-12 py-14 md:grid-cols-12 lg:py-20">
+          <div className="md:col-span-4 md:pr-8">
+            <Link
+              to="/"
+              className="group inline-flex items-center gap-4 border-y border-border/60 py-4"
+              aria-label="PULSE home"
+            >
+              <span className="grid h-14 w-14 place-items-center border border-accent/40 bg-accent/5 transition-colors group-hover:bg-accent/10">
+                <Logo size={42} wordmark={false} />
+              </span>
+              <span>
+                <span className="block font-display text-2xl font-bold leading-none">PULSE<span className="text-accent">.</span></span>
+                <span className="mono mt-1.5 block text-[9px] text-muted-foreground">Audio laboratory / Est. 2021</span>
+              </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-              The world's most premium wireless earbuds — engineered for music,
-              calls, gaming, fitness and everyday luxury.
+            <p className="mt-5 max-w-sm text-sm leading-6 text-muted-foreground">
+              Precision audio for music, calls, gaming and movement — designed
+              in Stockholm, tuned for listeners everywhere.
             </p>
 
             {/* Newsletter */}
             <form
-              className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2"
+              className="mt-7 border-b border-border focus-within:border-accent"
               onSubmit={(e) => e.preventDefault()}
             >
-              <label className="relative min-w-0">
+              <label className="relative grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center">
                 <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="email"
                   required
                   placeholder="Your email for drops"
                   aria-label="Email address"
-                  className="w-full rounded-full border border-border bg-surface-2 py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent"
+                  className="h-12 w-full bg-transparent pl-10 pr-3 text-sm outline-none placeholder:text-muted-foreground"
                 />
+                <Button type="submit" size="icon" variant="ghost" className="rounded-none" aria-label="Subscribe">
+                  <ArrowRight />
+                </Button>
               </label>
-              <button
-                type="submit"
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground transition-transform hover:scale-105"
-                aria-label="Subscribe"
-              >
-                <ArrowRight className="h-4 w-4" />
-              </button>
             </form>
 
             <div className="mt-6 flex gap-2">
@@ -98,8 +114,8 @@ export function Footer() {
                 <a
                   key={i}
                   href="#"
-                  className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 transition-all hover:-translate-y-0.5 hover:border-accent hover:text-accent"
-                  aria-label="social"
+                  className="grid h-10 w-10 place-items-center border border-border/60 transition-all hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+                  aria-label={["Instagram", "Twitter", "YouTube", "GitHub"][i]}
                 >
                   <Ico className="h-4 w-4" />
                 </a>
@@ -139,12 +155,12 @@ export function Footer() {
         </div>
 
         {/* Payments + assurances */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 py-6">
+        <div className="grid gap-5 border-t border-border/60 py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="flex flex-wrap items-center gap-2">
             {["VISA", "MASTERCARD", "RUPAY", "UPI", "NETBANKING", "EMI", "COD"].map((p) => (
               <span
                 key={p}
-                className="mono rounded-md border border-border/70 bg-surface-2 px-2.5 py-1.5 text-[9px] tracking-[0.14em] text-muted-foreground"
+                className="mono border border-border/70 bg-surface-2 px-2.5 py-1.5 text-[9px] text-muted-foreground"
               >
                 {p}
               </span>
@@ -152,16 +168,17 @@ export function Footer() {
           </div>
           <div className="mono flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> PCI-DSS SECURE CHECKOUT
+              <LockKeyhole className="h-3 w-3 text-accent" /> PCI-DSS SECURE CHECKOUT
             </span>
             <span>256-BIT TLS</span>
             <span>GST INVOICE ON EVERY ORDER</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 border-t border-border/60 py-6">
-          <LogoMark size={48} />
-          <div className="font-display text-[clamp(3rem,10vw,8rem)] font-bold leading-none text-foreground/10">PULSE.</div>
+        <div className="relative flex items-center gap-4 overflow-hidden border-t border-border/60 py-8 sm:py-10">
+          <LogoMark size={56} className="relative z-10" />
+          <div className="select-none font-display text-[clamp(3.5rem,12vw,9rem)] font-bold leading-[0.72] text-foreground/10">PULSE.</div>
+          <div className="mono absolute bottom-4 right-0 hidden text-[9px] text-muted-foreground sm:block">Sound / Form / Motion</div>
         </div>
 
         <div className="flex flex-col items-start justify-between gap-4 border-t border-border/60 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
