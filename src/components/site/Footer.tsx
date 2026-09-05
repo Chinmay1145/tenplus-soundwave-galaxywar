@@ -60,7 +60,7 @@ export function Footer() {
               </span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 text-sm font-semibold">
-                  <span className="mono text-[9px] text-muted-foreground">0{index + 1}</span>
+                  <span className="mono text-[11px] tracking-[0.2em] text-accent/70">0{index + 1}</span>
                   {title}
                 </div>
                 <div className="mt-1 text-xs leading-5 text-muted-foreground">{sub}</div>
@@ -69,8 +69,8 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="grid gap-12 py-14 md:grid-cols-12 lg:py-20">
-          <div className="md:col-span-4 md:pr-8">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:grid-cols-12 md:gap-12 md:py-14 lg:py-20">
+          <div className="col-span-2 md:col-span-4 md:pr-8">
             <Link
               to="/"
               className="group inline-flex items-center gap-4 border-y border-border/60 py-4"
@@ -101,7 +101,7 @@ export function Footer() {
                   required
                   placeholder="Your email for drops"
                   aria-label="Email address"
-                  className="h-12 w-full bg-transparent pl-10 pr-3 text-sm outline-none placeholder:text-muted-foreground"
+                  className="h-12 w-full bg-transparent pl-10 pr-3 text-base outline-none placeholder:text-sm placeholder:text-muted-foreground"
                 />
                 <Button type="submit" size="icon" variant="ghost" className="rounded-none" aria-label="Subscribe">
                   <ArrowRight />
@@ -175,10 +175,10 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="relative flex items-center gap-4 overflow-hidden border-t border-border/60 py-8 sm:py-10">
-          <LogoMark size={56} className="relative z-10" />
-          <div className="select-none font-display text-[clamp(3.5rem,12vw,9rem)] font-bold leading-[0.72] text-foreground/10">PULSE.</div>
-          <div className="mono absolute bottom-4 right-0 hidden text-[9px] text-muted-foreground sm:block">Sound / Form / Motion</div>
+        <div className="relative flex items-center gap-3 overflow-hidden border-t border-border/60 py-5 sm:gap-4 sm:py-10">
+          <LogoMark size={40} className="relative z-10 shrink-0 sm:h-14 sm:w-14" />
+          <div className="select-none font-display text-[clamp(2.75rem,11vw,8.5rem)] font-bold leading-[0.72] text-foreground/10">PULSE.</div>
+          <div className="mono absolute bottom-4 right-0 hidden text-[10px] tracking-[0.2em] text-muted-foreground sm:block">Sound / Form / Motion</div>
         </div>
 
         <div className="flex flex-col items-start justify-between gap-4 border-t border-border/60 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
@@ -201,8 +201,8 @@ export function Footer() {
 
 function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
   return (
-    <div className="md:col-span-2">
-      <div className="mono mb-4 text-muted-foreground">{title}</div>
+    <div className="min-w-0 md:col-span-2">
+      <div className="mono mb-4 border-b border-border/60 pb-2 text-[11px] tracking-[0.2em] text-muted-foreground">{title}</div>
       <ul className="space-y-2.5">
         {links.map(([label, href]) => (
           <li key={label}>
