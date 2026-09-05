@@ -23,6 +23,9 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
 
   useEffect(() => {
     if (!visible) return;
+    // Lock background scroll while the splash covers the screen.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const start = performance.now();
     const finish = () => {
       const elapsed = performance.now() - start;
