@@ -1,4 +1,0 @@
-- [ ] Repolish footer
-- [ ] Rebalance loading page sizing
-- [ ] Upgrade About page
-- [ ] Upgrade Contact page
