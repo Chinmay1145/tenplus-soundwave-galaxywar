@@ -59,15 +59,15 @@ export function SoundLoader({ label }: { label?: string }) {
       {/* letterbox bars — the cinematic frame */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[7vh] bg-background sl-bar-top" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[7vh] bg-background sl-bar-bottom" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-6 top-[11vh] flex items-center justify-between border-b border-border/60 pb-3 sm:inset-x-12">
-        <span className="mono text-[8px] text-muted-foreground">PULSE AUDIO LABS / STARTUP SEQUENCE</span>
-        <span className="mono text-[8px] text-muted-foreground">DSP CORE 03.26</span>
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-[10vh] flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
+        <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
+        <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-muted-foreground">DSP 03.26</span>
       </div>
 
-      <div className="relative flex w-full max-w-lg flex-col items-center px-6">
+      <div className="relative flex w-full max-w-lg flex-col items-center px-5 sm:px-6">
         {/* logo lockup */}
         <div className="sl-lockup relative flex flex-col items-center">
-          <div className="relative grid h-36 w-36 place-items-center border border-border bg-surface/60 backdrop-blur-md">
+          <div className="relative grid h-28 w-28 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-36 sm:w-36">
             <div
               aria-hidden
               className="absolute inset-x-0 bottom-0 h-1 bg-border/60"
@@ -77,16 +77,16 @@ export function SoundLoader({ label }: { label?: string }) {
             />
             <span aria-hidden className="absolute left-2 top-2 h-3 w-3 border-l border-t border-accent" />
             <span aria-hidden className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent" />
-            <LogoMark size={72} animated />
+            <LogoMark size={60} animated className="sm:h-[72px] sm:w-[72px]" />
           </div>
-          <div className="mt-6 font-display text-4xl font-bold tracking-[0.22em]">
+          <div className="mt-5 font-display text-3xl font-bold tracking-[0.2em] sm:mt-6 sm:text-4xl">
             PULSE<span className="text-accent">.</span>
           </div>
-          <div className="mono mt-2 text-[10px] tracking-[0.42em] text-accent/70">AUDIO LABS</div>
+          <div className="mono mt-2 text-[10px] tracking-[0.4em] text-accent/70">AUDIO LABS</div>
         </div>
 
         {/* equaliser */}
-        <div className="mt-7 flex h-8 items-center gap-1" aria-hidden>
+        <div className="mt-5 flex h-7 items-center gap-1 sm:mt-7 sm:h-8" aria-hidden>
           {Array.from({ length: 21 }).map((_, i) => (
             <span
               key={i}
