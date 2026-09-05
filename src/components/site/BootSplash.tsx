@@ -57,6 +57,10 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
       className="fixed inset-0 z-[200]"
       aria-hidden={fading}
       style={{
+        width: "100vw",
+        height: "100dvh",
+        minHeight: "100vh",
+        overflow: "hidden",
         opacity: fading ? 0 : 1,
         transform: fading ? "translateY(-1.5rem) scale(1.015)" : "none",
         filter: fading ? "blur(4px)" : "none",
