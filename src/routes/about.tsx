@@ -36,9 +36,12 @@ function About() {
               <LogoMark size={28} />
               <div className="mono text-accent">— Our story · Est. 2021</div>
             </div>
-            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.9] tracking-tight sm:text-[96px]">
+            <h1 className="mt-4 font-display text-[clamp(2.75rem,10.5vw,6rem)] font-bold leading-[0.88] tracking-tight">
               We make sound<br />feel <span className="text-accent">physical.</span>
             </h1>
+            <p className="mono mt-6 max-w-md border-l-2 border-accent pl-4 text-[11px] leading-6 tracking-[0.18em] text-muted-foreground">
+              STOCKHOLM ACOUSTICS LAB · BENGALURU DESIGN STUDIO · 8 PATENTS
+            </p>
           </div>
           <div className="flex flex-col justify-end gap-6 lg:col-span-5">
             <div className="relative aspect-[4/3] overflow-hidden border border-border/60 bg-surface">

@@ -57,8 +57,8 @@ export function SoundLoader({ label }: { label?: string }) {
         <span className="sl-scan" />
       </div>
       {/* letterbox bars — the cinematic frame */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[7vh] bg-background sl-bar-top" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[7vh] bg-background sl-bar-bottom" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[5vh] bg-background sl-bar-top sm:h-[7vh]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[5vh] bg-background sl-bar-bottom sm:h-[7vh]" />
       <div aria-hidden className="pointer-events-none absolute inset-x-4 top-[10vh] flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
         <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
         <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-muted-foreground">DSP 03.26</span>

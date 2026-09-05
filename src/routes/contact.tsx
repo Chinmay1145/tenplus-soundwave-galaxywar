@@ -49,10 +49,10 @@ function Contact() {
               <LogoMark size={28} />
               <div className="mono text-accent">— Contact · 24h response</div>
             </div>
-            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.9] tracking-tight sm:text-[104px]">
+            <h1 className="mt-4 font-display text-[clamp(2.75rem,11vw,6.5rem)] font-bold leading-[0.88] tracking-tight">
               Start with<br /><span className="text-accent">one question.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-muted-foreground">
+            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
               Questions about a product, an order, or a partnership? We're a
               small team based in Bengaluru and Stockholm, and we answer every
               message ourselves.
@@ -83,7 +83,7 @@ function Contact() {
           {/* Form */}
           <form
             onSubmit={submit}
-            className="relative overflow-hidden border border-border/60 bg-card p-8 sm:p-10"
+            className="relative overflow-hidden border border-border/60 bg-card p-6 sm:p-10"
           >
             <div
               aria-hidden
@@ -92,7 +92,7 @@ function Contact() {
             />
             <div className="relative">
               <div className="mono text-accent">— Send us a note</div>
-                <h2 className="mt-2 font-display text-4xl font-bold tracking-tight">Tell us what you need.</h2>
+                <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Tell us what you need.</h2>
 
               <div className="mt-8 space-y-5">
                 <div className="grid gap-5 sm:grid-cols-2">
