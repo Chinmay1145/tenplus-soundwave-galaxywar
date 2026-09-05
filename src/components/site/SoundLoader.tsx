@@ -57,17 +57,17 @@ export function SoundLoader({ label }: { label?: string }) {
         <span className="sl-scan" />
       </div>
       {/* letterbox bars — the cinematic frame */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[7vh] bg-background sl-bar-top" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[7vh] bg-background sl-bar-bottom" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-6 top-[11vh] flex items-center justify-between border-b border-border/60 pb-3 sm:inset-x-12">
-        <span className="mono text-[8px] text-muted-foreground">PULSE AUDIO LABS / STARTUP SEQUENCE</span>
-        <span className="mono text-[8px] text-muted-foreground">DSP CORE 03.26</span>
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[5vh] bg-background sl-bar-top sm:h-[7vh]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[5vh] bg-background sl-bar-bottom sm:h-[7vh]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-[10vh] flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
+        <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
+        <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-muted-foreground">DSP 03.26</span>
       </div>
 
-      <div className="relative flex w-full max-w-lg flex-col items-center px-6">
+      <div className="relative flex w-full max-w-lg flex-col items-center px-5 sm:px-6">
         {/* logo lockup */}
         <div className="sl-lockup relative flex flex-col items-center">
-          <div className="relative grid h-36 w-36 place-items-center border border-border bg-surface/60 backdrop-blur-md">
+          <div className="relative grid h-28 w-28 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-36 sm:w-36">
             <div
               aria-hidden
               className="absolute inset-x-0 bottom-0 h-1 bg-border/60"
@@ -77,16 +77,16 @@ export function SoundLoader({ label }: { label?: string }) {
             />
             <span aria-hidden className="absolute left-2 top-2 h-3 w-3 border-l border-t border-accent" />
             <span aria-hidden className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent" />
-            <LogoMark size={72} animated />
+            <LogoMark size={60} animated className="sm:h-[72px] sm:w-[72px]" />
           </div>
-          <div className="mt-6 font-display text-4xl font-bold tracking-[0.22em]">
+          <div className="mt-5 font-display text-3xl font-bold tracking-[0.2em] sm:mt-6 sm:text-4xl">
             PULSE<span className="text-accent">.</span>
           </div>
-          <div className="mono mt-2 text-[10px] tracking-[0.42em] text-accent/70">AUDIO LABS</div>
+          <div className="mono mt-2 text-[10px] tracking-[0.4em] text-accent/70">AUDIO LABS</div>
         </div>
 
         {/* equaliser */}
-        <div className="mt-7 flex h-8 items-center gap-1" aria-hidden>
+        <div className="mt-5 flex h-7 items-center gap-1 sm:mt-7 sm:h-8" aria-hidden>
           {Array.from({ length: 21 }).map((_, i) => (
             <span
               key={i}
@@ -97,12 +97,12 @@ export function SoundLoader({ label }: { label?: string }) {
         </div>
 
         {/* act headline with crossfade */}
-        <div className="mt-8 h-12 text-center">
+        <div className="mt-6 h-12 text-center sm:mt-8">
           <div key={headline} className="sl-act">
-            <div className="mono text-[11px] tracking-[0.4em] text-foreground/85">
+            <div className="mono text-[11px] tracking-[0.32em] text-foreground/85 sm:tracking-[0.4em]">
               {headline.toUpperCase()}
             </div>
-            <div className="mono mt-1.5 text-[9px] tracking-[0.22em] text-muted-foreground">
+            <div className="mono mt-1.5 text-[10px] tracking-[0.2em] text-muted-foreground">
               {(label ? "PREPARING YOUR SESSION" : act.sub).toUpperCase()}
             </div>
           </div>
@@ -110,14 +110,14 @@ export function SoundLoader({ label }: { label?: string }) {
 
         {/* progress */}
         <div className="mt-3 w-full">
-          <div className="relative h-px w-full overflow-hidden bg-border/70">
+          <div className="relative h-[2px] w-full overflow-hidden bg-border/70">
             <span
               className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-500 ease-out"
               style={{ width: `${pct}%` }}
             />
             <span aria-hidden className="sl-shine" />
           </div>
-          <div className="mono mt-2.5 flex items-center justify-between text-[9px] tracking-[0.26em] text-muted-foreground">
+          <div className="mono mt-2.5 flex items-center justify-between text-[10px] tracking-[0.24em] text-muted-foreground">
             <span>
               ACT {actIdx + 1} / {ACTS.length}
             </span>
@@ -142,7 +142,7 @@ export function SoundLoader({ label }: { label?: string }) {
                   }`}
                 />
                 <span
-                  className={`mono truncate text-[8px] tracking-[0.14em] transition-colors ${
+                  className={`mono truncate text-[10px] tracking-[0.12em] transition-colors ${
                     done ? "text-accent" : live ? "text-foreground/70" : "text-muted-foreground/45"
                   }`}
                 >
@@ -153,11 +153,11 @@ export function SoundLoader({ label }: { label?: string }) {
           })}
         </ul>
 
-        <div className="mt-7 grid w-full grid-cols-2 border border-border/60 sm:grid-cols-4">
+        <div className="mt-6 grid w-full grid-cols-2 border border-border/60 sm:mt-7 sm:grid-cols-4">
           {TAGS.map((t, i) => (
             <span
               key={t}
-              className="mono sl-tag border-r border-border/60 px-2.5 py-2 text-center text-[8px] tracking-[0.16em] text-muted-foreground last:border-r-0"
+              className="mono sl-tag border-r border-border/60 px-2 py-2 text-center text-[10px] tracking-[0.12em] text-muted-foreground last:border-r-0 sm:px-2.5"
               style={{ animationDelay: `${0.5 + i * 0.12}s` }}
             >
               {t.toUpperCase()}
