@@ -28,6 +28,7 @@ export function SoundLoader({ label }: { label?: string }) {
   return (
     <div
       className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-background"
+      style={{ width: "100vw", height: "100dvh", minHeight: "100vh" }}
       role="status"
       aria-live="polite"
       aria-busy="true"

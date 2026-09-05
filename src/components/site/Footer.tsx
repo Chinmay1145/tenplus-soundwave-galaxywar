@@ -175,10 +175,26 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="relative flex items-center gap-3 overflow-hidden border-t border-border/60 py-5 sm:gap-4 sm:py-10">
-          <LogoMark size={40} className="relative z-10 shrink-0 sm:h-14 sm:w-14" />
-          <div className="select-none font-display text-[clamp(2.75rem,11vw,8.5rem)] font-bold leading-[0.72] text-foreground/10">PULSE.</div>
-          <div className="mono absolute bottom-4 right-0 hidden text-[10px] tracking-[0.2em] text-muted-foreground sm:block">Sound / Form / Motion</div>
+        {/* Signature strip — logo lockup + studio tagline */}
+        <div className="grid gap-4 border-t border-border/60 py-6 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-6">
+          <Link
+            to="/"
+            className="group flex w-fit items-center gap-3"
+            aria-label="PULSE home"
+          >
+            <span className="grid h-11 w-11 place-items-center border border-accent/40 bg-accent/5 transition-colors group-hover:bg-accent/10">
+              <LogoMark size={28} />
+            </span>
+            <span className="font-display text-lg font-bold tracking-[0.18em]">
+              PULSE<span className="text-accent">.</span>
+            </span>
+          </Link>
+          <div className="mono text-[10px] tracking-[0.28em] text-muted-foreground sm:text-center">
+            SOUND / FORM / MOTION — THE LISTENING ROOM
+          </div>
+          <div className="mono hidden text-[10px] tracking-[0.2em] text-accent/70 sm:block">
+            EST. 2021
+          </div>
         </div>
 
         <div className="flex flex-col items-start justify-between gap-4 border-t border-border/60 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
