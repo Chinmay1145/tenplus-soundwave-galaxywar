@@ -157,7 +157,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         </div>
 
         {/* act ticks */}
-        <ul className="mt-5 grid w-full grid-cols-4 gap-1.5" aria-hidden>
+        <ul className="mt-5 grid w-full grid-cols-5 gap-1.5" aria-hidden>
           {ACTS.map((a, i) => {
             const done = pct >= a.to;
             const live = i === actIdx && !done;
