@@ -57,6 +57,19 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
   }, [visible, minDurationMs]);
 
   if (!visible) return null;
+  const skip = () => {
+    if (fading) return;
+    setFading(true);
+    window.setTimeout(() => {
+      setVisible(false);
+      document.body.style.overflow = "";
+      try {
+        sessionStorage.setItem("pulse-boot-shown", "1");
+      } catch {
+        /* ignore */
+      }
+    }, 700);
+  };
   return (
     <div
       className="fixed inset-0 z-[200]"
