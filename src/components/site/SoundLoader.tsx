@@ -7,16 +7,22 @@ const ACTS = [
   { title: "Fetching catalogue", sub: "150 hand-tuned products", to: 52 },
   { title: "Tuning drivers", sub: "Adaptive ANC · spatial engine", to: 78 },
   { title: "Finalising soundstage", sub: "Reference calibration complete", to: 97 },
+  { title: "Sound ready", sub: "Welcome to the listening room", to: 100 },
 ] as const;
 
 const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial Audio"];
 
-export function SoundLoader({ label }: { label?: string }) {
+export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => void }) {
   const [pct, setPct] = useState(3);
+  const [clock, setClock] = useState("00:00.0");
 
   useEffect(() => {
+    const start = performance.now();
     const id = setInterval(() => {
-      setPct((p) => (p >= 97 ? 97 : p + Math.max(1, Math.round((100 - p) / 11))));
+      setPct((p) => (p >= 100 ? 100 : p + Math.max(1, Math.round((100 - p) / 11))));
+      const t = (performance.now() - start) / 1000;
+      const s = Math.floor(t);
+      setClock(`${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}.${Math.floor((t % 1) * 10)}`);
     }, 130);
     return () => clearInterval(id);
   }, []);
@@ -62,7 +68,22 @@ export function SoundLoader({ label }: { label?: string }) {
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[5vh] bg-background sl-bar-bottom sm:h-[7vh]" />
       <div aria-hidden className="pointer-events-none absolute inset-x-4 top-[10vh] flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
         <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
-        <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-muted-foreground">DSP 03.26</span>
+        <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-accent/80 tabular-nums">T+{clock}</span>
+      </div>
+
+      {/* low backdrop spectrum — fills the widescreen edges */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[7vh] flex h-24 items-end justify-center gap-[3px] opacity-25 sm:h-32">
+        {Array.from({ length: 64 }).map((_, i) => (
+          <span
+            key={i}
+            className="sl-spectrum"
+            style={{
+              animationDelay: `${(i % 16) * 0.11}s`,
+              animationDuration: `${1.1 + ((i * 7) % 5) * 0.22}s`,
+              height: `${18 + ((i * 13) % 60)}%`,
+            }}
+          />
+        ))}
       </div>
 
       <div className="relative flex w-full max-w-lg flex-col items-center px-5 sm:px-6">
@@ -136,7 +157,7 @@ export function SoundLoader({ label }: { label?: string }) {
         </div>
 
         {/* act ticks */}
-        <ul className="mt-5 grid w-full grid-cols-4 gap-1.5" aria-hidden>
+        <ul className="mt-5 grid w-full grid-cols-5 gap-1.5" aria-hidden>
           {ACTS.map((a, i) => {
             const done = pct >= a.to;
             const live = i === actIdx && !done;
@@ -174,6 +195,16 @@ export function SoundLoader({ label }: { label?: string }) {
             </span>
           ))}
         </div>
+
+        {onSkip ? (
+          <button
+            type="button"
+            onClick={onSkip}
+            className="mono sl-skip mt-6 border border-border/60 px-5 py-2 text-[10px] tracking-[0.32em] text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+          >
+            TAP TO ENTER
+          </button>
+        ) : null}
       </div>
 
       <style>{`
@@ -220,6 +251,16 @@ export function SoundLoader({ label }: { label?: string }) {
         }
         @keyframes sl-eq { 0%,100% { transform: scaleY(.22); } 50% { transform: scaleY(1.7); } }
 
+        .sl-spectrum {
+          display: inline-block; width: 2px; align-self: flex-end;
+          background: linear-gradient(180deg, oklch(0.65 0.24 25 / 0.9), oklch(0.65 0.24 25 / 0.15));
+          transform-origin: bottom;
+          animation-name: sl-eq; animation-timing-function: cubic-bezier(.36,.07,.19,.97);
+          animation-iteration-count: infinite;
+        }
+
+        .sl-skip { animation: sl-tag-in .8s cubic-bezier(.16,1,.3,1) 1.4s both; }
+
         .sl-act { animation: sl-act-in .55s cubic-bezier(.16,1,.3,1) both; }
         @keyframes sl-act-in {
           from { opacity: 0; transform: translateY(8px); filter: blur(4px); }
@@ -245,8 +286,8 @@ export function SoundLoader({ label }: { label?: string }) {
         @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
 
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring,
-          .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag {
+          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring, .sl-spectrum,
+          .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag, .sl-skip {
             animation: none !important;
           }
         }
