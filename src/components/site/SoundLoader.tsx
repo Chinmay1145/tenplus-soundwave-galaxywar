@@ -245,7 +245,7 @@ export function SoundLoader({ label }: { label?: string }) {
         @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
 
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan,
+          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring,
           .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag {
             animation: none !important;
           }
