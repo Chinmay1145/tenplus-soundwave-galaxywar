@@ -7,16 +7,22 @@ const ACTS = [
   { title: "Fetching catalogue", sub: "150 hand-tuned products", to: 52 },
   { title: "Tuning drivers", sub: "Adaptive ANC · spatial engine", to: 78 },
   { title: "Finalising soundstage", sub: "Reference calibration complete", to: 97 },
+  { title: "Sound ready", sub: "Welcome to the listening room", to: 100 },
 ] as const;
 
 const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial Audio"];
 
-export function SoundLoader({ label }: { label?: string }) {
+export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => void }) {
   const [pct, setPct] = useState(3);
+  const [clock, setClock] = useState("00:00.0");
 
   useEffect(() => {
+    const start = performance.now();
     const id = setInterval(() => {
-      setPct((p) => (p >= 97 ? 97 : p + Math.max(1, Math.round((100 - p) / 11))));
+      setPct((p) => (p >= 100 ? 100 : p + Math.max(1, Math.round((100 - p) / 11))));
+      const t = (performance.now() - start) / 1000;
+      const s = Math.floor(t);
+      setClock(`${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}.${Math.floor((t % 1) * 10)}`);
     }, 130);
     return () => clearInterval(id);
   }, []);
