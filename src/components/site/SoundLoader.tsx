@@ -186,6 +186,19 @@ export function SoundLoader({ label }: { label?: string }) {
         @keyframes sl-open-bottom { from { height: 52vh; } to { height: 7vh; } }
 
         .sl-lockup { animation: sl-rise 1.1s cubic-bezier(.16,1,.3,1) .25s both; }
+        .sl-ring {
+          position: absolute; top: 0; left: 50%;
+          width: 9rem; height: 9rem; margin-left: -4.5rem;
+          border: 1px solid oklch(0.65 0.24 25 / 0.35);
+          animation: sl-ripple 3.6s cubic-bezier(.16,1,.3,1) infinite;
+          pointer-events: none;
+        }
+        @media (min-width: 640px) { .sl-ring { width: 11.5rem; height: 11.5rem; margin-left: -5.75rem; } }
+        @keyframes sl-ripple {
+          0%   { transform: scale(1); opacity: 0; }
+          15%  { opacity: .8; }
+          100% { transform: scale(1.9); opacity: 0; }
+        }
         @keyframes sl-rise {
           from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(6px); }
           to   { opacity: 1; transform: none; filter: none; }
