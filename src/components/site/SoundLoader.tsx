@@ -68,7 +68,22 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[5vh] bg-background sl-bar-bottom sm:h-[7vh]" />
       <div aria-hidden className="pointer-events-none absolute inset-x-4 top-[10vh] flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
         <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
-        <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-muted-foreground">DSP 03.26</span>
+        <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-accent/80 tabular-nums">T+{clock}</span>
+      </div>
+
+      {/* low backdrop spectrum — fills the widescreen edges */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[7vh] flex h-24 items-end justify-center gap-[3px] opacity-25 sm:h-32">
+        {Array.from({ length: 64 }).map((_, i) => (
+          <span
+            key={i}
+            className="sl-spectrum"
+            style={{
+              animationDelay: `${(i % 16) * 0.11}s`,
+              animationDuration: `${1.1 + ((i * 7) % 5) * 0.22}s`,
+              height: `${18 + ((i * 13) % 60)}%`,
+            }}
+          />
+        ))}
       </div>
 
       <div className="relative flex w-full max-w-lg flex-col items-center px-5 sm:px-6">
