@@ -251,6 +251,16 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         }
         @keyframes sl-eq { 0%,100% { transform: scaleY(.22); } 50% { transform: scaleY(1.7); } }
 
+        .sl-spectrum {
+          display: inline-block; width: 2px; align-self: flex-end;
+          background: linear-gradient(180deg, oklch(0.65 0.24 25 / 0.9), oklch(0.65 0.24 25 / 0.15));
+          transform-origin: bottom;
+          animation-name: sl-eq; animation-timing-function: cubic-bezier(.36,.07,.19,.97);
+          animation-iteration-count: infinite;
+        }
+
+        .sl-skip { animation: sl-tag-in .8s cubic-bezier(.16,1,.3,1) 1.4s both; }
+
         .sl-act { animation: sl-act-in .55s cubic-bezier(.16,1,.3,1) both; }
         @keyframes sl-act-in {
           from { opacity: 0; transform: translateY(8px); filter: blur(4px); }
