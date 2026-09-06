@@ -68,6 +68,10 @@ export function SoundLoader({ label }: { label?: string }) {
       <div className="relative flex w-full max-w-lg flex-col items-center px-5 sm:px-6">
         {/* logo lockup */}
         <div className="sl-lockup relative flex flex-col items-center">
+          {/* expanding sonar rings behind the lockup */}
+          <span aria-hidden className="sl-ring" />
+          <span aria-hidden className="sl-ring" style={{ animationDelay: "1.2s" }} />
+          <span aria-hidden className="sl-ring" style={{ animationDelay: "2.4s" }} />
           <div className="relative grid h-28 w-28 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-36 sm:w-36">
             <div
               aria-hidden
@@ -113,8 +117,13 @@ export function SoundLoader({ label }: { label?: string }) {
         <div className="mt-3 w-full">
           <div className="relative h-[2px] w-full overflow-hidden bg-border/70">
             <span
-              className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-500 ease-out"
-              style={{ width: `${pct}%` }}
+              className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-out"
+              style={{
+                width: `${pct}%`,
+                background:
+                  "linear-gradient(90deg, oklch(0.45 0.20 25), var(--color-accent) 60%, oklch(0.86 0.16 25))",
+                boxShadow: "0 0 12px oklch(0.65 0.24 25 / 0.55)",
+              }}
             />
             <span aria-hidden className="sl-shine" />
           </div>
@@ -177,6 +186,19 @@ export function SoundLoader({ label }: { label?: string }) {
         @keyframes sl-open-bottom { from { height: 52vh; } to { height: 7vh; } }
 
         .sl-lockup { animation: sl-rise 1.1s cubic-bezier(.16,1,.3,1) .25s both; }
+        .sl-ring {
+          position: absolute; top: 0; left: 50%;
+          width: 9rem; height: 9rem; margin-left: -4.5rem;
+          border: 1px solid oklch(0.65 0.24 25 / 0.35);
+          animation: sl-ripple 3.6s cubic-bezier(.16,1,.3,1) infinite;
+          pointer-events: none;
+        }
+        @media (min-width: 640px) { .sl-ring { width: 11.5rem; height: 11.5rem; margin-left: -5.75rem; } }
+        @keyframes sl-ripple {
+          0%   { transform: scale(1); opacity: 0; }
+          15%  { opacity: .8; }
+          100% { transform: scale(1.9); opacity: 0; }
+        }
         @keyframes sl-rise {
           from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(6px); }
           to   { opacity: 1; transform: none; filter: none; }
@@ -223,7 +245,7 @@ export function SoundLoader({ label }: { label?: string }) {
         @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
 
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan,
+          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring,
           .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag {
             animation: none !important;
           }

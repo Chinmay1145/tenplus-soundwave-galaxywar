@@ -138,13 +138,37 @@ export function Logo({
   animated?: boolean;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-2", className)}>
-      <LogoMark size={size} animated={animated} />
+    <span className={cn("group/logo inline-flex items-center gap-2", className)}>
+      <LogoMark
+        size={size}
+        animated={animated}
+        className="transition-transform duration-500 ease-out group-hover/logo:rotate-6 group-hover/logo:scale-105"
+      />
       {wordmark && (
-        <span className="font-display text-lg font-bold tracking-[0.02em]">
-          PULSE<span className="text-accent">.</span>
+        <span
+          className="font-display text-lg font-bold tracking-[0.06em]"
+          style={{
+            backgroundImage:
+              "linear-gradient(115deg, var(--color-foreground) 30%, var(--color-accent) 55%, var(--color-foreground) 80%)",
+            backgroundSize: "220% 100%",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            animation: "logo-sheen 5s ease-in-out infinite",
+          }}
+        >
+          PULSE<span style={{ color: "var(--color-accent)", WebkitTextFillColor: "var(--color-accent)" }}>.</span>
         </span>
       )}
+      <style>{`
+        @keyframes logo-sheen {
+          0%, 100% { background-position: 110% 0; }
+          50% { background-position: -10% 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .group\\/logo span { animation: none !important; }
+        }
+      `}</style>
     </span>
   );
 }
