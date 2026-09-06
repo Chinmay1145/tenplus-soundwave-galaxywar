@@ -68,6 +68,10 @@ export function SoundLoader({ label }: { label?: string }) {
       <div className="relative flex w-full max-w-lg flex-col items-center px-5 sm:px-6">
         {/* logo lockup */}
         <div className="sl-lockup relative flex flex-col items-center">
+          {/* expanding sonar rings behind the lockup */}
+          <span aria-hidden className="sl-ring" />
+          <span aria-hidden className="sl-ring" style={{ animationDelay: "1.2s" }} />
+          <span aria-hidden className="sl-ring" style={{ animationDelay: "2.4s" }} />
           <div className="relative grid h-28 w-28 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-36 sm:w-36">
             <div
               aria-hidden
