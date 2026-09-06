@@ -25,6 +25,22 @@ const PROMISES = [
 export function Footer() {
   return (
     <footer className="relative overflow-hidden border-t border-border/60 bg-surface">
+      {/* accent hairline */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, var(--color-accent) 35%, var(--color-accent) 65%, transparent)",
+          opacity: 0.7,
+        }}
+      />
+      {/* faint ember glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full"
+        style={{ background: "radial-gradient(closest-side, oklch(0.65 0.24 25 / 0.10), transparent)" }}
+      />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <div className="grid gap-8 border-b border-border/60 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="min-w-0">
@@ -33,7 +49,8 @@ export function Footer() {
               <span className="mono text-accent">The listening room / 2026</span>
             </div>
             <h2 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-[0.98] sm:text-6xl lg:text-7xl">
-              Find the sound you’ll<br className="hidden sm:block" /> want to live in.
+              Find the sound you’ll<br className="hidden sm:block" /> want to{" "}
+              <span className="text-accent">live in.</span>
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
               Compare signatures, explore new releases and choose audio built
