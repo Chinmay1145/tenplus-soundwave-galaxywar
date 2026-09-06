@@ -70,9 +70,9 @@ export function Footer() {
           {PROMISES.map(([Ico, title, sub], index) => (
             <div
               key={title}
-              className="flex min-w-0 items-start gap-3 border-border/60 py-6 sm:px-5 sm:odd:border-r lg:border-r lg:px-6 lg:first:pl-0 lg:last:border-r-0 lg:last:pr-0"
+              className="group flex min-w-0 items-start gap-3 border-border/60 py-6 transition-colors hover:bg-surface-2/60 sm:px-5 sm:odd:border-r lg:border-r lg:px-6 lg:first:pl-0 lg:last:border-r-0 lg:last:pr-0"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center border border-accent/30 bg-accent/10 text-accent">
+              <span className="grid h-10 w-10 shrink-0 place-items-center border border-accent/30 bg-accent/10 text-accent transition-all duration-300 group-hover:border-accent group-hover:bg-accent group-hover:text-accent-foreground">
                 <Ico className="h-4 w-4" />
               </span>
               <div className="min-w-0">
@@ -177,7 +177,7 @@ export function Footer() {
             {["VISA", "MASTERCARD", "RUPAY", "UPI", "NETBANKING", "EMI", "COD"].map((p) => (
               <span
                 key={p}
-                className="mono border border-border/70 bg-surface-2 px-2.5 py-1.5 text-[9px] text-muted-foreground"
+                className="mono cursor-default border border-border/70 bg-surface-2 px-2.5 py-1.5 text-[9px] text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent"
               >
                 {p}
               </span>
