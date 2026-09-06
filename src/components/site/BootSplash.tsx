@@ -34,6 +34,7 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
         setFading(true);
         window.setTimeout(() => {
           setVisible(false);
+          document.body.style.overflow = prevOverflow;
           try {
             sessionStorage.setItem("pulse-boot-shown", "1");
           } catch {
@@ -50,6 +51,7 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
       return () => {
         window.removeEventListener("load", finish);
         window.clearTimeout(safety);
+        document.body.style.overflow = prevOverflow;
       };
     }
   }, [visible, minDurationMs]);
