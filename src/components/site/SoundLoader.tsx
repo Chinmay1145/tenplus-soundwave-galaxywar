@@ -117,8 +117,13 @@ export function SoundLoader({ label }: { label?: string }) {
         <div className="mt-3 w-full">
           <div className="relative h-[2px] w-full overflow-hidden bg-border/70">
             <span
-              className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-500 ease-out"
-              style={{ width: `${pct}%` }}
+              className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-out"
+              style={{
+                width: `${pct}%`,
+                background:
+                  "linear-gradient(90deg, oklch(0.45 0.20 25), var(--color-accent) 60%, oklch(0.86 0.16 25))",
+                boxShadow: "0 0 12px oklch(0.65 0.24 25 / 0.55)",
+              }}
             />
             <span aria-hidden className="sl-shine" />
           </div>
