@@ -195,6 +195,16 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
             </span>
           ))}
         </div>
+
+        {onSkip ? (
+          <button
+            type="button"
+            onClick={onSkip}
+            className="mono sl-skip mt-6 border border-border/60 px-5 py-2 text-[10px] tracking-[0.32em] text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+          >
+            TAP TO ENTER
+          </button>
+        ) : null}
       </div>
 
       <style>{`
