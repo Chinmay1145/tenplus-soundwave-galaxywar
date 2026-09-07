@@ -87,7 +87,7 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
         pointerEvents: fading ? "none" : "auto",
       }}
     >
-      <SoundLoader label={undefined} />
+      <SoundLoader label={undefined} onSkip={skip} />
     </div>
   );
 }
