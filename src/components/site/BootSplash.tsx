@@ -14,7 +14,9 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
 
   useEffect(() => {
     try {
-      if (sessionStorage.getItem("pulse-boot-shown") !== "1") setVisible(true);
+      const shown = sessionStorage.getItem("pulse-boot-shown");
+      console.log("[BootSplash] shown:", shown);
+      if (shown !== "1") setVisible(true);
     } catch {
       setVisible(true);
     }
