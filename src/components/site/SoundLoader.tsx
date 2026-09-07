@@ -63,6 +63,13 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <span className="sl-scan" />
       </div>
+      {/* vignette + film grain for cinematic depth */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "radial-gradient(120% 90% at 50% 45%, transparent 40%, oklch(0 0 0 / 0.55) 100%)" }}
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 sl-grain opacity-[0.06]" />
       {/* letterbox bars — the cinematic frame */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[5vh] bg-background sl-bar-top sm:h-[7vh]" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[5vh] bg-background sl-bar-bottom sm:h-[7vh]" />
@@ -70,6 +77,12 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
         <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-accent/80 tabular-nums">T+{clock}</span>
       </div>
+      {/* bottom HUD readouts */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 bottom-[10vh] hidden items-center justify-between gap-3 border-t border-border/60 pt-3 sm:inset-x-12 sm:flex">
+        <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">SR 96 kHz · BIT 24 · LAT {(18 - pct / 8).toFixed(1)} ms</span>
+        <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">BUFFER {String(Math.min(512, 64 + pct * 4)).padStart(3, "0")}</span>
+      </div>
+
 
       {/* low backdrop spectrum — fills the widescreen edges */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[7vh] flex h-24 items-end justify-center gap-[3px] opacity-25 sm:h-32">
@@ -94,6 +107,8 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           <span aria-hidden className="sl-ring" style={{ animationDelay: "1.2s" }} />
           <span aria-hidden className="sl-ring" style={{ animationDelay: "2.4s" }} />
           <div className="relative grid h-28 w-28 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-36 sm:w-36">
+            {/* slow radar sweep behind the mark */}
+            <span aria-hidden className="sl-sweep" />
             <div
               aria-hidden
               className="absolute inset-x-0 bottom-0 h-1 bg-border/60"
@@ -103,7 +118,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
             />
             <span aria-hidden className="absolute left-2 top-2 h-3 w-3 border-l border-t border-accent" />
             <span aria-hidden className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent" />
-            <LogoMark size={60} animated className="sm:h-[72px] sm:w-[72px]" />
+            <LogoMark size={60} animated className="relative sm:h-[72px] sm:w-[72px]" />
           </div>
           <div className="mt-5 font-display text-3xl font-bold tracking-[0.2em] sm:mt-6 sm:text-4xl">
             PULSE<span className="text-accent">.</span>
@@ -111,8 +126,25 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           <div className="mono mt-2 text-[10px] tracking-[0.4em] text-accent/70">AUDIO LABS</div>
         </div>
 
+        {/* waveform trace */}
+        <svg
+          aria-hidden
+          viewBox="0 0 320 40"
+          preserveAspectRatio="none"
+          className="mt-5 h-8 w-full opacity-70 sm:mt-6"
+        >
+          <path
+            className="sl-wave"
+            d="M0 20 Q 20 2 40 20 T 80 20 T 120 20 T 160 20 T 200 20 T 240 20 T 280 20 T 320 20"
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+          />
+        </svg>
+
         {/* equaliser */}
-        <div className="mt-5 flex h-7 items-center gap-1 sm:mt-7 sm:h-8" aria-hidden>
+        <div className="mt-2 flex h-7 items-center gap-1 sm:h-8" aria-hidden>
           {Array.from({ length: 21 }).map((_, i) => (
             <span
               key={i}
@@ -121,6 +153,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
             />
           ))}
         </div>
+
 
         {/* act headline with crossfade */}
         <div className="mt-6 h-12 text-center sm:mt-8">
@@ -285,12 +318,40 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         }
         @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
 
+        .sl-grain {
+          background-image: radial-gradient(oklch(1 0 0 / 0.6) 0.5px, transparent 0.5px);
+          background-size: 3px 3px;
+          animation: sl-grain 0.6s steps(3) infinite;
+        }
+        @keyframes sl-grain {
+          0% { background-position: 0 0; }
+          33% { background-position: 1px 2px; }
+          66% { background-position: 2px 1px; }
+          100% { background-position: 0 0; }
+        }
+
+        .sl-sweep {
+          position: absolute; inset: 0; pointer-events: none;
+          background: conic-gradient(from 0deg, transparent 0 72%, oklch(0.65 0.24 25 / 0.28) 88%, transparent 100%);
+          mask-image: radial-gradient(closest-side, black 40%, transparent 100%);
+          animation: sl-sweep 4.5s linear infinite;
+        }
+        @keyframes sl-sweep { to { transform: rotate(360deg); } }
+
+        .sl-wave {
+          stroke-dasharray: 6 10;
+          animation: sl-wave 1.6s linear infinite;
+        }
+        @keyframes sl-wave { to { stroke-dashoffset: -32; } }
+
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring, .sl-spectrum,
+          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring, .sl-spectrum, .sl-grain,
+          .sl-sweep, .sl-wave,
           .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag, .sl-skip {
             animation: none !important;
           }
         }
+
       `}</style>
     </div>
   );
