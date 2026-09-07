@@ -107,6 +107,8 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           <span aria-hidden className="sl-ring" style={{ animationDelay: "1.2s" }} />
           <span aria-hidden className="sl-ring" style={{ animationDelay: "2.4s" }} />
           <div className="relative grid h-28 w-28 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-36 sm:w-36">
+            {/* slow radar sweep behind the mark */}
+            <span aria-hidden className="sl-sweep" />
             <div
               aria-hidden
               className="absolute inset-x-0 bottom-0 h-1 bg-border/60"
@@ -116,7 +118,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
             />
             <span aria-hidden className="absolute left-2 top-2 h-3 w-3 border-l border-t border-accent" />
             <span aria-hidden className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent" />
-            <LogoMark size={60} animated className="sm:h-[72px] sm:w-[72px]" />
+            <LogoMark size={60} animated className="relative sm:h-[72px] sm:w-[72px]" />
           </div>
           <div className="mt-5 font-display text-3xl font-bold tracking-[0.2em] sm:mt-6 sm:text-4xl">
             PULSE<span className="text-accent">.</span>
@@ -124,8 +126,25 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           <div className="mono mt-2 text-[10px] tracking-[0.4em] text-accent/70">AUDIO LABS</div>
         </div>
 
+        {/* waveform trace */}
+        <svg
+          aria-hidden
+          viewBox="0 0 320 40"
+          preserveAspectRatio="none"
+          className="mt-5 h-8 w-full opacity-70 sm:mt-6"
+        >
+          <path
+            className="sl-wave"
+            d="M0 20 Q 20 2 40 20 T 80 20 T 120 20 T 160 20 T 200 20 T 240 20 T 280 20 T 320 20"
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+          />
+        </svg>
+
         {/* equaliser */}
-        <div className="mt-5 flex h-7 items-center gap-1 sm:mt-7 sm:h-8" aria-hidden>
+        <div className="mt-2 flex h-7 items-center gap-1 sm:h-8" aria-hidden>
           {Array.from({ length: 21 }).map((_, i) => (
             <span
               key={i}
@@ -134,6 +153,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
             />
           ))}
         </div>
+
 
         {/* act headline with crossfade */}
         <div className="mt-6 h-12 text-center sm:mt-8">
