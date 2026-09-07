@@ -318,12 +318,40 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         }
         @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
 
+        .sl-grain {
+          background-image: radial-gradient(oklch(1 0 0 / 0.6) 0.5px, transparent 0.5px);
+          background-size: 3px 3px;
+          animation: sl-grain 0.6s steps(3) infinite;
+        }
+        @keyframes sl-grain {
+          0% { background-position: 0 0; }
+          33% { background-position: 1px 2px; }
+          66% { background-position: 2px 1px; }
+          100% { background-position: 0 0; }
+        }
+
+        .sl-sweep {
+          position: absolute; inset: 0; pointer-events: none;
+          background: conic-gradient(from 0deg, transparent 0 72%, oklch(0.65 0.24 25 / 0.28) 88%, transparent 100%);
+          mask-image: radial-gradient(closest-side, black 40%, transparent 100%);
+          animation: sl-sweep 4.5s linear infinite;
+        }
+        @keyframes sl-sweep { to { transform: rotate(360deg); } }
+
+        .sl-wave {
+          stroke-dasharray: 6 10;
+          animation: sl-wave 1.6s linear infinite;
+        }
+        @keyframes sl-wave { to { stroke-dashoffset: -32; } }
+
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring, .sl-spectrum,
+          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring, .sl-spectrum, .sl-grain,
+          .sl-sweep, .sl-wave,
           .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag, .sl-skip {
             animation: none !important;
           }
         }
+
       `}</style>
     </div>
   );
