@@ -14,9 +14,7 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
 
   useEffect(() => {
     try {
-      const shown = sessionStorage.getItem("pulse-boot-shown");
-      console.log("[BootSplash] shown:", shown);
-      if (shown !== "1") setVisible(true);
+      if (sessionStorage.getItem("pulse-boot-shown") !== "1") setVisible(true);
     } catch {
       setVisible(true);
     }
@@ -24,7 +22,6 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
 
 
   useEffect(() => {
-    console.log("[BootSplash] visible effect run, visible:", visible);
     if (!visible) return;
     // Lock background scroll while the splash covers the screen.
     const prevOverflow = document.body.style.overflow;
@@ -33,7 +30,6 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
     const finish = () => {
       const elapsed = performance.now() - start;
       const wait = Math.max(0, minDurationMs - elapsed);
-      console.log("[BootSplash] finish scheduled, wait:", wait);
       window.setTimeout(() => {
         setFading(true);
         window.setTimeout(() => {
@@ -60,7 +56,6 @@ export function BootSplash({ minDurationMs = 2400 }: { minDurationMs?: number })
     }
   }, [visible, minDurationMs]);
 
-  console.log("[BootSplash] render, visible:", visible, "fading:", fading);
   if (!visible) return null;
   const skip = () => {
     if (fading) return;
