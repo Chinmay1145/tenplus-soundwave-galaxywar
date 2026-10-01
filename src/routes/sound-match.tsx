@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { getSoundMatch } from "@/lib/sound-match.functions";
-import type { MatchResult } from "@/lib/sound-match.server";
+type MatchResult = { summary: string; picks: { id: number; score: number; headline: string; reason: string }[] };
 import { getProductById } from "@/data/products";
 import { ProductCard } from "@/components/site/ProductCard";
 import { inr } from "@/lib/format";
