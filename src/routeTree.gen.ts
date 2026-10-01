@@ -13,6 +13,7 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as WarrantyRouteImport } from './routes/warranty'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as SustainabilityRouteImport } from './routes/sustainability'
+import { Route as SoundMatchRouteImport } from './routes/sound-match'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ShippingRouteImport } from './routes/shipping'
@@ -55,6 +56,11 @@ const TrackOrderRoute = TrackOrderRouteImport.update({
 const SustainabilityRoute = SustainabilityRouteImport.update({
   id: '/sustainability',
   path: '/sustainability',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SoundMatchRoute = SoundMatchRouteImport.update({
+  id: '/sound-match',
+  path: '/sound-match',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sound-match': typeof SoundMatchRoute
   '/sustainability': typeof SustainabilityRoute
   '/track-order': typeof TrackOrderRoute
   '/warranty': typeof WarrantyRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sound-match': typeof SoundMatchRoute
   '/sustainability': typeof SustainabilityRoute
   '/track-order': typeof TrackOrderRoute
   '/warranty': typeof WarrantyRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sound-match': typeof SoundMatchRoute
   '/sustainability': typeof SustainabilityRoute
   '/track-order': typeof TrackOrderRoute
   '/warranty': typeof WarrantyRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/shop'
     | '/sitemap.xml'
+    | '/sound-match'
     | '/sustainability'
     | '/track-order'
     | '/warranty'
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/shop'
     | '/sitemap.xml'
+    | '/sound-match'
     | '/sustainability'
     | '/track-order'
     | '/warranty'
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/shop'
     | '/sitemap.xml'
+    | '/sound-match'
     | '/sustainability'
     | '/track-order'
     | '/warranty'
@@ -365,6 +377,7 @@ export interface RootRouteChildren {
   ShippingRoute: typeof ShippingRoute
   ShopRoute: typeof ShopRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SoundMatchRoute: typeof SoundMatchRoute
   SustainabilityRoute: typeof SustainabilityRoute
   TrackOrderRoute: typeof TrackOrderRoute
   WarrantyRoute: typeof WarrantyRoute
@@ -400,6 +413,13 @@ declare module '@tanstack/react-router' {
       path: '/sustainability'
       fullPath: '/sustainability'
       preLoaderRoute: typeof SustainabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sound-match': {
+      id: '/sound-match'
+      path: '/sound-match'
+      fullPath: '/sound-match'
+      preLoaderRoute: typeof SoundMatchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -602,6 +622,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShippingRoute: ShippingRoute,
   ShopRoute: ShopRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SoundMatchRoute: SoundMatchRoute,
   SustainabilityRoute: SustainabilityRoute,
   TrackOrderRoute: TrackOrderRoute,
   WarrantyRoute: WarrantyRoute,

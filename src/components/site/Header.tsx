@@ -8,6 +8,7 @@ import { Logo } from "./Logo";
 
 const NAV = [
   { to: "/shop", label: "Shop" },
+  { to: "/sound-match", label: "AI Match" },
   { to: "/brands", label: "Brands" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
