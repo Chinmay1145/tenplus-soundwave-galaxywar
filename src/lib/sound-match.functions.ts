@@ -9,7 +9,7 @@ const schema = z.object({
 });
 
 export const getSoundMatch = createServerFn({ method: "POST" })
-  .inputValidator((d) => schema.parse(d))
+  .validator((d) => schema.parse(d))
   .handler(async ({ data }) => {
     const { runSoundMatch } = await import("./sound-match.server");
     try {
