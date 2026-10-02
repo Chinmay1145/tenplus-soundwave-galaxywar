@@ -340,7 +340,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         @media (prefers-reduced-motion: reduce) {
           .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring, .sl-spectrum, .sl-grain,
           .sl-sweep, .sl-wave,
-          .sl-shine, .sl-bar-top, .sl-bar-bottom, .sl-lockup, .sl-act, .sl-tag, .sl-skip {
+          .sl-shine, .sl-lockup, .sl-act, .sl-tag, .sl-skip {
             animation: none !important;
           }
         }
