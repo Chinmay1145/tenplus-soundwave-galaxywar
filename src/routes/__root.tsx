@@ -3,7 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
-  lazyFn,
+  lazyRouteComponent,
   useRouter,
   HeadContent,
   Scripts,
