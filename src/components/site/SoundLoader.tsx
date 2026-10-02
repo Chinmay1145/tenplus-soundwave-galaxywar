@@ -70,15 +70,12 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         style={{ background: "radial-gradient(120% 90% at 50% 45%, transparent 40%, oklch(0 0 0 / 0.55) 100%)" }}
       />
       <div aria-hidden className="pointer-events-none absolute inset-0 sl-grain opacity-[0.06]" />
-      {/* letterbox bars — the cinematic frame */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[5vh] bg-background sl-bar-top sm:h-[7vh]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[5vh] bg-background sl-bar-bottom sm:h-[7vh]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-[10vh] flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-3 flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
         <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
         <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-accent/80 tabular-nums">T+{clock}</span>
       </div>
       {/* bottom HUD readouts */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-4 bottom-[10vh] hidden items-center justify-between gap-3 border-t border-border/60 pt-3 sm:inset-x-12 sm:flex">
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 bottom-3 hidden items-center justify-between gap-3 border-t border-border/60 pt-3 sm:inset-x-12 sm:flex">
         <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">SR 96 kHz · BIT 24 · LAT {(18 - pct / 8).toFixed(1)} ms</span>
         <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">BUFFER {String(Math.min(512, 64 + pct * 4)).padStart(3, "0")}</span>
       </div>
