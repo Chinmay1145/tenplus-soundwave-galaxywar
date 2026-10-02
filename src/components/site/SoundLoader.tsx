@@ -82,7 +82,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
 
 
       {/* low backdrop spectrum — fills the widescreen edges */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[7vh] flex h-24 items-end justify-center gap-[3px] opacity-25 sm:h-32">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-8 flex h-24 items-end justify-center gap-[3px] opacity-25 sm:h-32">
         {Array.from({ length: 64 }).map((_, i) => (
           <span
             key={i}
@@ -241,10 +241,6 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         .sl-wash { animation: sl-breathe 6s ease-in-out infinite; }
         @keyframes sl-breathe { 0%,100% { opacity: .75; } 50% { opacity: 1; } }
 
-        .sl-bar-top    { animation: sl-open-top 1.1s cubic-bezier(.16,1,.3,1) both; }
-        .sl-bar-bottom { animation: sl-open-bottom 1.1s cubic-bezier(.16,1,.3,1) both; }
-        @keyframes sl-open-top    { from { height: 52vh; } to { height: 7vh; } }
-        @keyframes sl-open-bottom { from { height: 52vh; } to { height: 7vh; } }
 
         .sl-lockup { animation: sl-rise 1.1s cubic-bezier(.16,1,.3,1) .25s both; }
         .sl-ring {
