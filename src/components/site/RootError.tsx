@@ -7,7 +7,7 @@ import { reportLovableError } from "@/lib/lovable-error-reporting";
  * load it through `lazyRouteComponent` (the router expects a lazy-style
  * error component in this version).
  */
-export default function RootError({ error, reset }: { error: Error; reset: () => void }) {
+export default function RootError({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
