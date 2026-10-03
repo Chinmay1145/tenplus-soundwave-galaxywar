@@ -11,7 +11,9 @@ const BRAND_TINT: Record<string, string> = {
   Soundcore: "#00AEEF", Marshall: "#c0392b", Audeze: "#8e44ad", Shure: "#00843d",
   AKG: "#003a70", Logitech: "#00B8FC", HyperX: "#e10600", Razer: "#44D62C",
   Bang: "#111111", "Bang & Olufsen": "#111111", Boat: "#e11d2f", Xiaomi: "#ff6900",
-  Huawei: "#c7000b", Google: "#4285F4",
+  Huawei: "#c7000b", Google: "#4285F4", Edifier: "#e60012",
+  "Audio-Technica": "#111111", "Bowers & Wilkins": "#c9a227",
+  Focal: "#ff4d00", Noise: "#6d28d9",
 };
 
 function BrandImage({ brand, alt, className }: { brand: string; alt: string; className?: string }) {
