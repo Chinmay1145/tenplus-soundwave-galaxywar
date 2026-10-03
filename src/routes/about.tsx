@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Award, Cpu, Globe, Leaf, ArrowUpRight, Quote } from "lucide-react";
+import { Award, Cpu, Globe, Leaf, ArrowRight, Quote, Sparkles } from "lucide-react";
 import { LogoMark } from "@/components/site/Logo";
 import studioImage from "@/assets/product-headphones.jpg";
 import { Reveal, SectionMast } from "@/components/site/Editorial";
@@ -10,6 +10,9 @@ export const Route = createFileRoute("/about")({
       { title: "About — PULSE" },
       { name: "description", content: "PULSE Audio Labs designs premium wireless earbuds engineered for sound purists." },
       { property: "og:title", content: "About — PULSE" },
+      { property: "og:description", content: "Meet the engineers and designers building PULSE listening instruments in Stockholm and Bengaluru." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "/about" },
     ],
     links: [{ rel: "canonical", href: "/about" }],
@@ -30,38 +33,37 @@ function About() {
               "radial-gradient(1000px 520px at 10% -10%, oklch(0.65 0.24 25 / 0.25), transparent 60%)",
           }}
         />
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-7">
+        <div className="mx-auto grid min-h-[calc(100svh-5rem)] max-w-7xl gap-10 px-4 pb-12 pt-16 sm:px-6 sm:pb-16 sm:pt-24 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7 lg:pb-8">
             <div className="flex items-center gap-3">
               <LogoMark size={28} />
               <div className="mono text-accent">— Our story · Est. 2021</div>
             </div>
-            <h1 className="mt-4 font-display text-[clamp(2.75rem,10.5vw,6rem)] font-bold leading-[0.88] tracking-tight">
-              We make sound<br />feel <span className="text-accent">physical.</span>
+            <h1 className="mt-5 max-w-4xl font-display text-[clamp(3.1rem,9vw,7rem)] font-bold leading-[0.84] tracking-tight">
+              Sound you can<br /><span className="text-accent">feel.</span>
             </h1>
-            <p className="mono mt-6 max-w-md border-l-2 border-accent pl-4 text-[11px] leading-6 tracking-[0.18em] text-muted-foreground">
-              STOCKHOLM ACOUSTICS LAB · BENGALURU DESIGN STUDIO · 8 PATENTS
+            <p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground sm:text-xl">
+              We design listening instruments that bring studio precision into everyday life—without losing the emotion in the music.
             </p>
+            <div className="mono mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-border/60 pt-4 text-[10px] text-muted-foreground">
+              <span>Stockholm / Acoustics</span><span>Bengaluru / Design</span><span className="text-accent">8 patents</span>
+            </div>
           </div>
-          <div className="flex flex-col justify-end gap-6 lg:col-span-5">
-            <div className="relative aspect-[4/3] overflow-hidden border border-border/60 bg-surface">
-              <img src={studioImage} alt="PULSE over-ear headphones showcasing precision industrial design" className="h-full w-full object-cover" />
+          <div className="flex flex-col justify-end gap-5 lg:col-span-5">
+            <div className="group relative aspect-[4/5] overflow-hidden border border-border/60 bg-surface sm:aspect-[5/4] lg:aspect-[4/5]">
+              <img src={studioImage} alt="PULSE over-ear headphones showcasing precision industrial design" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-background/85 px-4 py-3 backdrop-blur-md">
                 <span className="mono text-[9px] text-muted-foreground">OBJECT 03 / REFERENCE</span>
                 <span className="mono text-[9px] text-accent">STOCKHOLM × BENGALURU</span>
               </div>
             </div>
-            <p className="text-lg leading-relaxed text-muted-foreground">
-              PULSE was founded by a small group of engineers, audiophiles and
-              industrial designers obsessed with one idea: the most personal
-              piece of technology you own should feel like it.
-            </p>
             <Link
               to="/shop"
-              className="group inline-flex items-center gap-2 self-start rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm font-semibold text-accent transition hover:bg-accent hover:text-accent-foreground"
+              className="group inline-flex min-h-11 items-center gap-2 self-start border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm font-semibold text-accent transition hover:bg-accent hover:text-accent-foreground"
             >
               Shop the lineup
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>
@@ -83,7 +85,7 @@ function About() {
               disappear the moment the music starts, and reappear only when
               you notice they're beautiful.
             </p>
-            <div className="mono mt-7 border-t border-border/60 pt-3 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            <div className="mono mt-7 border-t border-border/60 pt-3 text-[10px] uppercase text-muted-foreground">
               Linus Okonkwo · Co-founder & head of acoustics
             </div>
           </Reveal>
@@ -109,8 +111,8 @@ function About() {
               const Icon = Ico as typeof Cpu;
               return (
                 <div key={t as string} className="group relative bg-background p-8 transition-colors hover:bg-card">
-                  <div className="mono text-[10px] text-muted-foreground">0{i + 1}</div>
-                  <Icon className="mt-4 h-6 w-6 text-accent transition-transform group-hover:scale-110" />
+                  <div className="flex items-center justify-between"><div className="mono text-[10px] text-muted-foreground">0{i + 1}</div><Sparkles className="h-3 w-3 text-accent/40" /></div>
+                  <Icon className="mt-8 h-6 w-6 text-accent transition-transform group-hover:scale-110" />
                   <h3 className="mt-6 font-display text-xl font-bold">{t as string}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{d as string}</p>
                 </div>
@@ -130,7 +132,7 @@ function About() {
           />
 
 
-          <ol className="mt-12 relative border-l border-border/60 pl-6 sm:pl-10">
+          <ol className="relative mt-12 grid gap-px overflow-hidden border border-border/60 bg-border/60 md:grid-cols-5">
             {[
               ["2021", "Founded in Stockholm", "A single product ships from a converted piano workshop. First 500 units sell to friends of friends."],
               ["2022", "Series 01 goes global", "Distribution opens in 18 markets. First iF Design award."],
@@ -138,10 +140,7 @@ function About() {
               ["2024", "Studio Bengaluru", "Second design studio opens, focused on acoustics for tropical climates."],
               ["2026", "Series 03 — Transparent", "Redefines transparent design with hybrid adaptive ANC and 42-hour battery."],
             ].map(([y, t, d], i) => (
-              <li key={y} className="relative pb-12 last:pb-0">
-                <span className="absolute -left-[calc(0.75rem+1px)] top-1.5 grid h-3 w-3 place-items-center sm:-left-[calc(1.25rem+1px)]">
-                  <span className="h-3 w-3 rounded-full bg-accent" />
-                </span>
+              <li key={y} className="relative bg-background p-6 md:min-h-72">
                 <Reveal delay={i * 70}>
                   <div className="mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
                     Chapter {String(i + 1).padStart(2, "0")}
@@ -150,7 +149,7 @@ function About() {
                     <div className="font-display text-4xl font-bold leading-none text-accent sm:text-5xl">{y}</div>
                     <div className="font-display text-xl font-bold tracking-tight sm:text-2xl">{t}</div>
                   </div>
-                  <p className="mt-2.5 max-w-xl text-[15px] leading-7 text-muted-foreground">{d}</p>
+                  <p className="mt-5 max-w-xl text-sm leading-6 text-muted-foreground">{d}</p>
                 </Reveal>
               </li>
             ))}
@@ -179,7 +178,7 @@ function About() {
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
-        <div className="relative overflow-hidden border border-border/60 bg-card p-10 sm:p-16">
+        <div className="relative overflow-hidden border border-border/60 bg-card p-7 sm:p-12 lg:p-16">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
@@ -191,16 +190,16 @@ function About() {
           <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="mono text-accent">— Join the labs</div>
-              <h3 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+              <h3 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-5xl">
                 We're hiring engineers,<br />designers and audio nerds.
               </h3>
             </div>
             <Link
               to="/careers"
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition hover:brightness-110"
+              className="group inline-flex min-h-11 items-center gap-2 bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition hover:brightness-110"
             >
               See open roles
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>

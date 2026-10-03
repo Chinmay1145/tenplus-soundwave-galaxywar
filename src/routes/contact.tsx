@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { LogoMark } from "@/components/site/Logo";
 import { BandRule, Reveal, SectionMast } from "@/components/site/Editorial";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -11,6 +12,9 @@ export const Route = createFileRoute("/contact")({
       { title: "Contact & Support — PULSE" },
       { name: "description", content: "Get in touch with PULSE for orders, warranty and product support." },
       { property: "og:title", content: "Contact — PULSE" },
+      { property: "og:description", content: "Contact PULSE for product guidance, order help, warranty support and partnerships." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "/contact" },
     ],
     links: [{ rel: "canonical", href: "/contact" }],
@@ -43,14 +47,14 @@ function Contact() {
               "radial-gradient(900px 480px at 90% -10%, oklch(0.65 0.24 25 / 0.22), transparent 60%)",
           }}
         />
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-20 sm:px-6 sm:pb-20 sm:pt-28 lg:grid-cols-12">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-20 sm:pt-24 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-8">
             <div className="flex items-center gap-3">
               <LogoMark size={28} />
               <div className="mono text-accent">— Contact · 24h response</div>
             </div>
-            <h1 className="mt-4 font-display text-[clamp(2.75rem,11vw,6.5rem)] font-bold leading-[0.88] tracking-tight">
-              Start with<br /><span className="text-accent">one question.</span>
+            <h1 className="mt-5 max-w-4xl font-display text-[clamp(3rem,9vw,7rem)] font-bold leading-[0.84] tracking-tight">
+              Let’s get you<br /><span className="text-accent">back to listening.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
               Questions about a product, an order, or a partnership? We're a
@@ -66,7 +70,7 @@ function Contact() {
                 ["24 mo.", "Warranty"],
                 ["Free", "Returns 30d"],
               ].map(([n, l]) => (
-                <div key={l} className="bg-background px-4 py-5">
+                <div key={l} className="bg-background px-4 py-6">
                   <div className="font-display text-2xl font-bold tracking-tight">{n}</div>
                   <div className="mono mt-1 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{l}</div>
                 </div>
@@ -83,7 +87,7 @@ function Contact() {
           {/* Form */}
           <form
             onSubmit={submit}
-            className="relative overflow-hidden border border-border/60 bg-card p-6 sm:p-10"
+            className="relative overflow-hidden border border-border/60 bg-card p-5 sm:p-10"
           >
             <div
               aria-hidden
@@ -101,21 +105,23 @@ function Contact() {
                 </div>
 
                 <div>
-                  <span className="mono mb-2 block text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Topic</span>
-                  <div className="flex flex-wrap gap-2">
+                  <span className="mono mb-2 block text-[11px] uppercase text-muted-foreground">Topic</span>
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                     {["Product support", "Order & shipping", "Warranty", "Press", "Partnership"].map((t) => (
-                      <button
+                      <Button
                         key={t}
                         type="button"
                         onClick={() => setForm({ ...form, topic: t })}
-                        className={`rounded-full border px-3.5 py-1.5 text-xs transition ${
+                        variant="outline"
+                        size="sm"
+                        className={`h-auto min-h-10 whitespace-normal rounded-none border px-3 py-2 text-xs transition ${
                           form.topic === t
                             ? "border-accent bg-accent text-accent-foreground"
                             : "border-border bg-surface-2 text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         {t}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -127,8 +133,9 @@ function Contact() {
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     rows={6}
                     required
+                    maxLength={1000}
                     placeholder="Tell us what's on your mind…"
-                    className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="w-full resize-y rounded-md border border-border bg-surface-2 px-4 py-3 text-base focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                   />
                 </label>
 
@@ -136,13 +143,13 @@ function Contact() {
                   <div className="mono text-[11px] text-muted-foreground">
                     We reply in under 24 hours · Mon–Sat
                   </div>
-                  <button
+                  <Button
                     disabled={sending}
-                    className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition hover:brightness-110 disabled:opacity-60"
+                    className="group h-11 bg-accent px-6 text-sm font-semibold text-accent-foreground transition hover:brightness-110 disabled:opacity-60"
                   >
                     {sending ? "Sending…" : "Send message"}
                     <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -159,12 +166,12 @@ function Contact() {
               const Icon = Ico as typeof Mail;
               const inner = (
                 <>
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-accent/40 bg-accent/10 text-accent">
+                  <div className="grid h-11 w-11 shrink-0 place-items-center border border-accent/40 bg-accent/10 text-accent">
                     <Icon className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
                     <div className="mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label as string}</div>
-                    <div className="mt-0.5 truncate font-display text-base font-bold tracking-tight">{val as string}</div>
+                    <div className="mt-0.5 break-words font-display text-base font-bold">{val as string}</div>
                   </div>
                   <ArrowUpRight className="ml-auto h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
                 </>
@@ -210,7 +217,7 @@ function Contact() {
             aside={
               <Link
                 to="/faq"
-                className="mono inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] transition-colors hover:border-accent hover:text-accent"
+                  className="mono inline-flex min-h-10 items-center gap-2 border border-border bg-card px-4 py-2 text-[10px] uppercase transition-colors hover:border-accent hover:text-accent"
               >
                 All FAQs →
               </Link>
@@ -270,14 +277,15 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mono mb-2 block text-[11px] uppercase tracking-[0.25em] text-muted-foreground">{label}</span>
+      <span className="mono mb-2 block text-[11px] uppercase text-muted-foreground">{label}</span>
       <input
         type={type}
         value={value}
         onChange={(e) => on(e.target.value)}
         placeholder={placeholder}
         required
-        className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+        maxLength={type === "email" ? 255 : 100}
+        className="w-full rounded-md border border-border bg-surface-2 px-4 py-3 text-base focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
       />
     </label>
   );
