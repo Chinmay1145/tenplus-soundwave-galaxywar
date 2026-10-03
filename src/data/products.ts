@@ -85,6 +85,11 @@ export const BRANDS = [
   "Xiaomi",
   "Huawei",
   "Google",
+  "Edifier",
+  "Audio-Technica",
+  "Bowers & Wilkins",
+  "Focal",
+  "Noise",
 ];
 
 // ─── IMAGE REGISTRY ──────────────────────────────────────────────────────────
@@ -1616,6 +1621,18 @@ export const PRODUCT_SEEDS: ProductSeed[] = [
   { id: 148, name: "Airdopes Xtreme", brand: "Boat", category: "tws", price: 1499, mrp: 2499, tagline: "80hr playback. Beast mode.", image: "black", gallery: ["black","silver","white","hero"], extra: { isBestSeller: true } },
   { id: 149, name: "Rockerz 550 Pro", brand: "Boat", category: "anc", price: 3499, mrp: 4999, tagline: "Over-ear ANC on a budget.", image: "headphones", gallery: ["headphones","black","silver","hero"] },
   { id: 150, name: "Redmi Buds 6 Pro", brand: "Xiaomi", category: "tws", price: 4999, mrp: 6999, tagline: "Triple driver. LDAC.", image: "white", gallery: ["white","black","silver","hero"], extra: { isNew: true } },
+
+  // ── Extension: 151–160 (new brands) ─────────────────────────────────
+  { id: 151, name: "NeoBuds Pro 3", brand: "Edifier", category: "tws", price: 10999, mrp: 12999, tagline: "Hi-Res LDAC. Hybrid ANC.", image: "black", gallery: ["black","silver","white","hero"], extra: { isNew: true } },
+  { id: 152, name: "W820NB Plus", brand: "Edifier", category: "anc", price: 5999, mrp: 7499, tagline: "Budget ANC over-ear champ.", image: "headphones", gallery: ["headphones","black","silver","hero"] },
+  { id: 153, name: "ATH-M50xBT3", brand: "Audio-Technica", category: "studio", price: 21990, mrp: 24990, tagline: "The studio classic, untethered.", image: "headphones", gallery: ["headphones","black","silver","hero"], extra: { isBestSeller: true } },
+  { id: 154, name: "ATH-CKS50TW", brand: "Audio-Technica", category: "tws", price: 12990, mrp: 14990, tagline: "Solid bass. 28hr total play.", image: "black", gallery: ["black","silver","white","hero"] },
+  { id: 155, name: "Pi8", brand: "Bowers & Wilkins", category: "luxury", price: 34990, mrp: 39990, tagline: "Carbon drivers. True reference.", image: "white", gallery: ["white","black","silver","hero"], extra: { badges: ["Luxury"] } },
+  { id: 156, name: "Px8 S2", brand: "Bowers & Wilkins", category: "flagship", price: 69900, mrp: 74900, tagline: "Nappa leather. Diamond-like sound.", image: "headphones", gallery: ["headphones","rose","black","hero"], extra: { badges: ["Luxury"] } },
+  { id: 157, name: "Bathys MG", brand: "Focal", category: "flagship", price: 89900, mrp: 99990, tagline: "Magnesium drivers. French hi-fi.", image: "headphones", gallery: ["headphones","black","silver","hero"], extra: { isNew: true } },
+  { id: 158, name: "Hadenys", brand: "Focal", category: "studio", price: 64900, mrp: 69900, tagline: "Open-back warmth, refined.", image: "headphones", gallery: ["headphones","rose","black","hero"] },
+  { id: 159, name: "Buds Vista Pro", brand: "Noise", category: "tws", price: 2999, mrp: 3999, tagline: "50hr play. Quad mic calls.", image: "black", gallery: ["black","white","silver","hero"], extra: { isBestSeller: true } },
+  { id: 160, name: "Kite Neckband Pro", brand: "Noise", category: "neckband", price: 1299, mrp: 1999, tagline: "Featherweight. 60hr battery.", image: "neckband", gallery: ["neckband","black","silver","white"] },
 ];
 
 // ── ADD NEW PRODUCTS BELOW ──

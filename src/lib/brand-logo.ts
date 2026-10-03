@@ -46,6 +46,8 @@ const DOMAINS: Record<string, string> = {
   Shure: "shure.com", AKG: "akg.com", HyperX: "hyperx.com", Razer: "razer.com",
   Logitech: "logitech.com", Bang: "bang-olufsen.com", "Bang & Olufsen": "bang-olufsen.com",
   Boat: "boat-lifestyle.com", Xiaomi: "mi.com", Huawei: "huawei.com", Google: "google.com",
+  Edifier: "edifier.com", "Audio-Technica": "audio-technica.com",
+  "Bowers & Wilkins": "bowerswilkins.com", Focal: "focal.com", Noise: "gonoise.com",
 };
 
 const SI_SLUGS: Record<string, string> = {
@@ -55,6 +57,7 @@ const SI_SLUGS: Record<string, string> = {
   Xiaomi: "xiaomi", Huawei: "huawei", Google: "google", Marshall: "marshall",
   Shure: "shure", Jabra: "jabra", Skullcandy: "skullcandy",
   Realme: "realme", Soundcore: "anker", Audeze: "audeze",
+  "Audio-Technica": "audiotechnica", "Bowers & Wilkins": "bowerswilkins",
 };
 
 function letterAvatar(brand: string, tint = "#111"): string {
