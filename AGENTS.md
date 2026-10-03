@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Project architecture
+
+- Keep shared editorial reveal and section-heading patterns in `src/components/site/Editorial.tsx` so story and support pages stay visually consistent.

@@ -4,7 +4,7 @@ import { LogoMark } from "./Logo";
 /** Cinematic acts — each act owns a headline, a subline and a progress ceiling. */
 const ACTS = [
   { title: "Booting audio core", sub: "Initialising DSP · 24-bit pipeline", to: 26 },
-  { title: "Fetching catalogue", sub: "150 hand-tuned products", to: 52 },
+  { title: "Fetching catalogue", sub: "160 hand-tuned products", to: 52 },
   { title: "Tuning drivers", sub: "Adaptive ANC · spatial engine", to: 78 },
   { title: "Finalising soundstage", sub: "Reference calibration complete", to: 97 },
   { title: "Sound ready", sub: "Welcome to the listening room", to: 100 },
@@ -70,19 +70,19 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         style={{ background: "radial-gradient(120% 90% at 50% 45%, transparent 40%, oklch(0 0 0 / 0.55) 100%)" }}
       />
       <div aria-hidden className="pointer-events-none absolute inset-0 sl-grain opacity-[0.06]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-3 flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12">
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-4 flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12 sm:top-8">
         <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
         <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-accent/80 tabular-nums">T+{clock}</span>
       </div>
       {/* bottom HUD readouts */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-4 bottom-3 hidden items-center justify-between gap-3 border-t border-border/60 pt-3 sm:inset-x-12 sm:flex">
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 bottom-5 hidden items-center justify-between gap-3 border-t border-border/60 pt-3 sm:inset-x-12 sm:flex">
         <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">SR 96 kHz · BIT 24 · LAT {(18 - pct / 8).toFixed(1)} ms</span>
         <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">BUFFER {String(Math.min(512, 64 + pct * 4)).padStart(3, "0")}</span>
       </div>
 
 
       {/* low backdrop spectrum — fills the widescreen edges */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-8 flex h-24 items-end justify-center gap-[3px] opacity-25 sm:h-32">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[22vh] items-end justify-center gap-[3px] opacity-20">
         {Array.from({ length: 64 }).map((_, i) => (
           <span
             key={i}
@@ -96,14 +96,14 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         ))}
       </div>
 
-      <div className="relative flex w-full max-w-lg flex-col items-center px-5 sm:px-6">
+      <div className="relative flex w-full max-w-xl flex-col items-center px-5 pt-8 sm:px-8">
         {/* logo lockup */}
         <div className="sl-lockup relative flex flex-col items-center">
           {/* expanding sonar rings behind the lockup */}
           <span aria-hidden className="sl-ring" />
           <span aria-hidden className="sl-ring" style={{ animationDelay: "1.2s" }} />
           <span aria-hidden className="sl-ring" style={{ animationDelay: "2.4s" }} />
-          <div className="relative grid h-28 w-28 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-36 sm:w-36">
+          <div className="relative grid h-32 w-32 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-40 sm:w-40">
             {/* slow radar sweep behind the mark */}
             <span aria-hidden className="sl-sweep" />
             <div
@@ -115,9 +115,9 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
             />
             <span aria-hidden className="absolute left-2 top-2 h-3 w-3 border-l border-t border-accent" />
             <span aria-hidden className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent" />
-            <LogoMark size={60} animated className="relative sm:h-[72px] sm:w-[72px]" />
+            <LogoMark size={68} animated className="relative sm:h-20 sm:w-20" />
           </div>
-          <div className="mt-5 font-display text-3xl font-bold tracking-[0.2em] sm:mt-6 sm:text-4xl">
+          <div className="mt-5 font-display text-3xl font-bold tracking-[0.14em] sm:mt-6 sm:text-4xl">
             PULSE<span className="text-accent">.</span>
           </div>
           <div className="mono mt-2 text-[10px] tracking-[0.4em] text-accent/70">AUDIO LABS</div>
@@ -153,7 +153,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
 
 
         {/* act headline with crossfade */}
-        <div className="mt-6 h-12 text-center sm:mt-8">
+        <div className="mt-5 min-h-12 text-center sm:mt-7">
           <div key={headline} className="sl-act">
             <div className="mono text-[11px] tracking-[0.32em] text-foreground/85 sm:tracking-[0.4em]">
               {headline.toUpperCase()}
@@ -165,7 +165,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         </div>
 
         {/* progress */}
-        <div className="mt-3 w-full">
+        <div className="mt-4 w-full">
           <div className="relative h-[2px] w-full overflow-hidden bg-border/70">
             <span
               className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-out"
@@ -214,7 +214,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           })}
         </ul>
 
-        <div className="mt-6 grid w-full grid-cols-2 border border-border/60 sm:mt-7 sm:grid-cols-4">
+        <div className="mt-5 hidden w-full grid-cols-2 border border-border/60 xs:grid sm:mt-7 sm:grid-cols-4">
           {TAGS.map((t, i) => (
             <span
               key={t}
@@ -230,7 +230,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           <button
             type="button"
             onClick={onSkip}
-            className="mono sl-skip mt-6 border border-border/60 px-5 py-2 text-[10px] tracking-[0.32em] text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            className="mono sl-skip mt-5 min-h-11 border border-border/60 px-6 py-2 text-[10px] tracking-[0.28em] text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 sm:mt-6"
           >
             TAP TO ENTER
           </button>
@@ -245,12 +245,12 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         .sl-lockup { animation: sl-rise 1.1s cubic-bezier(.16,1,.3,1) .25s both; }
         .sl-ring {
           position: absolute; top: 0; left: 50%;
-          width: 9rem; height: 9rem; margin-left: -4.5rem;
+          width: 10rem; height: 10rem; margin-left: -5rem;
           border: 1px solid oklch(0.65 0.24 25 / 0.35);
           animation: sl-ripple 3.6s cubic-bezier(.16,1,.3,1) infinite;
           pointer-events: none;
         }
-        @media (min-width: 640px) { .sl-ring { width: 11.5rem; height: 11.5rem; margin-left: -5.75rem; } }
+        @media (min-width: 640px) { .sl-ring { width: 12.5rem; height: 12.5rem; margin-left: -6.25rem; } }
         @keyframes sl-ripple {
           0%   { transform: scale(1); opacity: 0; }
           15%  { opacity: .8; }
