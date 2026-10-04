@@ -5,10 +5,13 @@ import { useStore } from "@/lib/store";
 import { inr } from "@/lib/format";
 import { toast } from "sonner";
 import { brandLogo } from "@/lib/brand-logo";
+import { blendedRating, useReviewSummary } from "@/lib/reviews";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare } = useStore();
   const off = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+  const summary = useReviewSummary();
+  const stats = blendedRating(product.rating, product.reviews, summary[product.id]);
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card transition-all duration-500 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[var(--shadow-card)]">
@@ -103,10 +106,16 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
             <span className="mono text-muted-foreground">{product.brand}</span>
           </span>
-          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+          <Link
+            to="/reviews"
+            search={{ product: product.id }}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-accent"
+            aria-label={`Reviews for ${product.name}`}
+          >
             <Star className="h-3 w-3 fill-accent text-accent" />
-            {product.rating.toFixed(1)} <span className="opacity-60">({product.reviews})</span>
-          </span>
+            {stats.rating.toFixed(1)} <span className="opacity-60">({stats.count})</span>
+            {stats.live > 0 && <span className="mono rounded-full bg-accent/15 px-1.5 text-[9px] text-accent">+{stats.live}</span>}
+          </Link>
         </div>
         <Link to="/product/$id" params={{ id: String(product.id) }}>
           <h3 className="font-display text-base font-semibold leading-tight">{product.name}</h3>
