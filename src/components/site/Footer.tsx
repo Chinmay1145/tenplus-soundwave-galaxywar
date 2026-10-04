@@ -167,6 +167,7 @@ export function Footer() {
             ["My orders", "/orders"],
             ["Wishlist", "/wishlist"],
             ["Compare", "/compare"],
+            ["Reviews", "/reviews"],
             ["Cart", "/cart"],
           ]} />
         </div>
