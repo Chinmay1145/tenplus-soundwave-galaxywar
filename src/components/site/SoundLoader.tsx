@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { LogoMark } from "./Logo";
 
 /** Cinematic acts — each act owns a headline, a subline and a progress ceiling. */
@@ -9,8 +10,6 @@ const ACTS = [
   { title: "Finalising soundstage", sub: "Reference calibration complete", to: 97 },
   { title: "Sound ready", sub: "Welcome to the listening room", to: 100 },
 ] as const;
-
-const TAGS = ["24-bit · 96 kHz", "Hi-Res Certified", "Adaptive ANC", "Spatial Audio"];
 
 export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => void }) {
   const [pct, setPct] = useState(3);
@@ -39,13 +38,13 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
       aria-live="polite"
       aria-busy="true"
     >
-      {/* cinematic colour field */}
+      {/* calibrated colour field */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 sl-wash"
         style={{
           background:
-            "linear-gradient(115deg, transparent 0 46%, oklch(0.65 0.24 25 / 0.08) 46% 47%, transparent 47%), radial-gradient(900px 500px at 50% 42%, oklch(0.65 0.24 25 / 0.16), transparent 72%)",
+            "radial-gradient(closest-side at 50% 46%, oklch(0.65 0.24 25 / 0.14), transparent 84%)",
         }}
       />
       {/* fine grid */}
@@ -55,7 +54,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         style={{
           backgroundImage:
             "linear-gradient(oklch(0.65 0.24 25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.65 0.24 25) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+          backgroundSize: "32px 32px",
           maskImage: "radial-gradient(closest-side at 50% 50%, black, transparent 82%)",
         }}
       />
@@ -70,79 +69,40 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         style={{ background: "radial-gradient(120% 90% at 50% 45%, transparent 40%, oklch(0 0 0 / 0.55) 100%)" }}
       />
       <div aria-hidden className="pointer-events-none absolute inset-0 sl-grain opacity-[0.06]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-4 flex items-center justify-between gap-3 border-b border-border/60 pb-3 sm:inset-x-12 sm:top-8">
-        <span className="mono truncate text-[10px] tracking-[0.2em] text-muted-foreground">PULSE AUDIO LABS / STARTUP</span>
+      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-4 flex items-center justify-between gap-3 sm:inset-x-10 sm:top-8">
+        <span className="mono flex min-w-0 items-center gap-3 truncate text-[9px] font-bold tracking-[0.22em] text-muted-foreground sm:text-[10px] sm:tracking-[0.3em]">
+          <i className="sl-status h-1.5 w-1.5 shrink-0 bg-accent" />
+          PULSE AUDIO LABS // STARTUP
+        </span>
         <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-accent/80 tabular-nums">T+{clock}</span>
       </div>
       {/* bottom HUD readouts */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-4 bottom-5 hidden items-center justify-between gap-3 border-t border-border/60 pt-3 sm:inset-x-12 sm:flex">
+      <div aria-hidden className="pointer-events-none absolute inset-x-10 bottom-8 hidden items-center justify-between gap-3 sm:flex">
         <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">SR 96 kHz · BIT 24 · LAT {(18 - pct / 8).toFixed(1)} ms</span>
         <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">BUFFER {String(Math.min(512, 64 + pct * 4)).padStart(3, "0")}</span>
       </div>
 
 
-      {/* low backdrop spectrum — fills the widescreen edges */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[22vh] items-end justify-center gap-[3px] opacity-20">
-        {Array.from({ length: 64 }).map((_, i) => (
-          <span
-            key={i}
-            className="sl-spectrum"
-            style={{
-              animationDelay: `${(i % 16) * 0.11}s`,
-              animationDuration: `${1.1 + ((i * 7) % 5) * 0.22}s`,
-              height: `${18 + ((i * 13) % 60)}%`,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative flex w-full max-w-xl flex-col items-center px-5 pt-8 sm:px-8">
+      <div className="relative flex w-full max-w-xl flex-col items-center px-5 py-16 sm:px-8">
         {/* logo lockup */}
-        <div className="sl-lockup relative flex flex-col items-center">
-          {/* expanding sonar rings behind the lockup */}
-          <span aria-hidden className="sl-ring" />
-          <span aria-hidden className="sl-ring" style={{ animationDelay: "1.2s" }} />
-          <span aria-hidden className="sl-ring" style={{ animationDelay: "2.4s" }} />
-          <div className="relative grid h-32 w-32 place-items-center border border-border bg-surface/60 backdrop-blur-md sm:h-40 sm:w-40">
-            {/* slow radar sweep behind the mark */}
-            <span aria-hidden className="sl-sweep" />
-            <div
-              aria-hidden
-              className="absolute inset-x-0 bottom-0 h-1 bg-border/60"
-              style={{
-                background: `linear-gradient(90deg, var(--color-accent) ${pct}%, transparent ${pct}%)`,
-              }}
-            />
-            <span aria-hidden className="absolute left-2 top-2 h-3 w-3 border-l border-t border-accent" />
-            <span aria-hidden className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent" />
-            <LogoMark size={68} animated className="relative sm:h-20 sm:w-20" />
+        <div className="sl-lockup relative flex flex-col items-center px-10 py-6 sm:px-12 sm:py-8">
+          <span aria-hidden className="absolute left-0 top-0 h-7 w-7 border-l-2 border-t-2 border-accent" />
+          <span aria-hidden className="absolute right-0 top-0 h-7 w-7 border-r-2 border-t-2 border-accent/20" />
+          <span aria-hidden className="absolute bottom-0 left-0 h-7 w-7 border-b-2 border-l-2 border-accent/20" />
+          <span aria-hidden className="absolute bottom-0 right-0 h-7 w-7 border-b-2 border-r-2 border-accent" />
+          <div className="relative grid h-20 w-20 place-items-center rounded-full border-2 border-accent sm:h-24 sm:w-24">
+            <span aria-hidden className="sl-orbit absolute inset-[-7px] rounded-full border border-accent/20" />
+            <LogoMark size={55} animated className="relative sm:h-16 sm:w-16" />
           </div>
-          <div className="mt-5 font-display text-3xl font-bold tracking-[0.14em] sm:mt-6 sm:text-4xl">
+          <div className="mt-5 font-display text-3xl font-bold tracking-[0.22em] sm:mt-6 sm:text-5xl">
             PULSE<span className="text-accent">.</span>
           </div>
-          <div className="mono mt-2 text-[10px] tracking-[0.4em] text-accent/70">AUDIO LABS</div>
+          <div className="mono mt-2 text-[9px] font-bold tracking-[0.55em] text-accent/60">AUDIO LABS</div>
         </div>
 
-        {/* waveform trace */}
-        <svg
-          aria-hidden
-          viewBox="0 0 320 40"
-          preserveAspectRatio="none"
-          className="mt-5 h-8 w-full opacity-70 sm:mt-6"
-        >
-          <path
-            className="sl-wave"
-            d="M0 20 Q 20 2 40 20 T 80 20 T 120 20 T 160 20 T 200 20 T 240 20 T 280 20 T 320 20"
-            fill="none"
-            stroke="var(--color-accent)"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-          />
-        </svg>
-
         {/* equaliser */}
-        <div className="mt-2 flex h-7 items-center gap-1 sm:h-8" aria-hidden>
-          {Array.from({ length: 21 }).map((_, i) => (
+        <div className="mt-7 flex h-9 items-center gap-1.5 sm:mt-9 sm:h-12" aria-hidden>
+          {Array.from({ length: 13 }).map((_, i) => (
             <span
               key={i}
               className="sl-eqbar"
@@ -165,8 +125,12 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         </div>
 
         {/* progress */}
-        <div className="mt-4 w-full">
-          <div className="relative h-[2px] w-full overflow-hidden bg-border/70">
+        <div className="mt-5 w-full">
+          <div className="mono mb-3 flex items-center justify-between text-[9px] font-bold tracking-[0.22em] text-muted-foreground">
+            <span>ACT {actIdx + 1} / {ACTS.length}</span>
+            <span className="text-accent">{pct}%</span>
+          </div>
+          <div className="relative h-1 w-full overflow-hidden bg-border/60">
             <span
               className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-out"
               style={{
@@ -178,23 +142,17 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
             />
             <span aria-hidden className="sl-shine" />
           </div>
-          <div className="mono mt-2.5 flex items-center justify-between text-[10px] tracking-[0.24em] text-muted-foreground">
-            <span>
-              ACT {actIdx + 1} / {ACTS.length}
-            </span>
-            <span className="text-accent">{pct}%</span>
-          </div>
         </div>
 
         {/* act ticks */}
-        <ul className="mt-5 grid w-full grid-cols-5 gap-1.5" aria-hidden>
+        <ul className="mt-4 grid w-full grid-cols-5 gap-1.5 sm:gap-2" aria-hidden>
           {ACTS.map((a, i) => {
             const done = pct >= a.to;
             const live = i === actIdx && !done;
             return (
               <li key={a.title} className="flex flex-col items-center gap-1.5">
                 <span
-                  className={`h-[3px] w-full rounded-full transition-all duration-500 ${
+                  className={`h-0.5 w-full transition-all duration-500 ${
                     done
                       ? "bg-accent shadow-[0_0_10px_oklch(0.65_0.24_25/0.8)]"
                       : live
@@ -203,7 +161,7 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
                   }`}
                 />
                 <span
-                  className={`mono truncate text-[10px] tracking-[0.12em] transition-colors ${
+                  className={`mono max-w-full truncate text-[8px] font-bold tracking-[0.04em] transition-colors sm:tracking-[0.1em] ${
                     done ? "text-accent" : live ? "text-foreground/70" : "text-muted-foreground/45"
                   }`}
                 >
@@ -214,48 +172,28 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           })}
         </ul>
 
-        <div className="mt-5 hidden w-full grid-cols-2 border border-border/60 xs:grid sm:mt-7 sm:grid-cols-4">
-          {TAGS.map((t, i) => (
-            <span
-              key={t}
-              className="mono sl-tag border-r border-border/60 px-2 py-2 text-center text-[10px] tracking-[0.12em] text-muted-foreground last:border-r-0 sm:px-2.5"
-              style={{ animationDelay: `${0.5 + i * 0.12}s` }}
-            >
-              {t.toUpperCase()}
-            </span>
-          ))}
-        </div>
-
         {onSkip ? (
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={onSkip}
-            className="mono sl-skip mt-5 min-h-11 border border-border/60 px-6 py-2 text-[10px] tracking-[0.28em] text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 sm:mt-6"
+            className="mono sl-skip mt-7 h-11 rounded-none border-accent/30 bg-surface/40 px-8 text-[9px] font-bold tracking-[0.36em] text-foreground hover:border-accent/60 hover:bg-accent/10 hover:text-accent sm:mt-10"
           >
             TAP TO ENTER
-          </button>
+          </Button>
         ) : null}
       </div>
 
       <style>{`
-        .sl-wash { animation: sl-breathe 6s ease-in-out infinite; }
+        .sl-wash { animation: sl-breathe 5s ease-in-out infinite; }
         @keyframes sl-breathe { 0%,100% { opacity: .75; } 50% { opacity: 1; } }
 
 
         .sl-lockup { animation: sl-rise 1.1s cubic-bezier(.16,1,.3,1) .25s both; }
-        .sl-ring {
-          position: absolute; top: 0; left: 50%;
-          width: 10rem; height: 10rem; margin-left: -5rem;
-          border: 1px solid oklch(0.65 0.24 25 / 0.35);
-          animation: sl-ripple 3.6s cubic-bezier(.16,1,.3,1) infinite;
-          pointer-events: none;
-        }
-        @media (min-width: 640px) { .sl-ring { width: 12.5rem; height: 12.5rem; margin-left: -6.25rem; } }
-        @keyframes sl-ripple {
-          0%   { transform: scale(1); opacity: 0; }
-          15%  { opacity: .8; }
-          100% { transform: scale(1.9); opacity: 0; }
-        }
+        .sl-status { animation: sl-status 1.5s ease-in-out infinite; }
+        @keyframes sl-status { 50% { opacity: .25; box-shadow: 0 0 14px var(--color-accent); } }
+        .sl-orbit { animation: sl-orbit 8s linear infinite; }
+        @keyframes sl-orbit { to { transform: rotate(360deg); } }
         @keyframes sl-rise {
           from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(6px); }
           to   { opacity: 1; transform: none; filter: none; }
@@ -269,21 +207,13 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         @keyframes sl-sheen { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
 
         .sl-eqbar {
-          display: inline-block; width: 3px; height: 22px;
+          display: inline-block; width: 2px; height: 28px;
           background: oklch(0.65 0.24 25);
           transform-origin: center;
           animation-name: sl-eq; animation-timing-function: cubic-bezier(.36,.07,.19,.97);
           animation-iteration-count: infinite;
         }
         @keyframes sl-eq { 0%,100% { transform: scaleY(.22); } 50% { transform: scaleY(1.7); } }
-
-        .sl-spectrum {
-          display: inline-block; width: 2px; align-self: flex-end;
-          background: linear-gradient(180deg, oklch(0.65 0.24 25 / 0.9), oklch(0.65 0.24 25 / 0.15));
-          transform-origin: bottom;
-          animation-name: sl-eq; animation-timing-function: cubic-bezier(.36,.07,.19,.97);
-          animation-iteration-count: infinite;
-        }
 
         .sl-skip { animation: sl-tag-in .8s cubic-bezier(.16,1,.3,1) 1.4s both; }
 
@@ -323,23 +253,8 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           100% { background-position: 0 0; }
         }
 
-        .sl-sweep {
-          position: absolute; inset: 0; pointer-events: none;
-          background: conic-gradient(from 0deg, transparent 0 72%, oklch(0.65 0.24 25 / 0.28) 88%, transparent 100%);
-          mask-image: radial-gradient(closest-side, black 40%, transparent 100%);
-          animation: sl-sweep 4.5s linear infinite;
-        }
-        @keyframes sl-sweep { to { transform: rotate(360deg); } }
-
-        .sl-wave {
-          stroke-dasharray: 6 10;
-          animation: sl-wave 1.6s linear infinite;
-        }
-        @keyframes sl-wave { to { stroke-dashoffset: -32; } }
-
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-ring, .sl-spectrum, .sl-grain,
-          .sl-sweep, .sl-wave,
+          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-status, .sl-orbit, .sl-grain,
           .sl-shine, .sl-lockup, .sl-act, .sl-tag, .sl-skip {
             animation: none !important;
           }
