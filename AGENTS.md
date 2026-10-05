@@ -12,3 +12,4 @@
 ## Project architecture
 
 - Keep shared editorial reveal and section-heading patterns in `src/components/site/Editorial.tsx` so story and support pages stay visually consistent.
+- Keep the first-load experience in `SoundLoader.tsx` as a full-viewport tactical HUD while `BootSplash.tsx` owns session timing and dismissal, so visuals and lifecycle remain independently maintainable.
