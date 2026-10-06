@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LogoMark } from "./Logo";
 
-/** Cinematic acts — each act owns a headline, a subline and a progress ceiling. */
 const ACTS = [
-  { title: "Booting audio core", sub: "Initialising DSP · 24-bit pipeline", to: 26 },
-  { title: "Fetching catalogue", sub: "160 hand-tuned products", to: 52 },
-  { title: "Tuning drivers", sub: "Adaptive ANC · spatial engine", to: 78 },
-  { title: "Finalising soundstage", sub: "Reference calibration complete", to: 97 },
-  { title: "Sound ready", sub: "Welcome to the listening room", to: 100 },
+  { short: "Initialize", title: "Booting audio core", sub: "DSP · 24-bit pipeline", to: 26 },
+  { short: "Sync", title: "Fetching catalogue", sub: "160 hand-tuned products", to: 52 },
+  { short: "Calibrate", title: "Tuning drivers", sub: "Adaptive ANC · spatial engine", to: 78 },
+  { short: "Optimize", title: "Finalising soundstage", sub: "Reference calibration complete", to: 97 },
+  { short: "Live", title: "Sound ready", sub: "Welcome to the listening room", to: 100 },
 ] as const;
 
 export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => void }) {
@@ -17,249 +16,170 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
 
   useEffect(() => {
     const start = performance.now();
-    const id = setInterval(() => {
-      setPct((p) => (p >= 100 ? 100 : p + Math.max(1, Math.round((100 - p) / 11))));
-      const t = (performance.now() - start) / 1000;
-      const s = Math.floor(t);
-      setClock(`${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}.${Math.floor((t % 1) * 10)}`);
+    const id = window.setInterval(() => {
+      setPct((current) => (current >= 100 ? 100 : current + Math.max(1, Math.round((100 - current) / 11))));
+      const elapsed = (performance.now() - start) / 1000;
+      const seconds = Math.floor(elapsed);
+      setClock(
+        `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}.${Math.floor((elapsed % 1) * 10)}`,
+      );
     }, 130);
-    return () => clearInterval(id);
+    return () => window.clearInterval(id);
   }, []);
 
-  const actIdx = Math.min(ACTS.length - 1, ACTS.findIndex((a) => pct <= a.to) === -1 ? ACTS.length - 1 : ACTS.findIndex((a) => pct <= a.to));
+  const firstPendingAct = ACTS.findIndex((act) => pct <= act.to);
+  const actIdx = firstPendingAct === -1 ? ACTS.length - 1 : firstPendingAct;
   const act = ACTS[actIdx];
   const headline = label ?? act.title;
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-background"
-      style={{ width: "100vw", height: "100dvh", minHeight: "100vh" }}
+      className="fixed inset-0 z-[100] flex min-h-screen w-screen items-center justify-center overflow-hidden bg-background"
+      style={{ height: "100dvh" }}
       role="status"
       aria-live="polite"
       aria-busy="true"
     >
-      {/* calibrated colour field */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 sl-wash"
-        style={{
-          background:
-            "radial-gradient(closest-side at 50% 46%, oklch(0.65 0.24 25 / 0.14), transparent 84%)",
-        }}
-      />
-      {/* fine grid */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "linear-gradient(oklch(0.65 0.24 25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.65 0.24 25) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-          maskImage: "radial-gradient(closest-side at 50% 50%, black, transparent 82%)",
-        }}
-      />
-      {/* sweeping scanline */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <span className="sl-scan" />
-      </div>
-      {/* vignette + film grain for cinematic depth */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(120% 90% at 50% 45%, transparent 40%, oklch(0 0 0 / 0.55) 100%)" }}
-      />
-      <div aria-hidden className="pointer-events-none absolute inset-0 sl-grain opacity-[0.06]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-4 top-4 flex items-center justify-between gap-3 sm:inset-x-10 sm:top-8">
-        <span className="mono flex min-w-0 items-center gap-3 truncate text-[9px] font-bold tracking-[0.22em] text-muted-foreground sm:text-[10px] sm:tracking-[0.3em]">
-          <i className="sl-status h-1.5 w-1.5 shrink-0 bg-accent" />
-          PULSE AUDIO LABS // STARTUP
+      <div aria-hidden className="sl-ember sl-ember-left pointer-events-none absolute" />
+      <div aria-hidden className="sl-ember sl-ember-right pointer-events-none absolute" />
+      <div aria-hidden className="sl-dot-grid pointer-events-none absolute inset-0" />
+      <div aria-hidden className="sl-vignette pointer-events-none absolute inset-0" />
+      <div aria-hidden className="sl-grain pointer-events-none absolute inset-0 opacity-[0.035]" />
+
+      <div aria-hidden className="absolute left-5 top-5 h-4 w-4 border-l border-t border-border sm:left-12 sm:top-12" />
+      <div aria-hidden className="absolute right-5 top-5 h-4 w-4 border-r border-t border-border sm:right-12 sm:top-12" />
+      <div aria-hidden className="absolute bottom-5 left-5 h-4 w-4 border-b border-l border-border sm:bottom-12 sm:left-12" />
+      <div aria-hidden className="absolute bottom-5 right-5 h-4 w-4 border-b border-r border-border sm:bottom-12 sm:right-12" />
+
+      <header className="absolute inset-x-5 top-5 flex items-center justify-between gap-3 sm:inset-x-12 sm:top-10">
+        <span className="mono flex min-w-0 items-center gap-2.5 truncate text-[8px] font-medium tracking-[0.18em] text-muted-foreground sm:text-[9px] sm:tracking-[0.28em]">
+          <i className="sl-status h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+          PULSE AUDIO LABS // SYSTEM START
         </span>
-        <span className="mono shrink-0 text-[10px] tracking-[0.2em] text-accent/80 tabular-nums">T+{clock}</span>
-      </div>
-      {/* bottom HUD readouts */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-10 bottom-8 hidden items-center justify-between gap-3 sm:flex">
-        <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">SR 96 kHz · BIT 24 · LAT {(18 - pct / 8).toFixed(1)} ms</span>
-        <span className="mono text-[10px] tracking-[0.2em] text-muted-foreground">BUFFER {String(Math.min(512, 64 + pct * 4)).padStart(3, "0")}</span>
-      </div>
+        <span className="mono shrink-0 text-[9px] tracking-[0.16em] text-accent/80 tabular-nums sm:text-[10px]">
+          T+{clock}
+        </span>
+      </header>
 
-
-      <div className="relative flex w-full max-w-xl flex-col items-center px-5 py-16 sm:px-8">
-        {/* logo lockup */}
-        <div className="sl-lockup relative flex flex-col items-center px-10 py-6 sm:px-12 sm:py-8">
-          <span aria-hidden className="absolute left-0 top-0 h-7 w-7 border-l-2 border-t-2 border-accent" />
-          <span aria-hidden className="absolute right-0 top-0 h-7 w-7 border-r-2 border-t-2 border-accent/20" />
-          <span aria-hidden className="absolute bottom-0 left-0 h-7 w-7 border-b-2 border-l-2 border-accent/20" />
-          <span aria-hidden className="absolute bottom-0 right-0 h-7 w-7 border-b-2 border-r-2 border-accent" />
-          <div className="relative grid h-20 w-20 place-items-center rounded-full border-2 border-accent sm:h-24 sm:w-24">
-            <span aria-hidden className="sl-orbit absolute inset-[-7px] rounded-full border border-accent/20" />
-            <LogoMark size={55} animated className="relative sm:h-16 sm:w-16" />
+      <main className="relative flex w-full max-w-2xl -translate-y-2 flex-col items-center px-5 sm:px-10">
+        <div className="sl-lockup flex select-none items-center gap-3 sm:gap-4">
+          <div className="sl-logo-shell relative grid h-14 w-14 place-items-center rounded-full border border-accent/45 bg-surface/60 sm:h-16 sm:w-16">
+            <span aria-hidden className="sl-logo-ring absolute inset-[-7px] rounded-full border border-accent/15" />
+            <span aria-hidden className="sl-logo-ring sl-logo-ring-late absolute inset-[-13px] rounded-full border border-border/70" />
+            <LogoMark size={42} animated className="relative sm:h-12 sm:w-12" />
           </div>
-          <div className="mt-5 font-display text-3xl font-bold tracking-[0.22em] sm:mt-6 sm:text-5xl">
-            PULSE<span className="text-accent">.</span>
-          </div>
-          <div className="mono mt-2 text-[9px] font-bold tracking-[0.55em] text-accent/60">AUDIO LABS</div>
-        </div>
-
-        {/* equaliser */}
-        <div className="mt-7 flex h-9 items-center gap-1.5 sm:mt-9 sm:h-12" aria-hidden>
-          {Array.from({ length: 13 }).map((_, i) => (
-            <span
-              key={i}
-              className="sl-eqbar"
-              style={{ animationDelay: `${i * 0.09}s`, animationDuration: `${0.9 + (i % 4) * 0.14}s` }}
-            />
-          ))}
-        </div>
-
-
-        {/* act headline with crossfade */}
-        <div className="mt-5 min-h-12 text-center sm:mt-7">
-          <div key={headline} className="sl-act">
-            <div className="mono text-[11px] tracking-[0.32em] text-foreground/85 sm:tracking-[0.4em]">
-              {headline.toUpperCase()}
+          <div>
+            <div className="font-display text-3xl font-bold tracking-[0.04em] sm:text-4xl">
+              PULSE<span className="text-accent">.</span>
             </div>
-            <div className="mono mt-1.5 text-[10px] tracking-[0.2em] text-muted-foreground">
-              {(label ? "PREPARING YOUR SESSION" : act.sub).toUpperCase()}
+            <div className="mono mt-1 text-[7px] font-medium tracking-[0.38em] text-muted-foreground sm:text-[8px]">
+              AUDIO LABS
             </div>
           </div>
         </div>
 
-        {/* progress */}
-        <div className="mt-5 w-full">
-          <div className="mono mb-3 flex items-center justify-between text-[9px] font-bold tracking-[0.22em] text-muted-foreground">
-            <span>ACT {actIdx + 1} / {ACTS.length}</span>
-            <span className="text-accent">{pct}%</span>
+        <section className="mt-14 w-full sm:mt-18" aria-label="Loading progress">
+          <div className="mb-4 flex items-end justify-between gap-4 sm:mb-5">
+            <div key={headline} className="sl-act min-w-0">
+              <p className="mono truncate text-[9px] tracking-[0.2em] text-muted-foreground sm:text-[10px]">
+                {label ? "Preparing your session" : act.sub}
+              </p>
+              <h2 className="mt-1.5 text-lg font-medium tracking-normal text-foreground sm:text-xl">
+                {headline}
+              </h2>
+            </div>
+            <span className="mono shrink-0 text-xs font-bold tracking-[0.12em] text-accent tabular-nums sm:text-sm">
+              {String(pct).padStart(2, "0")}%
+            </span>
           </div>
-          <div className="relative h-1 w-full overflow-hidden bg-border/60">
+
+          <div className="sl-track relative h-0.5 w-full overflow-hidden rounded-full bg-border/80">
             <span
-              className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-out"
-              style={{
-                width: `${pct}%`,
-                background:
-                  "linear-gradient(90deg, oklch(0.45 0.20 25), var(--color-accent) 60%, oklch(0.86 0.16 25))",
-                boxShadow: "0 0 12px oklch(0.65 0.24 25 / 0.55)",
-              }}
+              className="sl-progress absolute inset-y-0 left-0 rounded-full bg-accent transition-[width] duration-500 ease-out"
+              style={{ width: `${pct}%` }}
             />
             <span aria-hidden className="sl-shine" />
           </div>
-        </div>
 
-        {/* act ticks */}
-        <ul className="mt-4 grid w-full grid-cols-5 gap-1.5 sm:gap-2" aria-hidden>
-          {ACTS.map((a, i) => {
-            const done = pct >= a.to;
-            const live = i === actIdx && !done;
-            return (
-              <li key={a.title} className="flex flex-col items-center gap-1.5">
-                <span
-                  className={`h-0.5 w-full transition-all duration-500 ${
-                    done
-                      ? "bg-accent shadow-[0_0_10px_oklch(0.65_0.24_25/0.8)]"
-                      : live
-                        ? "bg-accent/60"
-                        : "bg-border/70"
-                  }`}
-                />
-                <span
-                  className={`mono max-w-full truncate text-[8px] font-bold tracking-[0.04em] transition-colors sm:tracking-[0.1em] ${
-                    done ? "text-accent" : live ? "text-foreground/70" : "text-muted-foreground/45"
+          <ol className="mt-7 grid w-full grid-cols-5 gap-1 sm:mt-8 sm:gap-3">
+            {ACTS.map((item, index) => {
+              const done = pct >= item.to;
+              const active = index === actIdx;
+              return (
+                <li
+                  key={item.short}
+                  className={`sl-stage flex min-w-0 flex-col items-center gap-2 text-center transition-opacity duration-500 ${
+                    active ? "opacity-100" : done ? "opacity-60" : "opacity-30"
                   }`}
                 >
-                  {a.title.split(" ")[0].toUpperCase()}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
+                  <span className={`mono text-[8px] tracking-[0.12em] sm:text-[9px] ${active ? "text-accent" : "text-muted-foreground"}`}>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className={`mono max-w-full text-[7px] tracking-[0.03em] sm:text-[9px] sm:tracking-[0.1em] ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    {item.short}
+                  </span>
+                  <span className={`h-1 w-1 rounded-full ${active ? "sl-stage-live bg-accent" : done ? "bg-accent/60" : "bg-border"}`} />
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        <p className="mono mt-9 text-center text-[8px] font-medium tracking-[0.24em] text-muted-foreground sm:mt-11 sm:text-[9px]">
+          Building your acoustic profile
+        </p>
 
         {onSkip ? (
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={onSkip}
-            className="mono sl-skip mt-7 h-11 rounded-none border-accent/30 bg-surface/40 px-8 text-[9px] font-bold tracking-[0.36em] text-foreground hover:border-accent/60 hover:bg-accent/10 hover:text-accent sm:mt-10"
+            className="mono sl-skip mt-5 h-10 rounded-full border border-border bg-surface/40 px-6 text-[8px] font-medium tracking-[0.24em] text-muted-foreground hover:border-accent/45 hover:bg-accent/10 hover:text-foreground sm:mt-6"
           >
-            TAP TO ENTER
+            Enter listening room
           </Button>
         ) : null}
-      </div>
+      </main>
+
+      <footer aria-hidden className="absolute inset-x-5 bottom-5 flex items-center justify-between gap-4 sm:inset-x-12 sm:bottom-10">
+        <span className="mono text-[7px] tracking-[0.12em] text-muted-foreground/70 sm:text-[9px] sm:tracking-[0.2em]">
+          SR 96 KHZ · 24 BIT
+        </span>
+        <span className="mono text-right text-[7px] tracking-[0.12em] text-muted-foreground/70 tabular-nums sm:text-[9px] sm:tracking-[0.2em]">
+          LAT {(18 - pct / 8).toFixed(1)} MS · BUF {String(Math.min(512, 64 + pct * 4)).padStart(3, "0")}
+        </span>
+      </footer>
 
       <style>{`
-        .sl-wash { animation: sl-breathe 5s ease-in-out infinite; }
-        @keyframes sl-breathe { 0%,100% { opacity: .75; } 50% { opacity: 1; } }
-
-
-        .sl-lockup { animation: sl-rise 1.1s cubic-bezier(.16,1,.3,1) .25s both; }
-        .sl-status { animation: sl-status 1.5s ease-in-out infinite; }
-        @keyframes sl-status { 50% { opacity: .25; box-shadow: 0 0 14px var(--color-accent); } }
-        .sl-orbit { animation: sl-orbit 8s linear infinite; }
-        @keyframes sl-orbit { to { transform: rotate(360deg); } }
-        @keyframes sl-rise {
-          from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(6px); }
-          to   { opacity: 1; transform: none; filter: none; }
+        .sl-ember { border-radius: 999px; filter: blur(110px); animation: sl-breathe 5s ease-in-out infinite; }
+        .sl-ember-left { width: min(48rem, 75vw); height: min(48rem, 75vw); left: -20%; bottom: -30%; background: color-mix(in oklab, var(--color-accent) 15%, transparent); }
+        .sl-ember-right { width: min(34rem, 55vw); height: min(34rem, 55vw); right: -14%; top: -22%; background: color-mix(in oklab, var(--color-muted) 45%, transparent); animation-delay: -2.5s; }
+        .sl-dot-grid { opacity: .12; background-image: radial-gradient(var(--color-border) .7px, transparent .7px); background-size: 24px 24px; mask-image: radial-gradient(ellipse at center, black 15%, transparent 76%); }
+        .sl-vignette { background: radial-gradient(ellipse at center, transparent 35%, color-mix(in oklab, var(--color-background) 88%, transparent) 100%); }
+        .sl-grain { background-image: radial-gradient(var(--color-foreground) .45px, transparent .45px); background-size: 3px 3px; animation: sl-grain .7s steps(3) infinite; }
+        .sl-lockup { animation: sl-rise 1s cubic-bezier(.16,1,.3,1) .12s both; }
+        .sl-logo-shell { box-shadow: 0 0 40px color-mix(in oklab, var(--color-accent) 15%, transparent), inset 0 0 24px color-mix(in oklab, var(--color-accent) 8%, transparent); }
+        .sl-logo-ring { animation: sl-ring 3.2s ease-out infinite; }
+        .sl-logo-ring-late { animation-delay: 1.6s; }
+        .sl-status, .sl-stage-live { animation: sl-status 1.5s ease-in-out infinite; }
+        .sl-act { animation: sl-act-in .5s cubic-bezier(.16,1,.3,1) both; }
+        .sl-progress { box-shadow: 0 0 14px color-mix(in oklab, var(--color-accent) 65%, transparent); }
+        .sl-shine { position: absolute; inset-block: 0; width: 24%; background: linear-gradient(90deg, transparent, var(--color-foreground), transparent); opacity: .55; animation: sl-shine 1.8s ease-in-out infinite; }
+        .sl-skip { animation: sl-rise .8s cubic-bezier(.16,1,.3,1) 1s both; }
+        @keyframes sl-breathe { 0%,100% { opacity: .55; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
+        @keyframes sl-rise { from { opacity: 0; transform: translateY(14px); filter: blur(5px); } to { opacity: 1; transform: none; filter: none; } }
+        @keyframes sl-ring { 0% { transform: scale(.84); opacity: 0; } 30% { opacity: .7; } 100% { transform: scale(1.32); opacity: 0; } }
+        @keyframes sl-status { 50% { opacity: .28; box-shadow: 0 0 12px var(--color-accent); } }
+        @keyframes sl-act-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        @keyframes sl-shine { from { transform: translateX(-120%); } to { transform: translateX(480%); } }
+        @keyframes sl-grain { 0% { background-position: 0 0; } 33% { background-position: 1px 2px; } 66% { background-position: 2px 1px; } 100% { background-position: 0 0; } }
+        @media (max-height: 650px) {
+          .sl-lockup { transform: scale(.88); }
+          main section { margin-top: 2rem; }
         }
-        .sl-sheen {
-          position: absolute; inset: 0; border-radius: 999px; overflow: hidden;
-          background: linear-gradient(115deg, transparent 35%, oklch(1 0 0 / 0.16) 50%, transparent 65%);
-          background-size: 260% 100%;
-          animation: sl-sheen 3.4s ease-in-out infinite;
-        }
-        @keyframes sl-sheen { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
-
-        .sl-eqbar {
-          display: inline-block; width: 2px; height: 28px;
-          background: oklch(0.65 0.24 25);
-          transform-origin: center;
-          animation-name: sl-eq; animation-timing-function: cubic-bezier(.36,.07,.19,.97);
-          animation-iteration-count: infinite;
-        }
-        @keyframes sl-eq { 0%,100% { transform: scaleY(.22); } 50% { transform: scaleY(1.7); } }
-
-        .sl-skip { animation: sl-tag-in .8s cubic-bezier(.16,1,.3,1) 1.4s both; }
-
-        .sl-act { animation: sl-act-in .55s cubic-bezier(.16,1,.3,1) both; }
-        @keyframes sl-act-in {
-          from { opacity: 0; transform: translateY(8px); filter: blur(4px); }
-          to   { opacity: 1; transform: none; filter: none; }
-        }
-
-        .sl-shine {
-          position: absolute; inset: 0; border-radius: 999px;
-          background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.35), transparent);
-          width: 40%;
-          animation: sl-shine 1.9s ease-in-out infinite;
-        }
-        @keyframes sl-shine { 0% { transform: translateX(-120%); } 100% { transform: translateX(320%); } }
-
-        .sl-tag { animation: sl-tag-in .7s cubic-bezier(.16,1,.3,1) both; }
-        @keyframes sl-tag-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-
-        .sl-scan {
-          position: absolute; left: 0; right: 0; top: -25%; height: 45%;
-          background: linear-gradient(180deg, transparent, oklch(0.65 0.24 25 / 0.10), transparent);
-          animation: sl-scan 4s ease-in-out infinite;
-        }
-        @keyframes sl-scan { 0% { transform: translateY(0); } 100% { transform: translateY(300%); } }
-
-        .sl-grain {
-          background-image: radial-gradient(oklch(1 0 0 / 0.6) 0.5px, transparent 0.5px);
-          background-size: 3px 3px;
-          animation: sl-grain 0.6s steps(3) infinite;
-        }
-        @keyframes sl-grain {
-          0% { background-position: 0 0; }
-          33% { background-position: 1px 2px; }
-          66% { background-position: 2px 1px; }
-          100% { background-position: 0 0; }
-        }
-
         @media (prefers-reduced-motion: reduce) {
-          .sl-wash, .sl-sheen, .sl-eqbar, .sl-scan, .sl-status, .sl-orbit, .sl-grain,
-          .sl-shine, .sl-lockup, .sl-act, .sl-tag, .sl-skip {
-            animation: none !important;
-          }
+          .sl-ember, .sl-grain, .sl-lockup, .sl-logo-ring, .sl-status, .sl-stage-live, .sl-act, .sl-shine, .sl-skip { animation: none !important; }
         }
-
       `}</style>
     </div>
   );
