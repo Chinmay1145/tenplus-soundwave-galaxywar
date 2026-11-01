@@ -1,7 +1,8 @@
 import { jsPDF } from "jspdf";
 import { drawPulseLockup, drawPulseMark, drawQrPanel, trackingUrl } from "@/lib/pdf-logo";
+import { PRODUCTS } from "@/data/products";
 
-export type InvoiceItem = { name: string; qty: number; price?: number };
+export type InvoiceItem = { id?: string | number; name: string; qty: number; price?: number };
 export type InvoiceData = {
   id: string;
   createdAt: string | Date;
@@ -55,6 +56,15 @@ const accent: [number, number, number] = [225, 29, 47];
 const accentDark: [number, number, number] = [170, 20, 36];
 const tint: [number, number, number] = [250, 250, 252];
 const success: [number, number, number] = [16, 128, 74];
+
+/** Brand · category subtitle for an invoice line, resolved from the catalog. */
+const productMeta = (it: InvoiceItem): string | null => {
+  const p =
+    (it.id !== undefined
+      ? PRODUCTS.find((x) => String(x.id) === String(it.id))
+      : undefined) ?? PRODUCTS.find((x) => x.name === it.name);
+  return p ? `${p.brand} · ${p.category.replace(/_/g, " ")}` : null;
+};
 
 
 export function downloadInvoice(data: InvoiceData) {
