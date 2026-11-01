@@ -390,7 +390,7 @@ export function downloadReportPDF(
   }
 
   // ── TREND CHART ──────────────────────────────────────────
-  y += 100;
+  y += 108;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
   doc.setTextColor(...ink);
