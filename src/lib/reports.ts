@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { drawPulseLockup, drawPulseMark, drawQrPanel, trackingUrl } from "@/lib/pdf-logo";
 import { getProduct } from "@/data/products";
+import { statusLabel } from "@/lib/order-status";
 
 export type ReportOrder = {
   id: string;
@@ -213,7 +214,21 @@ const accentDark: [number, number, number] = [170, 20, 36];
 const tint: [number, number, number] = [250, 250, 252];
 
 
-export function downloadReportPDF(s: ReportSummary, customerName?: string) {
+export type ReportDelta = { label: string; up: boolean; good: boolean };
+
+const deltaFor = (cur: number, before?: number, goodDown = false): ReportDelta | undefined => {
+  if (before === undefined || (!before && !cur)) return undefined;
+  const d = before ? ((cur - before) / before) * 100 : 100;
+  if (!isFinite(d)) return undefined;
+  const up = d >= 0;
+  return { label: `${up ? "+" : ""}${d.toFixed(1)}%`, up, good: goodDown ? !up : up };
+};
+
+export function downloadReportPDF(
+  s: ReportSummary,
+  customerName?: string,
+  prev?: Pick<ReportSummary, "totalRevenue" | "totalOrders" | "avgOrder" | "returnCount">,
+) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
