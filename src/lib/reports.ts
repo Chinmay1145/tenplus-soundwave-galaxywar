@@ -426,6 +426,38 @@ export function downloadReportPDF(
         doc.text(d.label, bx + bw / 2, y + chartH - 6, { align: "center" });
       }
     });
+    // Orders overlay — white dots on a dark connector line, own scale
+    if (s.series.length > 1) {
+      const maxOrders = Math.max(...s.series.map((d) => d.orders), 1);
+      const pts = s.series.map((d, i) => {
+        const cx = M + 12 + i * bw + bw / 2;
+        const cy = y + chartH - 18 - (d.orders / maxOrders) * (chartH - 32);
+        return [cx, cy] as const;
+      });
+      doc.setDrawColor(70, 70, 78);
+      doc.setLineWidth(1);
+      for (let i = 1; i < pts.length; i++)
+        doc.line(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1]);
+      pts.forEach(([cx, cy]) => {
+        doc.setFillColor(255, 255, 255);
+        doc.circle(cx, cy, 2.4, "F");
+        doc.setDrawColor(...accent);
+        doc.setLineWidth(0.9);
+        doc.circle(cx, cy, 2.4, "S");
+      });
+      // mini legend
+      doc.setFillColor(...ink);
+      doc.rect(M + 4, y + 8, 8, 8, "F");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text("revenue", M + 15, y + 14);
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(...accent);
+      doc.setLineWidth(0.9);
+      doc.circle(M + 62, y + 12, 2.6, "FS");
+      doc.text("orders", M + 68, y + 14);
+    }
     // Y-axis reference (max revenue)
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
