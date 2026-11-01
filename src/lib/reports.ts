@@ -470,9 +470,46 @@ export function downloadReportPDF(
     doc.text("No orders in this period.", W / 2, y + chartH / 2, { align: "center" });
   }
 
+  // ── FULFILMENT STATUS MIX ────────────────────────────────
+  y += chartH + 26;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...ink);
+  doc.text("Fulfilment Status Mix", M, y);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(...muted);
+  doc.text(`${s.totalOrders} orders in period`, M, y + 12);
+  y += 26;
+  if (s.statusMix.length === 0) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9.5);
+    doc.setTextColor(...muted);
+    doc.text("No orders in this period.", M, y + 8);
+    y += 24;
+  } else {
+    const maxCount = Math.max(...s.statusMix.map((m) => m.count), 1);
+    const barMaxW = chartW - 220;
+    s.statusMix.forEach((m) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...sub);
+      doc.text(statusLabel(m.status).toUpperCase(), M, y + 10);
+      const bw2 = Math.max(4, (m.count / maxCount) * barMaxW);
+      doc.setFillColor(...tint);
+      doc.rect(M + 130, y, barMaxW, 14, "F");
+      doc.setFillColor(...accent);
+      doc.rect(M + 130, y, bw2, 14, "F");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...ink);
+      doc.text(`${m.count} · ${inr(m.revenue)}`, M + 136 + barMaxW, y + 10);
+      y += 20;
+    });
+  }
 
   // ── CATEGORY TABLE ───────────────────────────────────────
-  y += chartH + 28;
+  y += 18;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
   doc.setTextColor(...ink);
