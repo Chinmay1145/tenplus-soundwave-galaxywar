@@ -39,6 +39,7 @@ export type ReportSummary = {
   byCategory: { name: string; revenue: number; units: number }[];
   topProducts: { name: string; units: number; revenue: number }[];
   returnReasons: { reason: string; count: number }[];
+  statusMix: { status: string; count: number; revenue: number }[];
 };
 
 const inr = (n: number) =>
@@ -162,6 +163,24 @@ export function buildSummary(
     .map(([reason, count]) => ({ reason, count }))
     .sort((a, b) => b.count - a.count);
 
+  // Fulfilment status mix
+  const statusMap = new Map<string, { count: number; revenue: number }>();
+  inWindow.forEach((o) => {
+    const k = o.status || "confirmed";
+    const cur = statusMap.get(k) ?? { count: 0, revenue: 0 };
+    cur.count += 1;
+    cur.revenue += Number(o.total || 0);
+    statusMap.set(k, cur);
+  });
+  const flow = ["confirmed", "packed", "shipped", "out_for_delivery", "delivered", "cancelled"];
+  const statusMix = Array.from(statusMap.entries())
+    .map(([status, v]) => ({ status, ...v }))
+    .sort(
+      (a, b) =>
+        (flow.indexOf(a.status) < 0 ? 99 : flow.indexOf(a.status)) -
+        (flow.indexOf(b.status) < 0 ? 99 : flow.indexOf(b.status)),
+    );
+
   return {
     label,
     rangeLabel: `${fmt(from)} — ${fmt(to)}`,
@@ -178,6 +197,7 @@ export function buildSummary(
     byCategory,
     topProducts,
     returnReasons,
+    statusMix,
   };
 }
 
