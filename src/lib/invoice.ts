@@ -219,8 +219,9 @@ export function downloadInvoice(data: InvoiceData) {
     const unit = it.price ?? subtotal / Math.max(1, data.items.reduce((a, b) => a + b.qty, 0));
     const amt = unit * it.qty;
 
+    const meta = productMeta(it);
     const nameLines = doc.splitTextToSize(it.name, 260) as string[];
-    const rowH = Math.max(24, 14 + nameLines.length * 12);
+    const rowH = Math.max(24, 14 + nameLines.length * 12 + (meta ? 10 : 0));
 
     // Page-break guard so long orders don't crash into the footer/totals
     if (y + rowH > H - 320) {
@@ -244,6 +245,13 @@ export function downloadInvoice(data: InvoiceData) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     nameLines.forEach((ln, li) => doc.text(ln, tableX + 12, y + li * 12));
+    if (meta) {
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(8);
+      doc.setTextColor(...muted);
+      doc.text(meta, tableX + 12, y + nameLines.length * 12);
+      doc.setFont("helvetica", "normal");
+    }
     doc.setTextColor(...sub);
     doc.setFontSize(9);
     doc.text("8518", colHsn, y);
