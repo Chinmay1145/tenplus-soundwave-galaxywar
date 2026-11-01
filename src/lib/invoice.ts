@@ -274,6 +274,13 @@ export function downloadInvoice(data: InvoiceData) {
   const labelX = W - M - 200;
   const valueX = W - M;
 
+  // Bordered totals card behind the summary rows
+  const totalCardH = 4 * 16 + 22 + 26;
+  doc.setFillColor(...tint);
+  doc.roundedRect(labelX - 20, y - 12, valueX - labelX + 40, totalCardH, 8, 8, "F");
+  doc.setDrawColor(...hair);
+  doc.roundedRect(labelX - 20, y - 12, valueX - labelX + 40, totalCardH, 8, 8, "S");
+
   const row = (label: string, value: string, opts: { bold?: boolean; rule?: boolean } = {}) => {
     if (opts.rule) {
       doc.setDrawColor(...ink);
@@ -426,6 +433,11 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(7.5);
   doc.setTextColor(...accent);
   doc.text("INCLUDED WITH YOUR ORDER", M, y);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...sub);
+  const eta = new Date(created.getTime() + 5 * 86400000);
+  doc.text(`ESTIMATED DELIVERY · ${dateFmt(eta)}`, W - M, y, { align: "right" });
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   const perks = [
