@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { drawPulseLockup, drawPulseMark, drawQrPanel, trackingUrl } from "@/lib/pdf-logo";
 import { getProduct } from "@/data/products";
+import { statusLabel } from "@/lib/order-status";
 
 export type ReportOrder = {
   id: string;
@@ -39,6 +40,7 @@ export type ReportSummary = {
   byCategory: { name: string; revenue: number; units: number }[];
   topProducts: { name: string; units: number; revenue: number }[];
   returnReasons: { reason: string; count: number }[];
+  statusMix: { status: string; count: number; revenue: number }[];
 };
 
 const inr = (n: number) =>
@@ -162,6 +164,24 @@ export function buildSummary(
     .map(([reason, count]) => ({ reason, count }))
     .sort((a, b) => b.count - a.count);
 
+  // Fulfilment status mix
+  const statusMap = new Map<string, { count: number; revenue: number }>();
+  inWindow.forEach((o) => {
+    const k = o.status || "confirmed";
+    const cur = statusMap.get(k) ?? { count: 0, revenue: 0 };
+    cur.count += 1;
+    cur.revenue += Number(o.total || 0);
+    statusMap.set(k, cur);
+  });
+  const flow = ["confirmed", "packed", "shipped", "out_for_delivery", "delivered", "cancelled"];
+  const statusMix = Array.from(statusMap.entries())
+    .map(([status, v]) => ({ status, ...v }))
+    .sort(
+      (a, b) =>
+        (flow.indexOf(a.status) < 0 ? 99 : flow.indexOf(a.status)) -
+        (flow.indexOf(b.status) < 0 ? 99 : flow.indexOf(b.status)),
+    );
+
   return {
     label,
     rangeLabel: `${fmt(from)} — ${fmt(to)}`,
@@ -178,6 +198,7 @@ export function buildSummary(
     byCategory,
     topProducts,
     returnReasons,
+    statusMix,
   };
 }
 
@@ -193,7 +214,21 @@ const accentDark: [number, number, number] = [170, 20, 36];
 const tint: [number, number, number] = [250, 250, 252];
 
 
-export function downloadReportPDF(s: ReportSummary, customerName?: string) {
+export type ReportDelta = { label: string; up: boolean; good: boolean };
+
+const deltaFor = (cur: number, before?: number, goodDown = false): ReportDelta | undefined => {
+  if (before === undefined || (!before && !cur)) return undefined;
+  const d = before ? ((cur - before) / before) * 100 : 100;
+  if (!isFinite(d)) return undefined;
+  const up = d >= 0;
+  return { label: `${up ? "+" : ""}${d.toFixed(1)}%`, up, good: goodDown ? !up : up };
+};
+
+export function downloadReportPDF(
+  s: ReportSummary,
+  customerName?: string,
+  prev?: Pick<ReportSummary, "totalRevenue" | "totalOrders" | "avgOrder" | "returnCount">,
+) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
@@ -308,18 +343,20 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
   // ── KPI CARDS ────────────────────────────────────────────
   let y = esY + 12;
   const cardW = (W - 2 * M - 24) / 4;
-  const cards: [string, string, string][] = [
-    ["REVENUE", inr(s.totalRevenue), `${s.totalOrders} orders`],
-    ["AVG ORDER", inr(s.avgOrder), `${s.totalUnits} units sold`],
-    ["RETURNS", String(s.returnCount), `${s.returnRate.toFixed(1)}% rate`],
-    ["REFUND EST.", inr(s.refundEstimate), `Across ${s.returnCount} returns`],
+  const cards: [string, string, string, ReportDelta | undefined][] = [
+    ["REVENUE", inr(s.totalRevenue), `${s.totalOrders} orders`, deltaFor(s.totalRevenue, prev?.totalRevenue)],
+    ["AVG ORDER", inr(s.avgOrder), `${s.totalUnits} units sold`, deltaFor(s.avgOrder, prev?.avgOrder)],
+    ["ORDERS", String(s.totalOrders), `${inr(s.avgOrder)} each`, deltaFor(s.totalOrders, prev?.totalOrders)],
+    ["RETURNS", String(s.returnCount), `${s.returnRate.toFixed(1)}% rate`, deltaFor(s.returnCount, prev?.returnCount, true)],
   ];
-  cards.forEach(([k, v, sub2], i) => {
+  cards.forEach(([k, v, sub2, delta], i) => {
     const x = M + i * (cardW + 8);
     doc.setFillColor(...tint);
     doc.rect(x, y, cardW, 78, "F");
     doc.setDrawColor(...hair);
     doc.rect(x, y, cardW, 78, "S");
+    doc.setFillColor(...accent);
+    doc.rect(x, y, 2.5, 78, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
@@ -332,10 +369,28 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
     doc.setFontSize(8);
     doc.setTextColor(...sub);
     doc.text(sub2, x + 14, y + 64);
+    if (delta) {
+      const col: [number, number, number] = delta.good ? [16, 128, 74] : [200, 40, 40];
+      doc.setFillColor(...col);
+      const ax = x + cardW - 13;
+      const ay = y + 16;
+      if (delta.up) doc.triangle(ax, ay + 4, ax + 4, ay + 4, ax + 2, ay - 1, "F");
+      else doc.triangle(ax, ay - 1, ax + 4, ay - 1, ax + 2, ay + 4, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.5);
+      doc.setTextColor(...col);
+      doc.text(delta.label, x + cardW - 20, y + 20, { align: "right" });
+    }
   });
+  if (prev) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text("Arrows compare this period with the previous period of equal length.", M, y + 92);
+  }
 
   // ── TREND CHART ──────────────────────────────────────────
-  y += 100;
+  y += 108;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
   doc.setTextColor(...ink);
@@ -371,6 +426,38 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
         doc.text(d.label, bx + bw / 2, y + chartH - 6, { align: "center" });
       }
     });
+    // Orders overlay — white dots on a dark connector line, own scale
+    if (s.series.length > 1) {
+      const maxOrders = Math.max(...s.series.map((d) => d.orders), 1);
+      const pts = s.series.map((d, i) => {
+        const cx = M + 12 + i * bw + bw / 2;
+        const cy = y + chartH - 18 - (d.orders / maxOrders) * (chartH - 32);
+        return [cx, cy] as const;
+      });
+      doc.setDrawColor(70, 70, 78);
+      doc.setLineWidth(1);
+      for (let i = 1; i < pts.length; i++)
+        doc.line(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1]);
+      pts.forEach(([cx, cy]) => {
+        doc.setFillColor(255, 255, 255);
+        doc.circle(cx, cy, 2.4, "F");
+        doc.setDrawColor(...accent);
+        doc.setLineWidth(0.9);
+        doc.circle(cx, cy, 2.4, "S");
+      });
+      // mini legend
+      doc.setFillColor(...ink);
+      doc.rect(M + 4, y + 8, 8, 8, "F");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text("revenue", M + 15, y + 14);
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(...accent);
+      doc.setLineWidth(0.9);
+      doc.circle(M + 62, y + 12, 2.6, "FS");
+      doc.text("orders", M + 68, y + 14);
+    }
     // Y-axis reference (max revenue)
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
@@ -383,9 +470,46 @@ export function downloadReportPDF(s: ReportSummary, customerName?: string) {
     doc.text("No orders in this period.", W / 2, y + chartH / 2, { align: "center" });
   }
 
+  // ── FULFILMENT STATUS MIX ────────────────────────────────
+  y += chartH + 26;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...ink);
+  doc.text("Fulfilment Status Mix", M, y);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(...muted);
+  doc.text(`${s.totalOrders} orders in period`, M, y + 12);
+  y += 26;
+  if (s.statusMix.length === 0) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9.5);
+    doc.setTextColor(...muted);
+    doc.text("No orders in this period.", M, y + 8);
+    y += 24;
+  } else {
+    const maxCount = Math.max(...s.statusMix.map((m) => m.count), 1);
+    const barMaxW = chartW - 220;
+    s.statusMix.forEach((m) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...sub);
+      doc.text(statusLabel(m.status).toUpperCase(), M, y + 10);
+      const bw2 = Math.max(4, (m.count / maxCount) * barMaxW);
+      doc.setFillColor(...tint);
+      doc.rect(M + 130, y, barMaxW, 14, "F");
+      doc.setFillColor(...accent);
+      doc.rect(M + 130, y, bw2, 14, "F");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...ink);
+      doc.text(`${m.count} · ${inr(m.revenue)}`, M + 136 + barMaxW, y + 10);
+      y += 20;
+    });
+  }
 
   // ── CATEGORY TABLE ───────────────────────────────────────
-  y += chartH + 28;
+  y += 18;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
   doc.setTextColor(...ink);

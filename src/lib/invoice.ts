@@ -1,7 +1,8 @@
 import { jsPDF } from "jspdf";
 import { drawPulseLockup, drawPulseMark, drawQrPanel, trackingUrl } from "@/lib/pdf-logo";
+import { PRODUCTS } from "@/data/products";
 
-export type InvoiceItem = { name: string; qty: number; price?: number };
+export type InvoiceItem = { id?: string | number; name: string; qty: number; price?: number };
 export type InvoiceData = {
   id: string;
   createdAt: string | Date;
@@ -55,6 +56,15 @@ const accent: [number, number, number] = [225, 29, 47];
 const accentDark: [number, number, number] = [170, 20, 36];
 const tint: [number, number, number] = [250, 250, 252];
 const success: [number, number, number] = [16, 128, 74];
+
+/** Brand · category subtitle for an invoice line, resolved from the catalog. */
+const productMeta = (it: InvoiceItem): string | null => {
+  const p =
+    (it.id !== undefined
+      ? PRODUCTS.find((x) => String(x.id) === String(it.id))
+      : undefined) ?? PRODUCTS.find((x) => x.name === it.name);
+  return p ? `${p.brand} · ${p.category.replace(/_/g, " ")}` : null;
+};
 
 
 export function downloadInvoice(data: InvoiceData) {
@@ -209,8 +219,9 @@ export function downloadInvoice(data: InvoiceData) {
     const unit = it.price ?? subtotal / Math.max(1, data.items.reduce((a, b) => a + b.qty, 0));
     const amt = unit * it.qty;
 
+    const meta = productMeta(it);
     const nameLines = doc.splitTextToSize(it.name, 260) as string[];
-    const rowH = Math.max(24, 14 + nameLines.length * 12);
+    const rowH = Math.max(24, 14 + nameLines.length * 12 + (meta ? 10 : 0));
 
     // Page-break guard so long orders don't crash into the footer/totals
     if (y + rowH > H - 320) {
@@ -234,6 +245,13 @@ export function downloadInvoice(data: InvoiceData) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     nameLines.forEach((ln, li) => doc.text(ln, tableX + 12, y + li * 12));
+    if (meta) {
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(8);
+      doc.setTextColor(...muted);
+      doc.text(meta, tableX + 12, y + nameLines.length * 12);
+      doc.setFont("helvetica", "normal");
+    }
     doc.setTextColor(...sub);
     doc.setFontSize(9);
     doc.text("8518", colHsn, y);
@@ -255,6 +273,13 @@ export function downloadInvoice(data: InvoiceData) {
   y += 14;
   const labelX = W - M - 200;
   const valueX = W - M;
+
+  // Bordered totals card behind the summary rows
+  const totalCardH = 4 * 16 + 22 + 26;
+  doc.setFillColor(...tint);
+  doc.roundedRect(labelX - 20, y - 12, valueX - labelX + 40, totalCardH, 8, 8, "F");
+  doc.setDrawColor(...hair);
+  doc.roundedRect(labelX - 20, y - 12, valueX - labelX + 40, totalCardH, 8, 8, "S");
 
   const row = (label: string, value: string, opts: { bold?: boolean; rule?: boolean } = {}) => {
     if (opts.rule) {
@@ -408,6 +433,11 @@ export function downloadInvoice(data: InvoiceData) {
   doc.setFontSize(7.5);
   doc.setTextColor(...accent);
   doc.text("INCLUDED WITH YOUR ORDER", M, y);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...sub);
+  const eta = new Date(created.getTime() + 5 * 86400000);
+  doc.text(`ESTIMATED DELIVERY · ${dateFmt(eta)}`, W - M, y, { align: "right" });
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   const perks = [
