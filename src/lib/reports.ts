@@ -343,18 +343,20 @@ export function downloadReportPDF(
   // ── KPI CARDS ────────────────────────────────────────────
   let y = esY + 12;
   const cardW = (W - 2 * M - 24) / 4;
-  const cards: [string, string, string][] = [
-    ["REVENUE", inr(s.totalRevenue), `${s.totalOrders} orders`],
-    ["AVG ORDER", inr(s.avgOrder), `${s.totalUnits} units sold`],
-    ["RETURNS", String(s.returnCount), `${s.returnRate.toFixed(1)}% rate`],
-    ["REFUND EST.", inr(s.refundEstimate), `Across ${s.returnCount} returns`],
+  const cards: [string, string, string, ReportDelta | undefined][] = [
+    ["REVENUE", inr(s.totalRevenue), `${s.totalOrders} orders`, deltaFor(s.totalRevenue, prev?.totalRevenue)],
+    ["AVG ORDER", inr(s.avgOrder), `${s.totalUnits} units sold`, deltaFor(s.avgOrder, prev?.avgOrder)],
+    ["ORDERS", String(s.totalOrders), `${inr(s.avgOrder)} each`, deltaFor(s.totalOrders, prev?.totalOrders)],
+    ["RETURNS", String(s.returnCount), `${s.returnRate.toFixed(1)}% rate`, deltaFor(s.returnCount, prev?.returnCount, true)],
   ];
-  cards.forEach(([k, v, sub2], i) => {
+  cards.forEach(([k, v, sub2, delta], i) => {
     const x = M + i * (cardW + 8);
     doc.setFillColor(...tint);
     doc.rect(x, y, cardW, 78, "F");
     doc.setDrawColor(...hair);
     doc.rect(x, y, cardW, 78, "S");
+    doc.setFillColor(...accent);
+    doc.rect(x, y, 2.5, 78, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
@@ -367,7 +369,25 @@ export function downloadReportPDF(
     doc.setFontSize(8);
     doc.setTextColor(...sub);
     doc.text(sub2, x + 14, y + 64);
+    if (delta) {
+      const col: [number, number, number] = delta.good ? [16, 128, 74] : [200, 40, 40];
+      doc.setFillColor(...col);
+      const ax = x + cardW - 13;
+      const ay = y + 16;
+      if (delta.up) doc.triangle(ax, ay + 4, ax + 4, ay + 4, ax + 2, ay - 1, "F");
+      else doc.triangle(ax, ay - 1, ax + 4, ay - 1, ax + 2, ay + 4, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.5);
+      doc.setTextColor(...col);
+      doc.text(delta.label, x + cardW - 20, y + 20, { align: "right" });
+    }
   });
+  if (prev) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text("Arrows compare this period with the previous period of equal length.", M, y + 92);
+  }
 
   // ── TREND CHART ──────────────────────────────────────────
   y += 100;
