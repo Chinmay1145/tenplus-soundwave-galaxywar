@@ -16,16 +16,19 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Calendar, Download, FileBarChart2, RotateCcw, ShoppingBag, TrendingUp } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Calendar, Download, FileBarChart2, HelpCircle, RotateCcw, ShoppingBag, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "@/components/site/Logo";
 import { useAuth } from "@/hooks/use-auth";
 import { inr } from "@/lib/format";
+import { statusLabel } from "@/lib/order-status";
 import {
   type Granularity,
+  type ReportDelta,
   type ReportOrder,
   type ReportReturn,
   buildSummary,
+  compareDelta,
   downloadReportPDF,
 } from "@/lib/reports";
 
