@@ -130,6 +130,14 @@ function ReportsPage() {
     [orders, returns, range, gran],
   );
 
+  // Previous period of equal length, for the period-over-period delta arrows.
+  const prevSummary = useMemo(() => {
+    const span = range.to.getTime() - range.from.getTime() + 1;
+    const prevTo = new Date(range.from.getTime() - 1);
+    const prevFrom = new Date(prevTo.getTime() - span + 1);
+    return buildSummary(orders ?? [], returns ?? [], prevFrom, prevTo, gran, range.label);
+  }, [orders, returns, range, gran]);
+
   const customerName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || undefined;
 
@@ -157,7 +165,7 @@ function ReportsPage() {
             </p>
           </div>
           <button
-            onClick={() => downloadReportPDF(summary, customerName)}
+            onClick={() => downloadReportPDF(summary, customerName, prevSummary)}
             className="btn-magnetic inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/30"
           >
             <Download className="h-4 w-4" /> Download PDF
@@ -230,9 +238,9 @@ function ReportsPage() {
 
       {/* KPIs */}
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <KPI icon={TrendingUp} label="Revenue" value={inr(summary.totalRevenue)} sub={`${summary.totalOrders} orders`} spark={summary.series.map((d) => d.revenue)} />
-        <KPI icon={ShoppingBag} label="Avg Order" value={inr(summary.avgOrder)} sub={`${summary.totalUnits} units`} spark={summary.series.map((d) => d.orders)} />
-        <KPI icon={RotateCcw} label="Returns" value={String(summary.returnCount)} sub={`${summary.returnRate.toFixed(1)}% rate`} tone={summary.returnRate > 5 ? "warn" : "ok"} />
+        <KPI icon={TrendingUp} label="Revenue" value={inr(summary.totalRevenue)} sub={`${summary.totalOrders} orders`} spark={summary.series.map((d) => d.revenue)} delta={compareDelta(summary.totalRevenue, prevSummary.totalRevenue)} />
+        <KPI icon={ShoppingBag} label="Avg Order" value={inr(summary.avgOrder)} sub={`${summary.totalUnits} units`} spark={summary.series.map((d) => d.orders)} delta={compareDelta(summary.avgOrder, prevSummary.avgOrder)} />
+        <KPI icon={RotateCcw} label="Returns" value={String(summary.returnCount)} sub={`${summary.returnRate.toFixed(1)}% rate`} tone={summary.returnRate > 5 ? "warn" : "ok"} delta={compareDelta(summary.returnCount, prevSummary.returnCount, true)} />
         <KPI icon={FileBarChart2} label="Refund Est." value={inr(summary.refundEstimate)} sub="lifetime value at risk" />
       </div>
 
@@ -435,6 +443,78 @@ function ReportsPage() {
           </div>
         )}
       </Section>
+
+      {/* Fulfilment status mix */}
+      <Section title="Fulfilment status mix" subtitle={`${summary.totalOrders} orders in period`}>
+        {summary.statusMix.length === 0 ? (
+          <Empty msg="No orders in this period." />
+        ) : (
+          <div className="space-y-2.5">
+            {summary.statusMix.map((m) => {
+              const maxCount = Math.max(...summary.statusMix.map((x) => x.count), 1);
+              return (
+                <div key={m.status} className="flex items-center gap-3 sm:gap-4">
+                  <span className="mono w-28 shrink-0 truncate text-[10px] uppercase tracking-[0.12em] text-muted-foreground sm:w-40">
+                    {statusLabel(m.status)}
+                  </span>
+                  <div className="h-4 min-w-0 flex-1 overflow-hidden rounded-full bg-surface-2">
+                    <div
+                      className="h-full rounded-full bg-accent transition-all"
+                      style={{ width: `${Math.max(4, (m.count / maxCount) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="mono shrink-0 text-[11px] text-foreground">
+                    {m.count} · {inr(m.revenue)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Section>
+
+      {/* Reading guide */}
+      <div className="mt-6 rounded-3xl border border-border/60 bg-card p-6">
+        <div className="flex items-center gap-3">
+          <span className="grid h-8 w-8 place-items-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+            <HelpCircle className="h-4 w-4" />
+          </span>
+          <h2 className="font-display text-lg font-bold tracking-tight">How do I read this report?</h2>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {[
+            [
+              "Period-over-period arrows",
+              "Each arrow compares this window with the previous window of exactly the same length. Green means the move is good for the business — revenue or orders up, returns down. Red means the opposite.",
+            ],
+            [
+              "Group by",
+              "Controls how the trend chart buckets orders — by day, week, month, quarter or year. Day-by-day suits short windows; month or quarter suits year-long ones.",
+            ],
+            [
+              "Refund estimate",
+              "An approximate amount at risk: average order value multiplied by returns raised in the window. It is an estimate, not a booked loss.",
+            ],
+            [
+              "Fulfilment status mix",
+              "Where every order in the window currently sits — confirmed, packed, shipped, out for delivery, delivered or cancelled. Use it to spot shipments stuck mid-flow.",
+            ],
+            [
+              "Leading category & top product",
+              "Computed from the items recorded on each order. Anything we cannot map to the catalogue rolls up under 'other'.",
+            ],
+            [
+              "Download PDF",
+              "Exports this page to a print-ready report with an executive summary, KPI cards, trend chart, recommendations and a QR code that opens live order tracking.",
+            ],
+          ].map(([h, b]) => (
+            <div key={h} className="rounded-2xl border border-border/60 bg-surface-2 p-4">
+              <div className="mono text-[10px] uppercase tracking-[0.14em] text-accent">{h}</div>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{b}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -446,6 +526,7 @@ function KPI({
   sub,
   spark,
   tone,
+  delta,
 }: {
   icon: typeof TrendingUp;
   label: string;
@@ -453,6 +534,7 @@ function KPI({
   sub: string;
   spark?: number[];
   tone?: "ok" | "warn";
+  delta?: ReportDelta;
 }) {
   const max = spark && spark.length ? Math.max(...spark, 1) : 1;
   return (
@@ -476,6 +558,16 @@ function KPI({
       </div>
       <div className="relative mt-3 font-display text-2xl font-bold tracking-tight">{value}</div>
       <div className="relative mt-0.5 text-xs text-muted-foreground">{sub}</div>
+      {delta && (
+        <div
+          className={`relative mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+            delta.good ? "bg-emerald-500/10 text-emerald-400" : "bg-destructive/10 text-destructive"
+          }`}
+        >
+          {delta.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+          {delta.label} vs previous period
+        </div>
+      )}
       {spark && spark.length > 1 ? (
         <div className="relative mt-3 flex h-6 items-end gap-0.5">
           {spark.slice(-16).map((v, i) => (
