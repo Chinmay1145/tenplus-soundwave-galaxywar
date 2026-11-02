@@ -224,6 +224,9 @@ const deltaFor = (cur: number, before?: number, goodDown = false): ReportDelta |
   return { label: `${up ? "+" : ""}${d.toFixed(1)}%`, up, good: goodDown ? !up : up };
 };
 
+/** Shared page/PDF comparison helper: period-over-period change for a metric. */
+export const compareDelta = deltaFor;
+
 export function downloadReportPDF(
   s: ReportSummary,
   customerName?: string,
