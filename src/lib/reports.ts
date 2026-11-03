@@ -218,7 +218,8 @@ export type ReportDelta = { label: string; up: boolean; good: boolean };
 
 const deltaFor = (cur: number, before?: number, goodDown = false): ReportDelta | undefined => {
   if (before === undefined || (!before && !cur)) return undefined;
-  const d = before ? ((cur - before) / before) * 100 : 100;
+  if (!before) return { label: "NEW", up: true, good: true };
+  const d = ((cur - before) / before) * 100;
   if (!isFinite(d)) return undefined;
   const up = d >= 0;
   return { label: `${up ? "+" : ""}${d.toFixed(1)}%`, up, good: goodDown ? !up : up };
