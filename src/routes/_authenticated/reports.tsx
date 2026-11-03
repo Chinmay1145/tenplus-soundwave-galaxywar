@@ -565,7 +565,7 @@ function KPI({
           }`}
         >
           {delta.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-          {delta.label} vs previous period
+          {delta.label === "NEW" ? "new activity — previous period empty" : `${delta.label} vs previous period`}
         </div>
       )}
       {spark && spark.length > 1 ? (
