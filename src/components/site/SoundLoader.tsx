@@ -66,6 +66,14 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           <div className="sl-logo-shell relative grid h-14 w-14 place-items-center rounded-full border border-accent/45 bg-surface/60 sm:h-16 sm:w-16">
             <span aria-hidden className="sl-logo-ring absolute inset-[-7px] rounded-full border border-accent/15" />
             <span aria-hidden className="sl-logo-ring sl-logo-ring-late absolute inset-[-13px] rounded-full border border-border/70" />
+            <svg aria-hidden viewBox="0 0 100 100" className="pointer-events-none absolute inset-[-6px] h-[calc(100%+12px)] w-[calc(100%+12px)] -rotate-90">
+              <circle cx="50" cy="50" r="47" fill="none" stroke="var(--color-border)" strokeWidth="1.6" opacity="0.55" />
+              <circle
+                cx="50" cy="50" r="47" fill="none" stroke="var(--color-accent)" strokeWidth="1.8" strokeLinecap="round"
+                pathLength={100} strokeDasharray="100" strokeDashoffset={100 - pct}
+                style={{ transition: "stroke-dashoffset .5s ease-out" }}
+              />
+            </svg>
             <LogoMark size={42} animated className="relative sm:h-12 sm:w-12" />
           </div>
           <div>
@@ -76,6 +84,11 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
               AUDIO LABS
             </div>
           </div>
+        </div>
+        <div aria-hidden className="sl-eq mt-2 flex items-center gap-1">
+          {[0.9, 0.4, 1, 0.6, 0.75, 0.45, 0.85].map((h, i) => (
+            <span key={i} className="sl-eq-bar rounded-full bg-accent" style={{ animationDelay: `${i * -0.28}s`, ["--eq-h" as string]: h }} />
+          ))}
         </div>
 
         <section className="mt-14 w-full sm:mt-18" aria-label="Loading progress">
