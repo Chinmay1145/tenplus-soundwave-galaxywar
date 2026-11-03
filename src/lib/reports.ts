@@ -378,12 +378,14 @@ export function downloadReportPDF(
       doc.setFillColor(...col);
       const ax = x + cardW - 13;
       const ay = y + 16;
-      if (delta.up) doc.triangle(ax, ay + 4, ax + 4, ay + 4, ax + 2, ay - 1, "F");
-      else doc.triangle(ax, ay - 1, ax + 4, ay - 1, ax + 2, ay + 4, "F");
+      if (delta.label !== "NEW") {
+        if (delta.up) doc.triangle(ax, ay + 4, ax + 4, ay + 4, ax + 2, ay - 1, "F");
+        else doc.triangle(ax, ay - 1, ax + 4, ay - 1, ax + 2, ay + 4, "F");
+      }
       doc.setFont("helvetica", "bold");
       doc.setFontSize(6.5);
       doc.setTextColor(...col);
-      doc.text(delta.label, x + cardW - 20, y + 20, { align: "right" });
+      doc.text(delta.label, x + cardW - (delta.label === "NEW" ? 10 : 20), y + 20, { align: "right" });
     }
   });
   if (prev) {
