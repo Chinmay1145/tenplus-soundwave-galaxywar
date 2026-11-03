@@ -66,6 +66,14 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           <div className="sl-logo-shell relative grid h-14 w-14 place-items-center rounded-full border border-accent/45 bg-surface/60 sm:h-16 sm:w-16">
             <span aria-hidden className="sl-logo-ring absolute inset-[-7px] rounded-full border border-accent/15" />
             <span aria-hidden className="sl-logo-ring sl-logo-ring-late absolute inset-[-13px] rounded-full border border-border/70" />
+            <svg aria-hidden viewBox="0 0 100 100" className="pointer-events-none absolute inset-[-6px] h-[calc(100%+12px)] w-[calc(100%+12px)] -rotate-90">
+              <circle cx="50" cy="50" r="47" fill="none" stroke="var(--color-border)" strokeWidth="1.6" opacity="0.55" />
+              <circle
+                cx="50" cy="50" r="47" fill="none" stroke="var(--color-accent)" strokeWidth="1.8" strokeLinecap="round"
+                pathLength={100} strokeDasharray="100" strokeDashoffset={100 - pct}
+                style={{ transition: "stroke-dashoffset .5s ease-out" }}
+              />
+            </svg>
             <LogoMark size={42} animated className="relative sm:h-12 sm:w-12" />
           </div>
           <div>
@@ -76,6 +84,11 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
               AUDIO LABS
             </div>
           </div>
+        </div>
+        <div aria-hidden className="sl-eq mt-2 flex items-center gap-1">
+          {[0.9, 0.4, 1, 0.6, 0.75, 0.45, 0.85].map((h, i) => (
+            <span key={i} className="sl-eq-bar rounded-full bg-accent" style={{ animationDelay: `${i * -0.28}s`, ["--eq-h" as string]: h }} />
+          ))}
         </div>
 
         <section className="mt-14 w-full sm:mt-18" aria-label="Loading progress">
@@ -162,6 +175,8 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         .sl-logo-ring { animation: sl-ring 3.2s ease-out infinite; }
         .sl-logo-ring-late { animation-delay: 1.6s; }
         .sl-status, .sl-stage-live { animation: sl-status 1.5s ease-in-out infinite; }
+        .sl-eq-bar { width: 3px; height: 4px; opacity: .7; animation: sl-eq 1.05s ease-in-out infinite; }
+        @keyframes sl-eq { 0%, 100% { height: 4px; opacity: .35; } 50% { height: calc(4px + var(--eq-h, 1) * 12px); opacity: .85; } }
         .sl-act { animation: sl-act-in .5s cubic-bezier(.16,1,.3,1) both; }
         .sl-progress { box-shadow: 0 0 14px color-mix(in oklab, var(--color-accent) 65%, transparent); }
         .sl-shine { position: absolute; inset-block: 0; width: 24%; background: linear-gradient(90deg, transparent, var(--color-foreground), transparent); opacity: .55; animation: sl-shine 1.8s ease-in-out infinite; }
@@ -178,7 +193,8 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           main section { margin-top: 2rem; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .sl-ember, .sl-grain, .sl-lockup, .sl-logo-ring, .sl-status, .sl-stage-live, .sl-act, .sl-shine, .sl-skip { animation: none !important; }
+          .sl-ember, .sl-grain, .sl-lockup, .sl-logo-ring, .sl-status, .sl-stage-live, .sl-act, .sl-shine, .sl-skip, .sl-eq-bar { animation: none !important; }
+          .sl-eq-bar { height: 9px; }
         }
       `}</style>
     </div>
