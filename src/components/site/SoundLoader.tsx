@@ -175,6 +175,8 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
         .sl-logo-ring { animation: sl-ring 3.2s ease-out infinite; }
         .sl-logo-ring-late { animation-delay: 1.6s; }
         .sl-status, .sl-stage-live { animation: sl-status 1.5s ease-in-out infinite; }
+        .sl-eq-bar { width: 3px; height: 4px; opacity: .7; animation: sl-eq 1.05s ease-in-out infinite; }
+        @keyframes sl-eq { 0%, 100% { height: 4px; opacity: .35; } 50% { height: calc(4px + var(--eq-h, 1) * 12px); opacity: .85; } }
         .sl-act { animation: sl-act-in .5s cubic-bezier(.16,1,.3,1) both; }
         .sl-progress { box-shadow: 0 0 14px color-mix(in oklab, var(--color-accent) 65%, transparent); }
         .sl-shine { position: absolute; inset-block: 0; width: 24%; background: linear-gradient(90deg, transparent, var(--color-foreground), transparent); opacity: .55; animation: sl-shine 1.8s ease-in-out infinite; }
@@ -191,7 +193,8 @@ export function SoundLoader({ label, onSkip }: { label?: string; onSkip?: () => 
           main section { margin-top: 2rem; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .sl-ember, .sl-grain, .sl-lockup, .sl-logo-ring, .sl-status, .sl-stage-live, .sl-act, .sl-shine, .sl-skip { animation: none !important; }
+          .sl-ember, .sl-grain, .sl-lockup, .sl-logo-ring, .sl-status, .sl-stage-live, .sl-act, .sl-shine, .sl-skip, .sl-eq-bar { animation: none !important; }
+          .sl-eq-bar { height: 9px; }
         }
       `}</style>
     </div>
