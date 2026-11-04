@@ -1,4 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
+import { Link, useServerFn } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { subscribeNewsletter } from "@/lib/newsletter.functions";
 import {
   Github,
   Instagram,
@@ -22,6 +25,33 @@ const PROMISES = [
 ] as const;
 
 export function Footer() {
+  const subscribe = useServerFn(subscribeNewsletter);
+  const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
+
+  const onSubscribe = async (e: FormEvent) => {
+    e.preventDefault();
+    const value = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+    setSubscribing(true);
+    try {
+      const res = await subscribe({ data: { email: value } });
+      if (res.status === "already") {
+        toast.info("You're already on the list — see you at the next drop.");
+      } else {
+        toast.success("You're in! A welcome email is on its way.");
+      }
+      setEmail("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not subscribe right now");
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   return (
     <footer className="relative border-t border-border/60 bg-surface">
       {/* accent hairline */}
@@ -103,26 +133,33 @@ export function Footer() {
               </div>
               <form
                 className="group flex border-b border-border pb-2 transition-colors focus-within:border-foreground"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={onSubscribe}
               >
                 <label className="relative grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <input
                     type="email"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={subscribing}
                     placeholder="Your email for drops"
                     aria-label="Email address"
-                    className="h-10 w-full bg-transparent text-base outline-none placeholder:text-sm placeholder:text-muted-foreground"
+                    className="h-10 w-full bg-transparent text-base outline-none placeholder:text-sm placeholder:text-muted-foreground disabled:opacity-60"
                   />
                 </label>
                 <button
                   type="submit"
                   aria-label="Subscribe"
-                  className="px-2 text-foreground transition-transform hover:translate-x-1"
+                  disabled={subscribing}
+                  className="px-2 text-foreground transition-transform hover:translate-x-1 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <ArrowRight className="h-5 w-5" />
                 </button>
               </form>
+              <p className="mono mt-2 text-[10px] text-muted-foreground">
+                Drops, launches & member pricing. Unsubscribe anytime.
+              </p>
             </div>
 
             {/* Social */}
