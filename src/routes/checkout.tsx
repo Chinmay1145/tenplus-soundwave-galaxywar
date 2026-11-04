@@ -43,6 +43,11 @@ const addressSchema = z.object({
   phone: z
     .string()
     .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile"),
+  email: z
+    .string()
+    .trim()
+    .email("Enter a valid email — your receipt goes here")
+    .max(255, "Email is too long"),
   line1: z
     .string()
     .trim()
@@ -77,6 +82,7 @@ function Checkout() {
   const [form, setForm] = useState({
     name: "",
     phone: "",
+    email: "",
     line1: "",
     city: "",
     pincode: "",
@@ -114,7 +120,10 @@ function Checkout() {
     if (user && !form.name && user.user_metadata?.full_name) {
       setForm((f) => ({ ...f, name: user.user_metadata.full_name as string }));
     }
-  }, [user, form.name]);
+    if (user?.email && !form.email) {
+      setForm((f) => ({ ...f, email: user.email ?? "" }));
+    }
+  }, [user, form.name, form.email]);
 
   const subtotal = items.reduce((s, i) => s + i.product.price * i.qty, 0);
   const shipping = subtotal >= 999 ? 0 : 99;
@@ -308,7 +317,7 @@ function Checkout() {
                   qty: i.qty,
                   price: i.product.price,
                 })),
-                customer: { name: form.name, email: user?.email },
+                customer: { name: form.name, email: form.email || user?.email },
                 shippingAddress: form,
               })
             }
@@ -426,6 +435,12 @@ function Checkout() {
                   v={form.phone} err={errors.phone}
                   on={(v) => updateField("phone", v.replace(/\D/g, "").slice(0, 10))}
                   onBlur={() => markTouched("phone")} />
+                <div className="sm:col-span-2">
+                  <In icon={Mail} label="Email for your receipt" placeholder="you@example.com"
+                    v={form.email} err={errors.email}
+                    on={(v) => updateField("email", v)}
+                    onBlur={() => markTouched("email")} />
+                </div>
                 <div className="sm:col-span-2">
                   <In icon={MapPin} label="Street address" placeholder="Flat / House no, Street, Landmark"
                     v={form.line1} err={errors.line1}
