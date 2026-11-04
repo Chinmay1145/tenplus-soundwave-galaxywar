@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { Link, useServerFn } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { subscribeNewsletter } from "@/lib/newsletter.functions";
 import {
