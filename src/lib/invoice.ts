@@ -67,7 +67,7 @@ const productMeta = (it: InvoiceItem): string | null => {
 };
 
 
-export function downloadInvoice(data: InvoiceData) {
+export function buildInvoicePdf(data: InvoiceData) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
@@ -560,6 +560,11 @@ export function downloadInvoice(data: InvoiceData) {
     doc.text(`Page ${p} of ${pageCount}`, W - M, H - 20, { align: "right" });
   }
 
-  doc.save(`PULSE-Invoice-${shortId}.pdf`);
+  return doc;
+}
+
+export function downloadInvoice(data: InvoiceData) {
+  const shortId = data.id.slice(0, 8).toUpperCase();
+  buildInvoicePdf(data).save(`PULSE-Invoice-${shortId}.pdf`);
 }
 
