@@ -478,7 +478,7 @@ export function buildInvoicePdf(data: InvoiceData) {
 
 
   // ── TERMS & SIGNATURE ────────────────────────────────────
-  y += compactInvoice ? 4 : 46;
+  y += compactInvoice ? (data.items.length > 3 ? 4 : 40) : 46;
   if (!compactInvoice && y + 120 > H - 60) {
     doc.addPage();
     y = M + 20;
