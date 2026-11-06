@@ -67,11 +67,13 @@ const productMeta = (it: InvoiceItem): string | null => {
 };
 
 
-export function downloadInvoice(data: InvoiceData) {
+export function buildInvoicePdf(data: InvoiceData) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
   const M = 48; // page margin
+  // Orders with up to five distinct products use a denser one-page invoice.
+  const compactInvoice = data.items.length <= 5;
 
   const shortId = data.id.slice(0, 8).toUpperCase();
   const created = new Date(data.createdAt);
@@ -178,7 +180,7 @@ export function downloadInvoice(data: InvoiceData) {
   shipLines.forEach((l, i) => doc.text(l, M + colW * 2, y + 16 + i * 13));
 
   // ── ITEMS TABLE ──────────────────────────────────────────
-  y = 260;
+  y = compactInvoice ? 252 : 260;
   const tableX = M;
   const tableW = W - 2 * M;
   const colHsn = M + 280;
@@ -221,10 +223,12 @@ export function downloadInvoice(data: InvoiceData) {
 
     const meta = productMeta(it);
     const nameLines = doc.splitTextToSize(it.name, 260) as string[];
-    const rowH = Math.max(24, 14 + nameLines.length * 12 + (meta ? 10 : 0));
+    const rowH = compactInvoice
+      ? Math.max(26, 11 + nameLines.length * 11 + (meta ? 8 : 0))
+      : Math.max(24, 14 + nameLines.length * 12 + (meta ? 10 : 0));
 
     // Page-break guard so long orders don't crash into the footer/totals
-    if (y + rowH > H - 320) {
+    if (!compactInvoice && y + rowH > H - 320) {
       doc.addPage();
       y = M + 20;
       doc.setFillColor(...ink);
@@ -239,17 +243,17 @@ export function downloadInvoice(data: InvoiceData) {
 
     if (idx % 2 === 1) {
       doc.setFillColor(...tint);
-      doc.rect(tableX, y - 14, tableW, rowH, "F");
+      doc.rect(tableX, y - (compactInvoice ? 12 : 14), tableW, rowH, "F");
     }
     doc.setTextColor(...ink);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    nameLines.forEach((ln, li) => doc.text(ln, tableX + 12, y + li * 12));
+    doc.setFontSize(compactInvoice ? 9.5 : 10);
+    nameLines.forEach((ln, li) => doc.text(ln, tableX + 12, y + li * (compactInvoice ? 11 : 12)));
     if (meta) {
       doc.setFont("helvetica", "italic");
-      doc.setFontSize(8);
+      doc.setFontSize(compactInvoice ? 7.5 : 8);
       doc.setTextColor(...muted);
-      doc.text(meta, tableX + 12, y + nameLines.length * 12);
+      doc.text(meta, tableX + 12, y + nameLines.length * (compactInvoice ? 11 : 12));
       doc.setFont("helvetica", "normal");
     }
     doc.setTextColor(...sub);
@@ -315,7 +319,8 @@ export function downloadInvoice(data: InvoiceData) {
   row("Total (INR)", inr(data.total), { bold: true, rule: true });
 
   // Keep the amount-in-words band clear of the QR panel
-  y = Math.max(y, qrBottom + 12);
+  const totalsBottom = y - 12 + totalCardH;
+  y = Math.max(y, qrBottom + 12, totalsBottom + 10);
 
   // Amount in words
   doc.setFillColor(...tint);
@@ -347,33 +352,35 @@ export function downloadInvoice(data: InvoiceData) {
       "Insured courier · signature on delivery",
     ],
   ];
-  const snapW = (W - 2 * M - 16) / 3;
-  snapCells.forEach(([k, v, note], i) => {
-    const x = M + i * (snapW + 8);
-    doc.setFillColor(...tint);
-    doc.rect(x, y, snapW, 54, "F");
-    doc.setDrawColor(...hair);
-    doc.rect(x, y, snapW, 54, "S");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7);
-    doc.setTextColor(...muted);
-    doc.text(k, x + 10, y + 15);
-    doc.setFontSize(13);
-    doc.setTextColor(...ink);
-    doc.text(v, x + 10, y + 33);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(6.8);
-    doc.setTextColor(...muted);
-    (doc.splitTextToSize(note, snapW - 20) as string[])
-      .slice(0, 2)
-      .forEach((ln, li) => doc.text(ln, x + 10, y + 44 + li * 8));
-  });
-  y += 66;
+  if (!compactInvoice) {
+    const snapW = (W - 2 * M - 16) / 3;
+    snapCells.forEach(([k, v, note], i) => {
+      const x = M + i * (snapW + 8);
+      doc.setFillColor(...tint);
+      doc.rect(x, y, snapW, 54, "F");
+      doc.setDrawColor(...hair);
+      doc.rect(x, y, snapW, 54, "S");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text(k, x + 10, y + 15);
+      doc.setFontSize(13);
+      doc.setTextColor(...ink);
+      doc.text(v, x + 10, y + 33);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(6.8);
+      doc.setTextColor(...muted);
+      (doc.splitTextToSize(note, snapW - 20) as string[])
+        .slice(0, 2)
+        .forEach((ln, li) => doc.text(ln, x + 10, y + 44 + li * 8));
+    });
+    y += 66;
+  }
 
 
 
   // Page-break guard before payment summary block
-  if (y + 220 > H - 60) {
+  if (!compactInvoice && y + 220 > H - 60) {
     doc.addPage();
     y = M + 20;
   }
@@ -383,10 +390,11 @@ export function downloadInvoice(data: InvoiceData) {
     (data.paymentMethod || "").toLowerCase() !== "cod" &&
     (data.status || "confirmed").toLowerCase() !== "pending";
   doc.setFillColor(...tint);
-  doc.rect(M, y, W - 2 * M, 64, "F");
+  const paymentBlockH = compactInvoice ? 54 : 64;
+  doc.rect(M, y, W - 2 * M, paymentBlockH, "F");
 
   doc.setDrawColor(...hair);
-  doc.rect(M, y, W - 2 * M, 64, "S");
+  doc.rect(M, y, W - 2 * M, paymentBlockH, "S");
 
   const blockW = (W - 2 * M - 92) / 4;
   const blocks: [string, string][] = [
@@ -398,37 +406,37 @@ export function downloadInvoice(data: InvoiceData) {
   blocks.forEach(([k, v], i) => {
     const bx = M + i * blockW + 14;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
+    doc.setFontSize(compactInvoice ? 7 : 7.5);
     doc.setTextColor(...muted);
-    doc.text(k, bx, y + 22);
+    doc.text(k, bx, y + (compactInvoice ? 18 : 22));
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
+    doc.setFontSize(compactInvoice ? 10 : 12);
     doc.setTextColor(...ink);
-    doc.text(v, bx, y + 44);
+    doc.text(v, bx, y + (compactInvoice ? 37 : 44));
   });
 
   // PAID / COD stamp — rotated
   const stampX = W - M - 60;
-  const stampY = y + 8;
+  const stampY = y + (compactInvoice ? 6 : 8);
   const stampCol = isPaid ? success : accent;
   doc.setDrawColor(...stampCol);
   doc.setLineWidth(1.8);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
+  doc.setFontSize(compactInvoice ? 17 : 20);
   doc.setTextColor(...stampCol);
   const label = isPaid ? "PAID" : "DUE";
   // faux rotated stamp: draw double border + label
-  doc.roundedRect(stampX - 4, stampY - 4, 68, 40, 4, 4, "S");
+  doc.roundedRect(stampX - 4, stampY - 4, 68, compactInvoice ? 34 : 40, 4, 4, "S");
   doc.setLineWidth(0.6);
-  doc.roundedRect(stampX - 1, stampY - 1, 62, 34, 3, 3, "S");
-  doc.text(label, stampX + 30, stampY + 22, { align: "center" });
+  doc.roundedRect(stampX - 1, stampY - 1, 62, compactInvoice ? 28 : 34, 3, 3, "S");
+  doc.text(label, stampX + 30, stampY + (compactInvoice ? 19 : 22), { align: "center" });
 
   // Accent strip
   doc.setFillColor(...accent);
-  doc.rect(M, y + 60, W - 2 * M, 4, "F");
+  doc.rect(M, y + paymentBlockH - 4, W - 2 * M, 4, "F");
 
   // ── VALUE-ADD BENEFITS BAR ───────────────────────────────
-  y += 78;
+  y += compactInvoice ? 62 : 78;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(7.5);
   doc.setTextColor(...accent);
@@ -446,7 +454,13 @@ export function downloadInvoice(data: InvoiceData) {
     "Free doorstep replacement within the first 10 days",
     "Priority customer care - 1800-PULSE-IN, 8am to 11pm IST",
   ];
-  perks.forEach((p, i) => {
+  if (compactInvoice && data.items.length > 3) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...sub);
+    doc.text("2-year warranty  ·  30-day returns  ·  priority customer care", M, y + 15);
+    y += 25;
+  } else perks.forEach((p, i) => {
     const col = i % 2;
     const rowIdx = Math.floor(i / 2);
     const px = M + col * ((W - 2 * M) / 2);
@@ -464,43 +478,46 @@ export function downloadInvoice(data: InvoiceData) {
 
 
   // ── TERMS & SIGNATURE ────────────────────────────────────
-  y += 46;
-  if (y + 120 > H - 60) {
+  y += compactInvoice ? (data.items.length > 3 ? 4 : 40) : 46;
+  if (!compactInvoice && y + 120 > H - 60) {
     doc.addPage();
     y = M + 20;
   }
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
+  doc.setFontSize(compactInvoice ? 7.5 : 8);
   doc.setTextColor(...ink);
   doc.text("TERMS & CONDITIONS", M, y);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
+  doc.setFontSize(compactInvoice ? 7 : 8);
   doc.setTextColor(...sub);
-  const terms = [
+  const terms = compactInvoice && data.items.length > 3 ? [
+    "Returns within 30 days in original condition. Warranty covers manufacturing defects.",
+    "Prices include applicable GST. Computer-generated invoice; E. & O. E.",
+  ] : [
     "1. Returns accepted within 30 days of delivery in original, unopened condition with all accessories.",
     "2. Warranty: 2 years on all PULSE audio products against manufacturing defects (accidental damage excluded).",
     "3. Prices are inclusive of all taxes. CGST + SGST as applicable under GST Act, 2017.",
     "4. Any dispute is subject to the exclusive jurisdiction of courts in Bengaluru, Karnataka.",
     "5. This is a computer-generated invoice; a digital signature is affixed in lieu of a physical one. E. & O. E.",
   ];
-  terms.forEach((t, i) => doc.text(t, M, y + 14 + i * 11));
+  terms.forEach((t, i) => doc.text(t, M, y + (compactInvoice ? 13 + i * 10 : 14 + i * 11)));
 
   // Signature box
   const sigX = W - M - 160;
-  const sigY = y + 6;
+  const sigY = y + (compactInvoice ? 0 : 6);
   doc.setDrawColor(...hair);
   doc.setLineWidth(0.5);
-  doc.line(sigX, sigY + 44, W - M, sigY + 44);
+  doc.line(sigX, sigY + (compactInvoice ? 27 : 44), W - M, sigY + (compactInvoice ? 27 : 44));
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
+  doc.setFontSize(compactInvoice ? 6.5 : 7.5);
   doc.setTextColor(...muted);
-  doc.text("For PULSE Audio Pvt. Ltd.", sigX + 80, sigY + 56, { align: "center" });
-  doc.text("Authorised Signatory · Digitally signed", sigX + 80, sigY + 66, { align: "center" });
+  doc.text("For PULSE Audio Pvt. Ltd.", sigX + 80, sigY + (compactInvoice ? 37 : 56), { align: "center" });
+  if (!compactInvoice) doc.text("Authorised Signatory · Digitally signed", sigX + 80, sigY + 66, { align: "center" });
   doc.setFont("helvetica", "italic");
-  doc.setFontSize(14);
+  doc.setFontSize(compactInvoice ? 11 : 14);
   doc.setTextColor(...accent);
-  doc.text("PULSE", sigX + 80, sigY + 38, { align: "center" });
+  doc.text("PULSE", sigX + 80, sigY + (compactInvoice ? 24 : 38), { align: "center" });
 
   // ── FOOTER (with page numbers + watermark) ───────────────
   const pageCount = doc.getNumberOfPages();
@@ -544,6 +561,11 @@ export function downloadInvoice(data: InvoiceData) {
     doc.text(`Page ${p} of ${pageCount}`, W - M, H - 20, { align: "right" });
   }
 
-  doc.save(`PULSE-Invoice-${shortId}.pdf`);
+  return doc;
+}
+
+export function downloadInvoice(data: InvoiceData) {
+  const shortId = data.id.slice(0, 8).toUpperCase();
+  buildInvoicePdf(data).save(`PULSE-Invoice-${shortId}.pdf`);
 }
 
