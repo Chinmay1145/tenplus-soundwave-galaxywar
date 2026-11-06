@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { buildInvoicePdf, type InvoiceData } from "@/lib/invoice";
 
 describe("invoice page fit", () => {
@@ -22,7 +23,7 @@ describe("invoice page fit", () => {
         items,
       };
 
-      expect(buildInvoicePdf(invoice).getNumberOfPages()).toBe(1);
+      assert.equal(buildInvoicePdf(invoice).getNumberOfPages(), 1);
     }
   });
 });
