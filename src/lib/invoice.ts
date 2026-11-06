@@ -319,7 +319,8 @@ export function buildInvoicePdf(data: InvoiceData) {
   row("Total (INR)", inr(data.total), { bold: true, rule: true });
 
   // Keep the amount-in-words band clear of the QR panel
-  y = Math.max(y, qrBottom + 12);
+  const totalsBottom = y - 12 + totalCardH;
+  y = Math.max(y, qrBottom + 12, totalsBottom + 10);
 
   // Amount in words
   doc.setFillColor(...tint);
@@ -453,7 +454,7 @@ export function buildInvoicePdf(data: InvoiceData) {
     "Free doorstep replacement within the first 10 days",
     "Priority customer care - 1800-PULSE-IN, 8am to 11pm IST",
   ];
-  if (compactInvoice) {
+  if (compactInvoice && data.items.length > 3) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...sub);
@@ -490,7 +491,7 @@ export function buildInvoicePdf(data: InvoiceData) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(compactInvoice ? 7 : 8);
   doc.setTextColor(...sub);
-  const terms = compactInvoice ? [
+  const terms = compactInvoice && data.items.length > 3 ? [
     "Returns within 30 days in original condition. Warranty covers manufacturing defects.",
     "Prices include applicable GST. Computer-generated invoice; E. & O. E.",
   ] : [
